@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.18)
 cmake_policy(SET CMP0048 NEW)
-set(CMAKE_VERBOSE_MAKEFILE ON)
 
 project(mmtdt
         VERSION 0.0.0
@@ -19,4 +18,32 @@ ExternalProject_Add(${TDTBASE}
     BUILD_IN_SOURCE ON
     INSTALL_COMMAND ""
 )
-ExternalProject_Get_Property(${TDTBASE} SOURCE_DIR)
+ExternalProject_Get_property(${TDTBASE} SOURCE_DIR)
+set(TDTBASESRC ${SOURCE_DIR})
+
+set(TRAVELTIME traveltime2d)
+ExternalProject_Add(${TRAVELTIME}
+    GIT_REPOSITORY git@github.com:rhyshawkins/traveltime2d.git
+    GIT_SHALLOW ON
+    GIT_SUBMODULES ""
+    UPDATE_COMMAND ""
+    CONFIGURE_COMMAND ""
+    BUILD_IN_SOURCE ON
+    INSTALL_COMMAND ""
+    DEPENDS ${TDTBASE}
+)
+ExternalProject_Get_property(${TRAVELTIME} SOURCE_DIR)
+set(TRAVELTIMESRC ${SOURCE_DIR}/..)
+
+set(TDTWAVETOMO wavetomo)
+ExternalProject_Add(${TDTWAVETOMO}
+    GIT_REPOSITORY git@github.com:rhyshawkins/TDTWavetomo2D.git
+    GIT_SHALLOW ON
+    GIT_SUBMODULES ""
+    UPDATE_COMMAND ""
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND make TDTBASE=${TDTBASESRC} TRAVELTIMEBASE=${TRAVELTIMESRC} CXX=${CMAKE_CXX_COMPILER}
+    BUILD_IN_SOURCE ON
+    INSTALL_COMMAND ""
+    DEPENDS ${TRAVELTIME}
+)
