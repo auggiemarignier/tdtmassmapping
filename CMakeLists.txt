@@ -47,3 +47,8 @@ ExternalProject_Add(${TDTWAVETOMO}
     INSTALL_COMMAND ""
     DEPENDS ${TRAVELTIME}
 )
+
+include_directories(include)
+set(SOURCES src/massmapping.cpp)
+
+add_executable(mmtdt ${SOURCES})
