@@ -52,3 +52,6 @@ include_directories(include)
 set(SOURCES src/massmapping.cpp)
 
 add_executable(mmtdt ${SOURCES})
+
+find_package(GSL REQUIRED)
+target_link_libraries(mmtdt GSL::gsl)
