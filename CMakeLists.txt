@@ -14,6 +14,12 @@ include(dependencies)
 set(SOURCES src/massmapping.cpp)
 
 add_executable(mmtdt ${SOURCES})
+set_property(TARGET mmtdt PROPERTY CXX_STANDARD 11)
+add_dependencies(mmtdt ${TDTWAVETOMO})
 
 find_package(GSL REQUIRED)
 target_link_libraries(mmtdt GSL::gsl)
+
+include_directories(include ${TDTWAVETOMO_INCLUDE}
+                            ${TDTBASE_INCLUDE}
+                            ${TRAVELTIME_INCLUDE})

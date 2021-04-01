@@ -1,6 +1,10 @@
 #include <iostream>
 #include <gsl/gsl_rng.h>
 
+#include <birthslice.hpp>
+#include <deathslice.hpp>
+#include <valueslice.hpp>
+
 int main()
 {
     // setup random number generator

@@ -11,3 +11,4 @@ ExternalProject_Add(${TRAVELTIME}
 )
 ExternalProject_Get_property(${TRAVELTIME} SOURCE_DIR)
 set(TRAVELTIME_SRC ${SOURCE_DIR}/..)
+set(TRAVELTIME_INCLUDE ${SOURCE_DIR})

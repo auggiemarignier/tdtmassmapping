@@ -12,4 +12,3 @@ ExternalProject_Add(${TDTWAVETOMO}
 )
 ExternalProject_Get_Property(${TDTWAVETOMO} SOURCE_DIR)
 set(TDTWAVETOMO_INCLUDE ${SOURCE_DIR})
-message(${TDTWAVETOMO_INCLUDE})

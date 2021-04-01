@@ -10,3 +10,12 @@ ExternalProject_Add(${TDTBASE}
 )
 ExternalProject_Get_property(${TDTBASE} SOURCE_DIR)
 set(TDTBASE_SRC ${SOURCE_DIR})
+list(APPEND TDTBASE_INCLUDE
+    ${TDTBASE_SRC}/hnk
+    ${TDTBASE_SRC}/log
+    ${TDTBASE_SRC}/oset
+    ${TDTBASE_SRC}/sphericalwavelet
+    ${TDTBASE_SRC}/tracking
+    ${TDTBASE_SRC}/wavelet
+    ${TDTBASE_SRC}/wavetree
+    )
