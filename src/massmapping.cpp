@@ -1,9 +1,7 @@
 #include <iostream>
 #include <gsl/gsl_rng.h>
 
-#include <birthslice.hpp>
-#include <deathslice.hpp>
-#include <valueslice.hpp>
+#include "proposals.hpp"
 
 int main()
 {
@@ -21,5 +19,8 @@ int main()
         double u = gsl_rng_uniform(r);
         std::cout << "i=" << i << "\t u=" << u << "\n";
     }
-        return 0;
+
+    GlobalSliceMM global;
+
+    return 0;
 }
