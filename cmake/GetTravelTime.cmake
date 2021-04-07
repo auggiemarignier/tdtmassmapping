@@ -12,3 +12,6 @@ ExternalProject_Add(${TRAVELTIME}
 ExternalProject_Get_property(${TRAVELTIME} SOURCE_DIR)
 set(TRAVELTIME_SRC ${SOURCE_DIR}/..)
 set(TRAVELTIME_INCLUDE ${SOURCE_DIR})
+
+set(TRAVELTIME_LIB ${SOURCE_DIR}/libtraveltime2d.a)
+set(TRAVELTIMEEXCEPTION ${SOURCE_DIR}/traveltimeexception.o)

@@ -19,3 +19,13 @@ list(APPEND TDTBASE_INCLUDE
     ${TDTBASE_SRC}/wavelet
     ${TDTBASE_SRC}/wavetree
     )
+list(APPEND TDTBASE_LIBS
+    ${TDTBASE_SRC}/hnk/libhnk.a
+    ${TDTBASE_SRC}/log/liblog.a
+    ${TDTBASE_SRC}/oset/liboset.a
+    ${TDTBASE_SRC}/sphericalwavelet/libsphericalwavelet.a
+    ${TDTBASE_SRC}/tracking/libtracking.a
+    ${TDTBASE_SRC}/wavelet/libwavelet.a
+    ${TDTBASE_SRC}/wavetree/libwavetree.a
+
+)
