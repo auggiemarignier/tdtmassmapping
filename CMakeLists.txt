@@ -21,7 +21,7 @@ include(dependencies)
 set(SOURCES src/mmobservations.cpp
             src/proposals.cpp)
 
-add_library(${PROJECT_LIB} SHARED ${SOURCES}                     
+add_library(${PROJECT_LIB} STATIC ${SOURCES}                     
                             $<TARGET_OBJECTS:${TDTWAVETOMO_LIB}>
                             ${TRAVELTIMEEXCEPTION})
 set_target_properties(${PROJECT_LIB} PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
@@ -45,6 +45,7 @@ if(tests)
                         GIT_REPOSITORY git@github.com:google/googletest.git
                         GIT_TAG master)
     FetchContent_MakeAvailable(googletest)
+    add_subdirectory(tests)
 endif()
 
 add_executable(${PROJECT_NAME} src/massmapping.cpp)
