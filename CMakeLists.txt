@@ -25,7 +25,11 @@ add_dependencies(mmtdt ${TDTWAVETOMO})
 
 find_package(GSL REQUIRED)
 find_package(GMP REQUIRED)
-target_link_libraries(mmtdt GSL::gsl ${GMP_LIBRARY} ${TRAVELTIME_LIB} ${TDTBASE_LIBS})
+target_link_libraries(mmtdt
+                    GSL::gsl
+                    ${GMP_LIBRARY}
+                    ${TRAVELTIME_SRC}/libtraveltime2d.a
+                    ${TDTBASE_LIBS})
 
 include_directories(include ${TDTWAVETOMO_INCLUDE}
                             ${TDTBASE_INCLUDE}

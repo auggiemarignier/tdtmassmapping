@@ -10,8 +10,9 @@ ExternalProject_Add(${TRAVELTIME}
     DEPENDS ${TDTBASE}
 )
 ExternalProject_Get_property(${TRAVELTIME} SOURCE_DIR)
-set(TRAVELTIME_SRC ${SOURCE_DIR}/..)
+set(TRAVELTIME_SRC ${SOURCE_DIR})
 set(TRAVELTIME_INCLUDE ${SOURCE_DIR})
 
-set(TRAVELTIME_LIB ${SOURCE_DIR}/libtraveltime2d.a)
-set(TRAVELTIMEEXCEPTION ${SOURCE_DIR}/traveltimeexception.o)
+add_library(TRAVELTIME_LIB OBJECT IMPORTED GLOBAL)
+set_property(TARGET TRAVELTIME_LIB PROPERTY IMPORTED_OBJECTS
+            ${SOURCE_DIR}/traveltimeexception.o)
