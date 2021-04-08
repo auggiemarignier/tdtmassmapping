@@ -5,7 +5,11 @@ project(mmtdt
         VERSION 0.0.0
         DESCRIPTION "Mass mapping with transdimensional trees"
         LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(PROJECT_LIB lib${PROJECT_NAME})
 
+set(CMAKE_VERBOSE_MAKEFILE OFF)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 option(tests "Enable testing" on)
@@ -14,22 +18,22 @@ include(ExternalProject)
 include(FetchContent)
 include(dependencies)
 
-set(SOURCES src/massmapping.cpp
+set(SOURCES src/mmobservations.cpp
             src/proposals.cpp)
 
-add_executable(mmtdt ${SOURCES}
-                     $<TARGET_OBJECTS:${TDTWAVETOMO_LIB}>
-                     ${TRAVELTIMEEXCEPTION})
-set_property(TARGET mmtdt PROPERTY CXX_STANDARD 11)
-add_dependencies(mmtdt ${TDTWAVETOMO})
+add_library(${PROJECT_LIB} SHARED ${SOURCES}                     
+                            $<TARGET_OBJECTS:${TDTWAVETOMO_LIB}>
+                            ${TRAVELTIMEEXCEPTION})
+set_target_properties(${PROJECT_LIB} PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
+add_dependencies(${PROJECT_LIB} ${TDTWAVETOMO})
 
 find_package(GSL REQUIRED)
 find_package(GMP REQUIRED)
-target_link_libraries(mmtdt
-                    GSL::gsl
-                    ${GMP_LIBRARY}
-                    ${TRAVELTIME_SRC}/libtraveltime2d.a
-                    ${TDTBASE_LIBS})
+target_link_libraries(${PROJECT_LIB}
+                        GSL::gsl
+                        ${GMP_LIBRARY}
+                        ${TRAVELTIME_SRC}/libtraveltime2d.a
+                        ${TDTBASE_LIBS})
 
 include_directories(include ${TDTWAVETOMO_INCLUDE}
                             ${TDTBASE_INCLUDE}
@@ -42,3 +46,6 @@ if(tests)
                         GIT_TAG master)
     FetchContent_MakeAvailable(googletest)
 endif()
+
+add_executable(${PROJECT_NAME} src/massmapping.cpp)
+target_link_libraries(${PROJECT_NAME} ${PROJECT_LIB})
