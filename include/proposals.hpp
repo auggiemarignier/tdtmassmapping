@@ -12,4 +12,6 @@ public:
 
 private:
     int width;
+
+    void readdatafile(const char *filename);
 };

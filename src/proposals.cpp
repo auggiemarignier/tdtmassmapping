@@ -25,13 +25,19 @@ GlobalSliceMM::GlobalSliceMM(const char *filename) : GlobalSlice(NULL,
 {
     cout << "in GlobalSliceMM Constructor\n";
     cout << "width = " << width << "\n";
+    readdatafile(filename);
+}
+
+void GlobalSliceMM::readdatafile(const char *filename)
+{
     cout << "Opening file " << filename << "\n";
 
-    ifstream file (filename);
+    ifstream file(filename);
     string str;
     if (file.is_open())
     {
-        for (int i = 0; i < 256 * 256; i++){
+        for (int i = 0; i < 256 * 256; i++)
+        {
             file >> inputdata[i];
         }
     }
