@@ -20,7 +20,7 @@ int main()
         std::cout << "i=" << i << "\t u=" << u << "\n";
     }
 
-    GlobalSliceMM global;
+    GlobalSliceMM global("../../../data/Bolshoi_7_clean_256.txt");
 
     return 0;
 }
