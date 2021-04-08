@@ -1,6 +1,11 @@
 #include <iostream>
 #include <fstream>
 #include "proposals.hpp"
+
+extern "C" {
+  #include "slog.h"
+};
+
 using namespace std;
 
 GlobalSliceMM::GlobalSliceMM(const char *filename) : GlobalSlice(NULL,
@@ -23,14 +28,14 @@ GlobalSliceMM::GlobalSliceMM(const char *filename) : GlobalSlice(NULL,
                                                                  true),
                                                      width(5)
 {
-    cout << "in GlobalSliceMM Constructor\n";
-    cout << "width = " << width << "\n";
+    INFO("In GlobalSliceMM Constructor\n");
+    INFO("width = %i \n", width);
     readdatafile(filename);
 }
 
 void GlobalSliceMM::readdatafile(const char *filename)
 {
-    cout << "Opening file " << filename << "\n";
+    INFO("Opening file %s \n", filename);
 
     ifstream file(filename);
     string str;
@@ -43,7 +48,7 @@ void GlobalSliceMM::readdatafile(const char *filename)
     }
     else
     {
-        cout << "File not opened";
+        INFO("File not opened");
     }
     file.close();
 }
