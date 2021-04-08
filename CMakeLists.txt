@@ -5,10 +5,13 @@ project(mmtdt
         VERSION 0.0.0
         DESCRIPTION "Mass mapping with transdimensional trees"
         LANGUAGES CXX)
-set(CMAKE_VERBOSE_MAKEFILE ON)
+
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
+option(tests "Enable testing" on)
+
 include(ExternalProject)
+include(FetchContent)
 include(dependencies)
 
 set(SOURCES src/massmapping.cpp
@@ -27,3 +30,11 @@ target_link_libraries(mmtdt GSL::gsl ${GMP_LIBRARY} ${TRAVELTIME_LIB} ${TDTBASE_
 include_directories(include ${TDTWAVETOMO_INCLUDE}
                             ${TDTBASE_INCLUDE}
                             ${TRAVELTIME_INCLUDE})
+
+if(tests)
+    enable_testing()
+    FetchContent_Declare(googletest
+                        GIT_REPOSITORY git@github.com:google/googletest.git
+                        GIT_TAG master)
+    FetchContent_MakeAvailable(googletest)
+endif()
