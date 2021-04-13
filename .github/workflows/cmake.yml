@@ -19,15 +19,18 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Setup environment
-        run: cmake -E make_directory ${{runner.workspace}}/build
+        run: |
+          brew install gsl
+          brew install open-mpi
+          cmake -E make_directory ${{runner.workspace}}/build
 
       - name: Configure CMake
         working-directory: ${{runner.workspace}}/build
         run: >-
           cmake $GITHUB_WORKSPACE
-          -DCMAKE_C_COMPILER=gcc
-          -DCMAKE_CXX_COMPILER=mpicxx
           -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          -DCMAKE_CXX_COMPILER=/usr/local/bin/mpicxx
+          -DCMAKE_CXX_FLAGS=-I\ /usr/local/include
 
       - name: Build
         working-directory: ${{runner.workspace}}/build
@@ -35,4 +38,4 @@ jobs:
 
       - name: Test
         working-directory: ${{runner.workspace}}/build
-        run: ctest -C $BUILD_TYPE
+        run: ctest -C $BUILD_TYPE -T test --output-on-failure

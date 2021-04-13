@@ -9,7 +9,7 @@ protected:
     GlobalSliceMM *global;
     void SetUp() override
     {
-        global = new GlobalSliceMM("../../../../data/Bolshoi_7_clean_256.txt");
+        global = new GlobalSliceMM("../../data/Bolshoi_7_clean_256.txt");
     }
 
     void TearDown() override
@@ -23,11 +23,6 @@ class MMObsTest : public ::testing::Test
 protected:
     mmobservations *observations;
 };
-
-TEST_F(GlobalTest, FileReadIn)
-{
-    ASSERT_TRUE(global->file_read);
-}
 
 TEST_F(MMObsTest, MMPredsIdentity)
 {

@@ -1,6 +1,6 @@
 set(TRAVELTIME traveltime2d)
 ExternalProject_Add(${TRAVELTIME}
-    GIT_REPOSITORY git@github.com:rhyshawkins/traveltime2d.git
+    GIT_REPOSITORY https://github.com/rhyshawkins/traveltime2d.git
     GIT_SHALLOW ON
     GIT_SUBMODULES ""
     UPDATE_COMMAND ""

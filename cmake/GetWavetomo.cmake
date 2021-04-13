@@ -1,6 +1,6 @@
 set(TDTWAVETOMO wavetomo)
 ExternalProject_Add(${TDTWAVETOMO}
-    GIT_REPOSITORY git@github.com:rhyshawkins/TDTWavetomo2D.git
+    GIT_REPOSITORY https://github.com/rhyshawkins/TDTWavetomo2D.git
     GIT_SHALLOW ON
     GIT_SUBMODULES ""
     UPDATE_COMMAND ""
