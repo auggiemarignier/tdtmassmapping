@@ -9,7 +9,7 @@ protected:
     GlobalSliceMM *global;
     void SetUp() override
     {
-        global = new GlobalSliceMM("../../../../data/Bolshoi_7_clean_256.txt");
+        global = new GlobalSliceMM("../../data/Bolshoi_7_clean_256.txt");
     }
 
     void TearDown() override
