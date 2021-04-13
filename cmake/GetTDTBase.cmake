@@ -1,6 +1,6 @@
 set(TDTBASE tdtbase)
 ExternalProject_Add(${TDTBASE}
-    GIT_REPOSITORY git@github.com:rhyshawkins/TDTbase.git
+    GIT_REPOSITORY https://github.com/rhyshawkins/TDTbase.git
     GIT_SHALLOW ON
     GIT_SUBMODULES ""
     UPDATE_COMMAND ""
