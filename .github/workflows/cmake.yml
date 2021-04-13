@@ -19,8 +19,9 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Setup environment
-        run: brew install gsl
-        run: cmake -E make_directory ${{runner.workspace}}/build
+        run: |
+          brew install gsl
+          cmake -E make_directory ${{runner.workspace}}/build
 
       - name: Configure CMake
         working-directory: ${{runner.workspace}}/build
