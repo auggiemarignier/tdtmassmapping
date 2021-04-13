@@ -24,11 +24,6 @@ protected:
     mmobservations *observations;
 };
 
-TEST_F(GlobalTest, FileReadIn)
-{
-    ASSERT_TRUE(global->file_read);
-}
-
 TEST_F(MMObsTest, MMPredsIdentity)
 {
     ASSERT_FALSE(observations->single_frequency_predictions(nullptr));

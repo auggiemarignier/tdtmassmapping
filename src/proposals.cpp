@@ -45,7 +45,6 @@ void GlobalSliceMM::readdatafile(const char *filename)
         {
             file >> inputdata[i];
         }
-        file_read = true;
     }
     else
     {
