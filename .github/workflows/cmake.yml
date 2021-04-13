@@ -21,7 +21,7 @@ jobs:
       - name: Setup environment
         run: |
           brew install gsl
-          brew install gmp
+          ls -l /usr/local/include/gmp.h
           brew install open-mpi
           cmake -E make_directory ${{runner.workspace}}/build
 
