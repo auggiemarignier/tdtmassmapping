@@ -38,4 +38,4 @@ jobs:
 
       - name: Test
         working-directory: ${{runner.workspace}}/build
-        run: ctest -C $BUILD_TYPE
+        run: ctest -C $BUILD_TYPE -T test --output-on-failure
