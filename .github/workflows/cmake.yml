@@ -29,7 +29,7 @@ jobs:
         run: >-
           cmake $GITHUB_WORKSPACE
           -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-          -DCMAKE_CXX_FLAGS=-I\ /usr/local/include\ -L\ /usr/local/lib
+          -DCMAKE_CXX_COMPILER=/usr/local/bin/mpicxx
 
       - name: Build
         working-directory: ${{runner.workspace}}/build
