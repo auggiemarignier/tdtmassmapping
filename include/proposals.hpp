@@ -3,12 +3,16 @@
 #include <deathslice.hpp>
 #include <valueslice.hpp>
 
+#include <array>
+
+using namespace std;
+
 class GlobalSliceMM : public GlobalSlice
 {
 public:
     GlobalSliceMM(const char *filename);
 
-    double inputdata[256 * 256];
+    array<double, 256 * 256> inputdata;
 
 private:
     int width;
