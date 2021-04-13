@@ -21,6 +21,7 @@ jobs:
       - name: Setup environment
         run: |
           brew install gsl
+          brew install open-mpi
           cmake -E make_directory ${{runner.workspace}}/build
 
       - name: Configure CMake
