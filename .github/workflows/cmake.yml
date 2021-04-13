@@ -21,7 +21,6 @@ jobs:
       - name: Setup environment
         run: |
           brew install gsl
-          ls -l /usr/local/include/gmp.h
           brew install open-mpi
           cmake -E make_directory ${{runner.workspace}}/build
 
@@ -31,6 +30,7 @@ jobs:
           cmake $GITHUB_WORKSPACE
           -DCMAKE_BUILD_TYPE=$BUILD_TYPE
           -DCMAKE_CXX_COMPILER=/usr/local/bin/mpicxx
+          -DCMAKE_CXX_FLAGS=-I\ /usr/local/include
 
       - name: Build
         working-directory: ${{runner.workspace}}/build
