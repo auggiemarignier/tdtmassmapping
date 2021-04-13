@@ -13,6 +13,7 @@ public:
     GlobalSliceMM(const char *filename);
 
     array<double, 256 * 256> inputdata;
+    bool file_read = false;
 
 private:
     int width;
