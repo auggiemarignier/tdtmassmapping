@@ -17,6 +17,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - uses: MarkusJx/googletest-installer@v1.1
 
       - name: Setup environment
         run: |
@@ -28,6 +29,7 @@ jobs:
         run: >-
           cmake $GITHUB_WORKSPACE
           -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          -DCMAKE_CXX_FLAGS=-I\ /usr/local/include -L\ /usr/local/lib
 
       - name: Build
         working-directory: ${{runner.workspace}}/build
