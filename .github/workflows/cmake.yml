@@ -30,6 +30,7 @@ jobs:
           cmake $GITHUB_WORKSPACE
           -DCMAKE_BUILD_TYPE=$BUILD_TYPE
           -DCMAKE_CXX_COMPILER=/usr/local/bin/mpicxx
+          -DCMAKE_CXX_FLAGS=-I\ /usr/local/include
 
       - name: Build
         working-directory: ${{runner.workspace}}/build
@@ -37,4 +38,4 @@ jobs:
 
       - name: Test
         working-directory: ${{runner.workspace}}/build
-        run: ctest -C $BUILD_TYPE
+        run: ctest -C $BUILD_TYPE -T test --output-on-failure
