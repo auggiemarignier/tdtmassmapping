@@ -41,6 +41,7 @@ include_directories(include ${TDTWAVETOMO_INCLUDE}
 
 if(tests)
     enable_testing()
+    include(CTest)
     FetchContent_Declare(googletest
                         GIT_REPOSITORY git@github.com:google/googletest.git
                         GIT_TAG master)
