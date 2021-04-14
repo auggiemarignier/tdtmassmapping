@@ -1,16 +1,13 @@
+#include <vector>
+
 #include "mmobservations.hpp"
-extern "C" {
-  #include "slog.h"
+extern "C"
+{
+#include "slog.h"
 };
 
-bool mmobservations::single_frequency_predictions(const double *model){
-    if (!model) {
-        INFO("!model");
-        return false;
-    }
-    else
-    {
-        INFO("Returning same model");
-        return true;
-    }
+std::vector<double> mmobservations::single_frequency_predictions(std::vector<double> model)
+{
+    std::vector<double> predictions = model;
+    return predictions;
 }

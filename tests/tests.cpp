@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include <vector>
 
 #include "proposals.hpp"
 #include "mmobservations.hpp"
@@ -21,15 +22,13 @@ protected:
 class MMObsTest : public ::testing::Test
 {
 protected:
-    mmobservations *observations;
+    mmobservations observations;
 };
 
 TEST_F(MMObsTest, MMPredsIdentity)
 {
-    ASSERT_FALSE(observations->single_frequency_predictions(nullptr));
-
-    const double model1 = 1.0;
-    ASSERT_TRUE(observations->single_frequency_predictions(&model1));
+    std::vector<double> model = {1, 2, 3, 4, 5};
+    ASSERT_EQ(model, observations.single_frequency_predictions(model));
 }
 
 int main(int argc, char **argv)

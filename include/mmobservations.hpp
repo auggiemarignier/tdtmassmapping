@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <vector>
 
 class mmobservations
 {
@@ -10,5 +11,5 @@ public:
                                        double *residuals_normed,
                                        double &log_normalization);
 
-    bool single_frequency_predictions(const double *model);
+    std::vector<double> single_frequency_predictions(std::vector<double> model);
 };
