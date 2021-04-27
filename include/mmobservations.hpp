@@ -6,6 +6,13 @@
 class mmobservations
 {
 public:
+    // Constructor that reads a file
+    // TODO: implement this
+    mmobservations(const char *filename);
+
+    // Constructor that takes in vectors
+    mmobservations(std::vector<double> obs, std::vector<double> sigma);
+
     double single_frequency_likelihood(
         std::vector<double> model,
         const hierarchicalmodel *hmodel,
