@@ -31,6 +31,19 @@ TEST_F(MMObsTest, MMPredsIdentity)
     ASSERT_EQ(model, observations.single_frequency_predictions(model));
 }
 
+TEST_F(MMObsTest, MMLikelihood)
+{
+    std::vector<double> model = {1, 2, 3, 4, 5};
+    independentgaussianhierarchicalmodel *hmodel;
+    hmodel->setparameter(0, 0.0);
+    double log_normalization = 0.0;
+    double residual[5];
+    double residual_norm[5];
+
+    ASSERT_EQ(0, observations.single_frequency_likelihood(
+                     model, hmodel, residual, residual_norm, log_normalization));
+}
+
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
