@@ -1,4 +1,5 @@
 #include <vector>
+#include <iostream>
 
 #include "mmobservations.hpp"
 extern "C"
@@ -20,4 +21,16 @@ double mmobservations::single_frequency_likelihood(
     double *residuals_normed,
     double &log_normalization)
 {
+    std::vector<double> predictions = single_frequency_predictions(model);
+
+    for (int i = 0; i < predictions.size(); i++){
+        residuals[i] = model[i] - predictions[i];
+    }
+    double loglikelihood = hmodel->nll(
+        residuals,
+        &sigma,
+        residuals_normed,
+        log_normalization);
+
+    return loglikelihood
 }
