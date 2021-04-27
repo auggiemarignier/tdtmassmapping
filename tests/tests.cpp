@@ -34,8 +34,9 @@ TEST_F(MMObsTest, MMPredsIdentity)
 TEST_F(MMObsTest, MMLikelihood)
 {
     std::vector<double> model = {1, 2, 3, 4, 5};
-    independentgaussianhierarchicalmodel *hmodel;
-    hmodel->setparameter(0, 0.0);
+    independentgaussianhierarchicalmodel *hmodel = nullptr;
+    hmodel = new independentgaussianhierarchicalmodel();
+    hmodel->setparameter(0, 1.0);
     double log_normalization = 0.0;
     double residual[5];
     double residual_norm[5];
