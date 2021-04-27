@@ -22,13 +22,22 @@ protected:
 class MMObsTest : public ::testing::Test
 {
 protected:
-    mmobservations observations;
+    void SetUp() override {
+        std::vector<double> obs = {1, 2, 3, 4, 5};
+        double sigma = 1.41;
+        observations = new mmobservations(obs, sigma);
+    }
+    void TearDown() override {
+        delete observations;
+    }
+
+    mmobservations *observations;
 };
 
 TEST_F(MMObsTest, MMPredsIdentity)
 {
     std::vector<double> model = {1, 2, 3, 4, 5};
-    ASSERT_EQ(model, observations.single_frequency_predictions(model));
+    ASSERT_EQ(model, observations->single_frequency_predictions(model));
 }
 
 TEST_F(MMObsTest, MMLikelihood)
@@ -41,7 +50,7 @@ TEST_F(MMObsTest, MMLikelihood)
     double residual[5];
     double residual_norm[5];
 
-    ASSERT_EQ(0, observations.single_frequency_likelihood(
+    ASSERT_EQ(0, observations->single_frequency_likelihood(
                      model, hmodel, residual, residual_norm, log_normalization));
 }
 
