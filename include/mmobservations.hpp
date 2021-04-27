@@ -26,6 +26,6 @@ public:
     std::vector<double> single_frequency_predictions(std::vector<double> model);
 
     std::vector<double> obs;
-    double sigma;
+    std::vector<double> sigma;
     size_t n_obs;
 };

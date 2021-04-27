@@ -9,9 +9,20 @@ extern "C"
 
 mmobservations::mmobservations(
     std::vector<double> _obs,
+    std::vector<double> _sigma) : obs(_obs),
+                                  sigma(_sigma),
+                                  n_obs(_obs.size()) {}
+
+mmobservations::mmobservations(
+    std::vector<double> _obs,
     double _sigma) : obs(_obs),
-                     sigma(_sigma),
-                     n_obs(_obs.size()) {}
+                     n_obs(_obs.size())
+{
+    for (int i = 0; i < n_obs; i++)
+    {
+        sigma[i] = _sigma;
+    }
+}
 
 std::vector<double> mmobservations::single_frequency_predictions(
     std::vector<double> model)
@@ -35,7 +46,7 @@ double mmobservations::single_frequency_likelihood(
     }
     double loglikelihood = hmodel->nll(
         residuals,
-        &sigma,
+        &sigma[0],
         n_obs,
         residuals_normed,
         log_normalization);
