@@ -28,7 +28,7 @@ GlobalSliceMM::GlobalSliceMM(
                   1.0,
                   true,
                   4,
-                  true),
+                  true)
 {
     INFO("In GlobalSliceMM Constructor\n");
     readdatafile(filename);
