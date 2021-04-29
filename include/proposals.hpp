@@ -13,6 +13,7 @@ public:
     GlobalSliceMM(const char *filename);
 
     array<double, 256 * 256> inputdata;
+    double sigma;
 
 private:
     void readdatafile(const char *filename);
