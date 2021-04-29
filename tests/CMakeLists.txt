@@ -1,9 +1,12 @@
 cmake_minimum_required(VERSION 3.18)
 
-set(SOURCES test_proposals.cpp
-            test_mmobservations.cpp)
+set(LIBS gtest_main ${PROJECT_LIB})
 
-add_executable(tests ${SOURCES})
-target_link_libraries(tests PUBLIC gtest_main ${PROJECT_LIB})
+add_executable(test_proposals test_proposals.cpp)
+add_executable(test_mmobservations test_mmobservations.cpp)
 
-add_test(NAME tests COMMAND tests)
+target_link_libraries(test_proposals PUBLIC ${LIBS})
+target_link_libraries(test_mmobservations PUBLIC ${LIBS})
+
+add_test(NAME test_proposals COMMAND test_proposals)
+add_test(NAME test_mmobservations COMMAND test_mmobservations)
