@@ -15,7 +15,5 @@ public:
     array<double, 256 * 256> inputdata;
 
 private:
-    int width;
-
     void readdatafile(const char *filename);
 };

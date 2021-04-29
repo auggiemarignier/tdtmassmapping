@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include <vector>
 
 #include "proposals.hpp"
 #include "mmobservations.hpp"
@@ -21,15 +22,36 @@ protected:
 class MMObsTest : public ::testing::Test
 {
 protected:
+    void SetUp() override {
+        std::vector<double> obs = {1, 2, 3, 4, 5};
+        double sigma = 1.41;
+        observations = new mmobservations(obs, sigma);
+    }
+    void TearDown() override {
+        delete observations;
+    }
+
     mmobservations *observations;
 };
 
 TEST_F(MMObsTest, MMPredsIdentity)
 {
-    ASSERT_FALSE(observations->single_frequency_predictions(nullptr));
+    std::vector<double> model = {1, 2, 3, 4, 5};
+    ASSERT_EQ(model, observations->single_frequency_predictions(model));
+}
 
-    const double model1 = 1.0;
-    ASSERT_TRUE(observations->single_frequency_predictions(&model1));
+TEST_F(MMObsTest, MMLikelihood)
+{
+    std::vector<double> model = {1, 2, 3, 4, 5};
+    independentgaussianhierarchicalmodel *hmodel = nullptr;
+    hmodel = new independentgaussianhierarchicalmodel();
+    hmodel->setparameter(0, 1.0);
+    double log_normalization = 0.0;
+    double residual[5];
+    double residual_norm[5];
+
+    ASSERT_EQ(0, observations->single_frequency_likelihood(
+                     model, hmodel, residual, residual_norm, log_normalization));
 }
 
 int main(int argc, char **argv)
