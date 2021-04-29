@@ -19,6 +19,11 @@ protected:
     }
 };
 
+TEST_F(GlobalTest, GlobalSetup)
+{
+    ASSERT_FLOAT_EQ(global->sigma, 0.034364982263599415);
+}
+
 class MMObsTest : public ::testing::Test
 {
 protected:
