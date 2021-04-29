@@ -42,14 +42,13 @@ void GlobalSliceMM::readdatafile(const char *filename)
 
     ifstream file(filename);
     double element;
-    int i = 0;
-    string str;
     if (file.is_open())
     {
         while (file >> element)
         {
             inputdata.push_back(element);
-            i++;
+            mean += element;
+            n_obs++;
         }
         mean /= n_obs;
         for (int i = 0; i < n_obs; i++)
