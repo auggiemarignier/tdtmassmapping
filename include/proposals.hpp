@@ -13,8 +13,11 @@ public:
     GlobalSliceMM(const char *filename);
 
     array<double, 256 * 256> inputdata;
-    double sigma;
+    double mean;
+    double var;
+    double stddev;
 
 private:
     void readdatafile(const char *filename);
+    int n_obs;
 };
