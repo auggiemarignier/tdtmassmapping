@@ -6,10 +6,6 @@
 class mmobservations
 {
 public:
-    // Constructor that reads a file
-    // TODO: implement this
-    mmobservations(const char *filename);
-
     // Constructor that takes in vectors
     mmobservations(std::vector<double> _obs, std::vector<double> _sigma);
 
