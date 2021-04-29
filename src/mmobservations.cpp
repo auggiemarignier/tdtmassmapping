@@ -20,7 +20,7 @@ mmobservations::mmobservations(
 {
     for (int i = 0; i < n_obs; i++)
     {
-        sigma[i] = _sigma;
+        sigma.push_back(_sigma);
     }
 }
 
