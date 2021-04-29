@@ -32,6 +32,8 @@ GlobalSliceMM::GlobalSliceMM(
 {
     INFO("In GlobalSliceMM Constructor\n");
     readdatafile(filename);
+    
+    observations = new mmobservations(inputdata, stddev);
 }
 
 void GlobalSliceMM::readdatafile(const char *filename)
@@ -39,14 +41,15 @@ void GlobalSliceMM::readdatafile(const char *filename)
     INFO("Opening file %s \n", filename);
 
     ifstream file(filename);
-    n_obs = 256 * 256;
+    double element;
+    int i = 0;
     string str;
     if (file.is_open())
     {
-        for (int i = 0; i < n_obs; i++)
+        while (file >> element)
         {
-            file >> inputdata[i];
-            mean += inputdata[i];
+            inputdata.push_back(element);
+            i++;
         }
         mean /= n_obs;
         for (int i = 0; i < n_obs; i++)

@@ -3,7 +3,9 @@
 #include <deathslice.hpp>
 #include <valueslice.hpp>
 
-#include <array>
+#include <vector>
+
+#include "mmobservations.hpp"
 
 using namespace std;
 
@@ -12,7 +14,8 @@ class GlobalSliceMM : public GlobalSlice
 public:
     GlobalSliceMM(const char *filename);
 
-    array<double, 256 * 256> inputdata;
+    std::vector<double> inputdata;
+    mmobservations *observations;
     double mean;
     double var;
     double stddev;
