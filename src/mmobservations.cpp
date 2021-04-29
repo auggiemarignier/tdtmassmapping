@@ -9,14 +9,16 @@ extern "C"
 
 mmobservations::mmobservations(
     std::vector<double> _obs,
-    std::vector<double> _sigma) : obs(_obs),
-                                  sigma(_sigma),
-                                  n_obs(_obs.size()) {}
+    std::vector<double> _sigma)
+    : obs(_obs),
+      sigma(_sigma),
+      n_obs(_obs.size()) {}
 
 mmobservations::mmobservations(
     std::vector<double> _obs,
-    double _sigma) : obs(_obs),
-                     n_obs(_obs.size())
+    double _sigma)
+    : obs(_obs),
+      n_obs(_obs.size())
 {
     for (int i = 0; i < n_obs; i++)
     {

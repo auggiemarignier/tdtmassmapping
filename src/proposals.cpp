@@ -2,34 +2,35 @@
 #include <fstream>
 #include "proposals.hpp"
 
-extern "C" {
-  #include "slog.h"
+extern "C"
+{
+#include "slog.h"
 };
 
 using namespace std;
 
-GlobalSliceMM::GlobalSliceMM(const char *filename) : GlobalSlice(NULL,
-                                                                 NULL,
-                                                                 nullptr,
-                                                                 3,
-                                                                 3,
-                                                                 3,
-                                                                 0,
-                                                                 0,
-                                                                 -10.0,
-                                                                 10.0,
-                                                                 -10.0,
-                                                                 10.0,
-                                                                 1,
-                                                                 5,
-                                                                 1.0,
-                                                                 true,
-                                                                 4,
-                                                                 true),
-                                                     width(5)
+GlobalSliceMM::GlobalSliceMM(
+    const char *filename)
+    : GlobalSlice(NULL,
+                  NULL,
+                  nullptr,
+                  3,
+                  3,
+                  3,
+                  0,
+                  0,
+                  -10.0,
+                  10.0,
+                  -10.0,
+                  10.0,
+                  1,
+                  5,
+                  1.0,
+                  true,
+                  4,
+                  true),
 {
     INFO("In GlobalSliceMM Constructor\n");
-    INFO("width = %i \n", width);
     readdatafile(filename);
 }
 
