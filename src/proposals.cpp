@@ -62,6 +62,16 @@ GlobalSliceMM::GlobalSliceMM(
 GlobalSliceMM::~GlobalSliceMM()
 {
     delete observations;
+
+    delete model;
+    delete workspace;
+    delete residual;
+    delete mean_residual;
+    delete last_valid_residual;
+    delete residual_normed;
+    delete mean_residual_normed;
+    delete last_valid_residual_normed;
+    delete residual_hist;
 }
 
 void GlobalSliceMM::readdatafile(const char *filename)
