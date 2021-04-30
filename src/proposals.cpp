@@ -30,7 +30,6 @@ GlobalSliceMM::GlobalSliceMM(
                   4,
                   true)
 {
-    INFO("In GlobalSliceMM Constructor\n");
     readdatafile(filename);
     
     observations = new mmobservations(inputdata, stddev);
