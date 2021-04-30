@@ -41,6 +41,11 @@ GlobalSliceMM::GlobalSliceMM(
     observations = new mmobservations(inputdata, stddev);
 }
 
+GlobalSliceMM::~GlobalSliceMM()
+{
+    delete observations;
+}
+
 void GlobalSliceMM::readdatafile(const char *filename)
 {
     INFO("Opening file %s \n", filename);

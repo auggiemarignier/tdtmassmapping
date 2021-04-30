@@ -19,6 +19,7 @@ public:
                   int seed,
                   int kmax,
                   int waveletxy);
+    ~GlobalSliceMM();
 
     std::vector<double> inputdata;
     mmobservations *observations;
