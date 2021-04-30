@@ -10,28 +10,34 @@ extern "C"
 using namespace std;
 
 GlobalSliceMM::GlobalSliceMM(
-    const char *filename)
+    const char *filename,
+    const char *prior_file,
+    int degreex,
+    int degreey,
+    int seed,
+    int kmax,
+    int waveletxy)
     : GlobalSlice(NULL,
                   NULL,
-                  nullptr,
-                  3,
-                  3,
-                  3,
-                  0,
-                  0,
-                  -10.0,
-                  10.0,
-                  -10.0,
-                  10.0,
-                  1,
-                  5,
+                  prior_file,
+                  degreex,
+                  degreey,
+                  NULL,
+                  NULL,
+                  NULL,
+                  NULL,
+                  NULL,
+                  NULL,
+                  NULL,
+                  seed,
+                  kmax,
                   1.0,
                   true,
-                  4,
+                  waveletxy,
                   true)
 {
     readdatafile(filename);
-    
+
     observations = new mmobservations(inputdata, stddev);
 }
 

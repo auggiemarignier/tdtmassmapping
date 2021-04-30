@@ -11,7 +11,13 @@ int main()
 {
     int total = 10;
 
-    GlobalSliceMM global("../../../data/Bolshoi_7_clean_256.txt");
+    GlobalSliceMM global("../../../data/Bolshoi_7_clean_256.txt",
+                         "/Users/auggiemarignier/Documents/PhD/TDT/massmapping/data/tutorial_prior.txt",
+                         8,
+                         8,
+                         1,
+                         100,
+                         4);
     BirthSlice birth(global);
     DeathSlice death(global);
     ValueSlice value(global);
