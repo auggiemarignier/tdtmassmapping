@@ -52,6 +52,11 @@ TEST_F(MMObsTest, MMLikelihood)
 
     ASSERT_EQ(0, observations->single_frequency_likelihood(
                      model, hmodel, residual, residual_norm, log_normalization));
+
+    std::vector<double> model2 = {0, 2, 3, 4, 5};
+    ASSERT_NE(0, observations->single_frequency_likelihood(
+                     model2, hmodel, residual, residual_norm, log_normalization));
+
 }
 
 int main(int argc, char **argv)
