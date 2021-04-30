@@ -2,6 +2,7 @@
 #include <fstream>
 #include "proposals.hpp"
 
+#include "wavetomo2dexception.hpp"
 extern "C"
 {
 #include "slog.h"
@@ -70,7 +71,7 @@ void GlobalSliceMM::readdatafile(const char *filename)
     }
     else
     {
-        INFO("File not opened");
+        throw WAVETOMO2DEXCEPTION("File not opened %s", filename);
     }
     file.close();
 }
