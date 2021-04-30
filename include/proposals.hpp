@@ -21,6 +21,8 @@ public:
                   int waveletxy);
     ~GlobalSliceMM();
 
+    double likelihood(double &log_normalization);
+    
     std::vector<double> inputdata;
     mmobservations *observations;
     double mean;

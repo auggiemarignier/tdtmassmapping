@@ -8,7 +8,7 @@ extern "C"
 #include "slog.h"
 };
 
-using namespace std;
+static constexpr int SUBTILE = 1;
 
 GlobalSliceMM::GlobalSliceMM(
     const char *filename,
@@ -18,24 +18,25 @@ GlobalSliceMM::GlobalSliceMM(
     int seed,
     int kmax,
     int waveletxy)
-    : GlobalSlice(NULL,
-                  NULL,
-                  prior_file,
-                  degreex,
-                  degreey,
-                  NULL,
-                  NULL,
-                  NULL,
-                  NULL,
-                  NULL,
-                  NULL,
-                  NULL,
-                  seed,
-                  kmax,
-                  1.0,
-                  true,
-                  waveletxy,
-                  true)
+    : GlobalSlice(
+          NULL,
+          NULL,
+          prior_file,
+          degreex,
+          degreey,
+          NULL,
+          NULL,
+          NULL,
+          NULL,
+          NULL,
+          NULL,
+          NULL,
+          seed,
+          kmax,
+          1.0,
+          true,
+          waveletxy,
+          true)
 {
     readdatafile(filename);
 
@@ -74,4 +75,41 @@ void GlobalSliceMM::readdatafile(const char *filename)
         throw WAVETOMO2DEXCEPTION("File not opened %s", filename);
     }
     file.close();
+}
+
+double
+GlobalSliceMM::likelihood(double &log_normalization)
+{
+    //
+    // Get tree model wavelet coefficients
+    //
+    memset(model, 0, sizeof(double) * size);
+    if (wavetree2d_sub_map_to_array(wt, model, size) < 0)
+    {
+        throw WAVETOMO2DEXCEPTION("Failed to map model to array\n");
+    }
+
+    //
+    // Inverse wavelet transform
+    //
+    if (generic_lift_inverse2d(
+            model,
+            width,
+            height,
+            width,
+            workspace,
+            xywaveletf,
+            xywaveletf,
+            SUBTILE) < 0)
+    {
+        throw WAVETOMO2DEXCEPTION("Failed to do inverse transform on coefficients\n");
+    }
+
+    log_normalization = 0.0;
+    return observations->single_frequency_likelihood(
+        model,
+        hierarchical,
+        residual,
+        residual_normed,
+        log_normalization);
 }
