@@ -19,10 +19,18 @@ public:
                   int seed,
                   int kmax,
                   int waveletxy);
+    GlobalSliceMM(std::vector<double> _obs,
+                  std::vector<double> _sigma,
+                  const char *prior_file,
+                  int degreex,
+                  int degreey,
+                  int seed,
+                  int kmax,
+                  int waveletxy);
     ~GlobalSliceMM();
 
     double likelihood(double &log_normalization);
-    
+
     std::vector<double> inputdata;
     mmobservations *observations;
     double mean;

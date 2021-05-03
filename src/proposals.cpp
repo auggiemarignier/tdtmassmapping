@@ -59,6 +59,53 @@ GlobalSliceMM::GlobalSliceMM(
     residual_hist = new int[residual_size * residual_hist_bins];
 }
 
+GlobalSliceMM::GlobalSliceMM(
+    std::vector<double> _obs,
+    std::vector<double> _sigma,
+    const char *prior_file,
+    int degreex,
+    int degreey,
+    int seed,
+    int kmax,
+    int waveletxy)
+    : GlobalSlice(
+          NULL,
+          NULL,
+          prior_file,
+          degreex,
+          degreey,
+          NULL,
+          NULL,
+          NULL,
+          NULL,
+          NULL,
+          NULL,
+          NULL,
+          seed,
+          kmax,
+          1.0,
+          true,
+          waveletxy,
+          true)
+{
+    observations = new mmobservations(_obs, _sigma);
+    model = new double[size];
+    int workspacesize = width;
+    if (height > workspacesize)
+    {
+        workspacesize = height;
+    }
+    workspace = new double[workspacesize];
+    residual_size = observations->n_obs;
+    residual = new double[residual_size];
+    mean_residual = new double[residual_size];
+    last_valid_residual = new double[residual_size];
+    residual_normed = new double[residual_size];
+    mean_residual_normed = new double[residual_size];
+    last_valid_residual_normed = new double[residual_size];
+    residual_hist = new int[residual_size * residual_hist_bins];
+}
+
 GlobalSliceMM::~GlobalSliceMM()
 {
     delete observations;
@@ -75,34 +122,6 @@ GlobalSliceMM::~GlobalSliceMM()
     delete[] residual_hist;
 }
 
-void GlobalSliceMM::readdatafile(const char *filename)
-{
-    INFO("Opening file %s \n", filename);
-
-    ifstream file(filename);
-    double element;
-    if (file.is_open())
-    {
-        while (file >> element)
-        {
-            inputdata.push_back(element);
-            mean += element;
-            n_obs++;
-        }
-        mean /= n_obs;
-        for (int i = 0; i < n_obs; i++)
-        {
-            var += (inputdata[i] - mean) * (inputdata[i] - mean);
-        }
-        var /= n_obs;
-        stddev = sqrt(var);
-        file.close();
-    }
-    else
-    {
-        throw WAVETOMO2DEXCEPTION("File not opened %s", filename);
-    }
-}
 
 double
 GlobalSliceMM::likelihood(double &log_normalization)
@@ -140,4 +159,33 @@ GlobalSliceMM::likelihood(double &log_normalization)
         residual,
         residual_normed,
         log_normalization);
+}
+
+void GlobalSliceMM::readdatafile(const char *filename)
+{
+    INFO("Opening file %s \n", filename);
+
+    ifstream file(filename);
+    double element;
+    if (file.is_open())
+    {
+        while (file >> element)
+        {
+            inputdata.push_back(element);
+            mean += element;
+            n_obs++;
+        }
+        mean /= n_obs;
+        for (int i = 0; i < n_obs; i++)
+        {
+            var += (inputdata[i] - mean) * (inputdata[i] - mean);
+        }
+        var /= n_obs;
+        stddev = sqrt(var);
+        file.close();
+    }
+    else
+    {
+        throw WAVETOMO2DEXCEPTION("File not opened %s", filename);
+    }
 }
