@@ -55,7 +55,7 @@ GlobalSliceMM::GlobalSliceMM(
     last_valid_residual = new double[residual_size];
     residual_normed = new double[residual_size];
     mean_residual_normed = new double[residual_size];
-    last_valid_residual_normed = new double [residual_size];
+    last_valid_residual_normed = new double[residual_size];
     residual_hist = new int[residual_size * residual_hist_bins];
 }
 
@@ -63,15 +63,16 @@ GlobalSliceMM::~GlobalSliceMM()
 {
     delete observations;
 
-    delete model;
-    delete workspace;
-    delete residual;
-    delete mean_residual;
-    delete last_valid_residual;
-    delete residual_normed;
-    delete mean_residual_normed;
-    delete last_valid_residual_normed;
-    delete residual_hist;
+    delete[] model;
+    delete[] workspace;
+
+    delete[] residual;
+    delete[] mean_residual;
+    delete[] last_valid_residual;
+    delete[] residual_normed;
+    delete[] mean_residual_normed;
+    delete[] last_valid_residual_normed;
+    delete[] residual_hist;
 }
 
 void GlobalSliceMM::readdatafile(const char *filename)
@@ -95,12 +96,12 @@ void GlobalSliceMM::readdatafile(const char *filename)
         }
         var /= n_obs;
         stddev = sqrt(var);
+        file.close();
     }
     else
     {
         throw WAVETOMO2DEXCEPTION("File not opened %s", filename);
     }
-    file.close();
 }
 
 double
