@@ -32,6 +32,7 @@ public:
     double likelihood(double &log_normalization);
 
     std::vector<double> inputdata;
+    std::vector<double> stddev_v;
     mmobservations *observations;
     double mean;
     double var;

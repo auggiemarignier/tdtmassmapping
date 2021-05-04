@@ -86,9 +86,11 @@ GlobalSliceMM::GlobalSliceMM(
           1.0,
           true,
           waveletxy,
-          true)
+          true),
+      inputdata(_obs),
+      stddev_v(_sigma)
 {
-    observations = new mmobservations(_obs, _sigma);
+    observations = new mmobservations(inputdata, stddev_v);
     model = new double[size];
     int workspacesize = width;
     if (height > workspacesize)
@@ -121,7 +123,6 @@ GlobalSliceMM::~GlobalSliceMM()
     delete[] last_valid_residual_normed;
     delete[] residual_hist;
 }
-
 
 double
 GlobalSliceMM::likelihood(double &log_normalization)
