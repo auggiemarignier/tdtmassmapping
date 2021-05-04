@@ -153,7 +153,7 @@ GlobalSliceMM::likelihood(double &log_normalization)
     }
 
     log_normalization = 0.0;
-    std::vector<double> model_v(model, model + sizeof(double) * size);
+    std::vector<double> model_v(model, model + size);
     return observations->single_frequency_likelihood(
         model_v,
         hierarchical,
