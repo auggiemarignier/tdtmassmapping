@@ -41,6 +41,7 @@ GlobalSliceMM::GlobalSliceMM(
     readdatafile(filename);
 
     observations = new mmobservations(inputdata, stddev);
+    INFO("Data: %d total points\n", observations->n_obs);
 
     model = new double[size];
     int workspacesize = width;
@@ -57,6 +58,8 @@ GlobalSliceMM::GlobalSliceMM(
     mean_residual_normed = new double[residual_size];
     last_valid_residual_normed = new double[residual_size];
     residual_hist = new int[residual_size * residual_hist_bins];
+    
+    reset_residuals();
 }
 
 GlobalSliceMM::GlobalSliceMM(
@@ -91,6 +94,8 @@ GlobalSliceMM::GlobalSliceMM(
       stddev_v(_sigma)
 {
     observations = new mmobservations(inputdata, stddev_v);
+    INFO("Data: %d total points\n", observations->n_obs);
+
     model = new double[size];
     int workspacesize = width;
     if (height > workspacesize)
@@ -106,6 +111,8 @@ GlobalSliceMM::GlobalSliceMM(
     mean_residual_normed = new double[residual_size];
     last_valid_residual_normed = new double[residual_size];
     residual_hist = new int[residual_size * residual_hist_bins];
+
+    reset_residuals();
 }
 
 GlobalSliceMM::~GlobalSliceMM()
