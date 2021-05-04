@@ -35,3 +35,23 @@ TEST_F(GlobalTest, GlobalLikelihood)
     double likelihood = global->likelihood(global->current_log_normalization);
     ASSERT_FLOAT_EQ(likelihood, 13.8323);
 }
+
+TEST_F(GlobalTest, GlobalAccept)
+{
+    ASSERT_EQ(global->mean_residual_n, 0);
+    for (int i = 0; i < global->residual_size; i++)
+    {
+        ASSERT_EQ(global->mean_residual[i], 0);
+        ASSERT_EQ(global->last_valid_residual[i], 0);
+    }
+
+    double likelihood = global->likelihood(global->current_log_normalization);
+    global->accept();
+
+    ASSERT_EQ(global->mean_residual_n, 1);
+    for (int i = 0; i < global->residual_size; i++)
+    {
+        ASSERT_EQ(global->mean_residual[i], global->observations->obs[i]);
+        ASSERT_EQ(global->last_valid_residual[i], global->observations->obs[i]);
+    }
+}
