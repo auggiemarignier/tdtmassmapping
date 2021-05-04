@@ -11,7 +11,10 @@ protected:
     GlobalSliceMM *global;
     void SetUp() override
     {
-        global = new GlobalSliceMM("../../data/Bolshoi_7_clean_256.txt",
+        std::vector<double> obs = {1, 2, 3, 4, 5};
+        std::vector<double> sigma = {1.41, 1.41, 1.41, 1.41, 1.41};
+        global = new GlobalSliceMM(obs,
+                                   sigma,
                                    NULL,
                                    8,
                                    8,
@@ -23,7 +26,7 @@ protected:
 
 TEST_F(GlobalTest, GlobalSetup)
 {
-    ASSERT_FLOAT_EQ(global->stddev, 0.034364982263599415);
+    ASSERT_FLOAT_EQ(global->stddev, 1.41);
 }
 
 TEST_F(GlobalTest, GlobalLikelihood)
