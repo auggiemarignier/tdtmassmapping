@@ -26,7 +26,7 @@ protected:
 
 TEST_F(GlobalTest, GlobalSetup)
 {
-    ASSERT_FLOAT_EQ(global->stddev, 1.41);
+    ASSERT_FLOAT_EQ(global->observations->sigma[0], 1.41);
 }
 
 TEST_F(GlobalTest, GlobalLikelihood)
