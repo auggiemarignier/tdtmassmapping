@@ -42,9 +42,9 @@ double mmobservations::single_frequency_likelihood(
 {
     std::vector<double> predictions = single_frequency_predictions(model);
 
-    for (int i = 0; i < predictions.size(); i++)
+    for (int i = 0; i < obs.size(); i++)
     {
-        residuals[i] = model[i] - predictions[i];
+        residuals[i] = obs[i] - predictions[i];
     }
     double loglikelihood = hmodel->nll(
         residuals,
