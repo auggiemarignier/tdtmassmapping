@@ -30,6 +30,7 @@ public:
     ~GlobalSliceMM();
 
     double likelihood(double &log_normalization);
+    void accept();
 
     std::vector<double> inputdata;
     std::vector<double> stddev_v;

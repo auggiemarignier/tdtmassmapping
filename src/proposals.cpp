@@ -58,7 +58,7 @@ GlobalSliceMM::GlobalSliceMM(
     mean_residual_normed = new double[residual_size];
     last_valid_residual_normed = new double[residual_size];
     residual_hist = new int[residual_size * residual_hist_bins];
-    
+
     reset_residuals();
 }
 
@@ -167,6 +167,18 @@ GlobalSliceMM::likelihood(double &log_normalization)
         residual,
         residual_normed,
         log_normalization);
+}
+
+void GlobalSliceMM::accept()
+{
+    residuals_valid = true;
+    for (int i = 0; i < residual_size; i++)
+    {
+        last_valid_residual[i] = residual[i];
+        last_valid_residual_normed[i] = residual_normed[i];
+    }
+    update_residual_mean();
+    update_residual_covariance();
 }
 
 void GlobalSliceMM::readdatafile(const char *filename)
