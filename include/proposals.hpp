@@ -44,3 +44,17 @@ private:
     readdatafile(const char *filename);
     int n_obs;
 };
+
+class DeathSliceMM : public DeathSlice
+{
+public:
+    DeathSliceMM(GlobalSliceMM &global);
+
+    GlobalSliceMM &global;
+
+    int propose;
+    int accept;
+
+    int *propose_depth;
+    int *accept_depth;
+};
