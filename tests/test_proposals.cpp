@@ -72,5 +72,5 @@ TEST_F(GlobalTest, Death)
     {
         ASSERT_EQ(death.propose_depth[i], 0) << i << " " << death.propose_depth[i];
     }
-    ASSERT_FALSE(true) << death.global.treemaxdepth;
+    ASSERT_FALSE(true) << death.propose;
 }

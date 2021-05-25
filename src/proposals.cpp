@@ -211,16 +211,6 @@ void GlobalSliceMM::readdatafile(const char *filename)
 }
 
 DeathSliceMM::DeathSliceMM(GlobalSliceMM &_global)
-    : DeathSlice(_global),
-      global(_global),
-      propose(0),
-      accept(0),
-      propose_depth(new int[global.treemaxdepth + 1]),
-      accept_depth(new int[global.treemaxdepth + 1])
+    : DeathSlice(_global)
 {
-    for (int i = 0; i <= global.treemaxdepth; i++)
-    {
-        propose_depth[i] = 0;
-        accept_depth[i] = 0;
-    }
 }
