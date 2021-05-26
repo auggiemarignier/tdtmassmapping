@@ -16,7 +16,7 @@ protected:
         std::vector<double> sigma = {1.41, 1.41, 1.41, 1.41, 1.41};
         global = new GlobalSliceMM(obs,
                                    sigma,
-                                   NULL,
+                                   "tutorial_prior.txt",
                                    8,
                                    8,
                                    1,
@@ -64,7 +64,7 @@ TEST_F(GlobalTest, Death)
     ASSERT_GT(death.propose, 0) << death.propose;
 }
 
-TEST_F(GlobalTest, DISABLED_Birth)
+TEST_F(GlobalTest, Birth)
 {
     BirthSliceMM birth(*global);
     ASSERT_EQ(birth.step(), 0);
