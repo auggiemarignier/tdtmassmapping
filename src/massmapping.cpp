@@ -1,13 +1,29 @@
 #include <iostream>
 #include <gsl/gsl_rng.h>
 
+#include "birthslice.hpp"
+#include "deathslice.hpp"
+#include "valueslice.hpp"
+
 #include "proposals.hpp"
 
 int main()
 {
     int total = 10;
 
-    GlobalSliceMM global("../../../data/Bolshoi_7_clean_256.txt");
+    GlobalSliceMM global("../../../data/Bolshoi_7_clean_256.txt",
+                         "/Users/auggiemarignier/Documents/PhD/TDT/massmapping/data/tutorial_prior.txt",
+                         8,
+                         8,
+                         1,
+                         100,
+                         4);
+    BirthSlice birth(global);
+    DeathSlice death(global);
+    ValueSlice value(global);
+
+    global.current_likelihood = global.likelihood(global.current_log_normalization);
+    printf("Initial Likelihood: %f\n", global.current_likelihood);
 
     for (int i = 0; i < total; i++)
     {

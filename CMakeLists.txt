@@ -37,7 +37,8 @@ target_link_libraries(${PROJECT_LIB}
 
 include_directories(include ${TDTWAVETOMO_INCLUDE}
                             ${TDTBASE_INCLUDE}
-                            ${TRAVELTIME_INCLUDE})
+                            ${TRAVELTIME_INCLUDE}
+                            ${GMP_INCLUDE_DIR})
 
 if(tests)
     enable_testing()
