@@ -10,3 +10,5 @@ target_link_libraries(test_mmobservations PUBLIC ${LIBS})
 
 add_test(NAME test_proposals COMMAND test_proposals)
 add_test(NAME test_mmobservations COMMAND test_mmobservations)
+
+configure_file(../data/tutorial_prior.txt ${CMAKE_CURRENT_BINARY_DIR}/tutorial_prior.txt)
