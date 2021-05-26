@@ -214,3 +214,8 @@ DeathSliceMM::DeathSliceMM(GlobalSliceMM &_global)
     : DeathSlice(_global)
 {
 }
+
+BirthSliceMM::BirthSliceMM(GlobalSliceMM &_global)
+    : BirthSlice(_global)
+{
+}

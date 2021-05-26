@@ -5,7 +5,6 @@
 #include "proposals.hpp"
 #include "mmobservations.hpp"
 
-#include "wavetomo2dutil.hpp"
 
 class GlobalTest : public ::testing::Test
 {
@@ -61,6 +60,13 @@ TEST_F(GlobalTest, GlobalAccept)
 TEST_F(GlobalTest, Death)
 {
     DeathSliceMM death(*global);
-    ASSERT_EQ(death.step(), 0) << death.step();
+    ASSERT_EQ(death.step(), 0);
     ASSERT_GT(death.propose, 0) << death.propose;
+}
+
+TEST_F(GlobalTest, Birth)
+{
+    BirthSliceMM birth(*global);
+    ASSERT_EQ(birth.step(), 0);
+    ASSERT_GT(birth.propose, 0) << birth.propose;
 }

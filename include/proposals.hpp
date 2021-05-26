@@ -50,3 +50,9 @@ class DeathSliceMM : public DeathSlice
 public:
     DeathSliceMM(GlobalSliceMM &global);
 };
+
+class BirthSliceMM : public BirthSlice
+{
+public:
+    BirthSliceMM(GlobalSliceMM &global);
+};
