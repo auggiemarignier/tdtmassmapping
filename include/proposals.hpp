@@ -56,3 +56,9 @@ class BirthSliceMM : public BirthSlice
 public:
     BirthSliceMM(GlobalSliceMM &global);
 };
+
+class ValueSliceMM : public ValueSlice
+{
+public:
+    ValueSliceMM(GlobalSliceMM &global);
+};

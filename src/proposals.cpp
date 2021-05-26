@@ -219,3 +219,8 @@ BirthSliceMM::BirthSliceMM(GlobalSliceMM &_global)
     : BirthSlice(_global)
 {
 }
+
+ValueSliceMM::ValueSliceMM(GlobalSliceMM &_global)
+    : ValueSlice(_global)
+{
+}

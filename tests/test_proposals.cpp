@@ -64,9 +64,16 @@ TEST_F(GlobalTest, Death)
     ASSERT_GT(death.propose, 0) << death.propose;
 }
 
-TEST_F(GlobalTest, Birth)
+TEST_F(GlobalTest, DISABLED_Birth)
 {
     BirthSliceMM birth(*global);
     ASSERT_EQ(birth.step(), 0);
     ASSERT_GT(birth.propose, 0) << birth.propose;
+}
+
+TEST_F(GlobalTest, Value)
+{
+    ValueSliceMM value(*global);
+    ASSERT_EQ(value.step(), 0);
+    ASSERT_GT(value.propose, 0) << value.propose;
 }
