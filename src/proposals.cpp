@@ -187,6 +187,7 @@ void GlobalSliceMM::readdatafile(const char *filename)
 
     ifstream file(filename);
     double element;
+    int n_obs = 0;
     if (file.is_open())
     {
         while (file >> element)
