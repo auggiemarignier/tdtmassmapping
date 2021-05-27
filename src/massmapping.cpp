@@ -98,8 +98,19 @@ int main()
                 return -1;
             }
         }
+        printf("current Likelihood: %f\n", global.current_likelihood);
+
     } // end MCMC loop
+    printf("Value propose %i\n", value.propose);
+    printf("birth propose %i\n", birth.propose);
+    printf("death propose %i\n", death.propose);
+
+    printf("Value accept %i\n", value.accept);
+    printf("birth accept %i\n", birth.accept);
+    printf("death accept %i\n", death.accept);
+
     printf("MCMC loop done\n");
+    printf("Final Likelihood: %f\n", global.current_likelihood);
 
     fclose(fp_ch);
 
