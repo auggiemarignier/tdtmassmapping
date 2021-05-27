@@ -22,6 +22,7 @@ TEST_F(MMObsTest, MMPredsIdentity)
 {
     std::vector<double> model = {1, 2, 3, 4, 5};
     ASSERT_EQ(model, observations->single_frequency_predictions(model));
+    ASSERT_EQ(observations->n_obs, 5);
 }
 
 TEST_F(MMObsTest, MMLikelihood)
