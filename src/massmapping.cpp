@@ -64,7 +64,43 @@ int main()
     for (int i = 0; i < total; i++)
     {
         double u = global.random.uniform();
-        std::cout << "i=" << i << "\t u=" << u << "\n";
+
+        if (u < Pb)
+        {
+
+            //
+            // Birth
+            //
+            if (birth.step() < 0)
+            {
+                fprintf(stderr, "error: failed to do birth step\n");
+                return -1;
+            }
+        }
+        else if (u < (2.0 * Pb))
+        {
+
+            //
+            // Death
+            //
+            if (death.step() < 0)
+            {
+                fprintf(stderr, "error: failed to do death step\n");
+                return -1;
+            }
+        }
+        else
+        {
+
+            //
+            // Value
+            //
+            if (value.step() < 0)
+            {
+                fprintf(stderr, "error: failed to do value step\n");
+                return -1;
+            }
+        }
     }
 
     fclose(fp_ch);
