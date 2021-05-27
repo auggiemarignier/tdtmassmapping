@@ -1,12 +1,15 @@
 #include <iostream>
 #include <gsl/gsl_rng.h>
 
+#include "wavetomo2dutil.hpp"
+
 #include "proposals.hpp"
 
 int main()
 {
     const char *input_obs = "Bolshoi_7_clean_256.txt";
     const char *prior_file = "tutorial_prior.txt";
+    const char *output_prefix = "../outputs/";
 
     int total = 10;
     int seed = 1;
@@ -50,10 +53,21 @@ int main()
         return -1;
     }
 
+    std::string filename = mkfilename(output_prefix, "ch.dat");
+    fp_ch = fopen(filename.c_str(), "w");
+    if (fp_ch == NULL)
+    {
+        fprintf(stderr, "error: failed to create chain history file\n");
+        return -1;
+    }
+
     for (int i = 0; i < total; i++)
     {
         double u = global.random.uniform();
         std::cout << "i=" << i << "\t u=" << u << "\n";
     }
+
+    fclose(fp_ch);
+
     return 0;
 }
