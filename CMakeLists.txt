@@ -40,6 +40,9 @@ include_directories(include ${TDTWAVETOMO_INCLUDE}
                             ${TRAVELTIME_INCLUDE}
                             ${GMP_INCLUDE_DIR})
 
+configure_file(data/Bolshoi_7_clean_256.txt ${CMAKE_CURRENT_BINARY_DIR}/Bolshoi_7_clean_256.txt)
+configure_file(data/tutorial_prior.txt ${CMAKE_CURRENT_BINARY_DIR}/tutorial_prior.txt)
+
 if(tests)
     enable_testing()
     include(CTest)

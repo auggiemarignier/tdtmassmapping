@@ -5,6 +5,9 @@
 
 int main()
 {
+    const char *input_obs = "Bolshoi_7_clean_256.txt";
+    const char *prior_file = "tutorial_prior.txt";
+
     int total = 10;
     int seed = 1;
 
@@ -16,8 +19,8 @@ int main()
     int degreex = 8;
     int degreey = 8;
 
-    GlobalSliceMM global("../../../data/Bolshoi_7_clean_256.txt",
-                         "/Users/auggiemarignier/Documents/PhD/TDT/massmapping/data/tutorial_prior.txt",
+    GlobalSliceMM global(input_obs,
+                         prior_file,
                          degreex,
                          degreey,
                          seed,
