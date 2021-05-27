@@ -29,9 +29,9 @@ int main()
                          seed,
                          kmax,
                          wavelet_xy);
-    BirthSlice birth(global);
-    DeathSlice death(global);
-    ValueSlice value(global);
+    BirthSliceMM birth(global);
+    DeathSliceMM death(global);
+    ValueSliceMM value(global);
 
     global.current_likelihood = global.likelihood(global.current_log_normalization);
     printf("Initial Likelihood: %f\n", global.current_likelihood);
@@ -61,13 +61,12 @@ int main()
         return -1;
     }
 
-    for (int i = 0; i < total; i++)
+    for (int i = 0; i < total; i++) // start MCMC loop
     {
         double u = global.random.uniform();
 
         if (u < Pb)
         {
-
             //
             // Birth
             //
@@ -79,7 +78,6 @@ int main()
         }
         else if (u < (2.0 * Pb))
         {
-
             //
             // Death
             //
@@ -91,7 +89,6 @@ int main()
         }
         else
         {
-
             //
             // Value
             //
@@ -101,7 +98,8 @@ int main()
                 return -1;
             }
         }
-    }
+    } // end MCMC loop
+    printf("MCMC loop done\n");
 
     fclose(fp_ch);
 
