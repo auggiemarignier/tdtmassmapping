@@ -62,6 +62,7 @@ TEST_F(GlobalTest, Death)
     DeathSliceMM death(*global);
     ASSERT_EQ(death.step(), 0);
     ASSERT_GT(death.propose, 0) << death.propose;
+    ASSERT_EQ(&(death.global), global);
 }
 
 TEST_F(GlobalTest, Birth)
@@ -69,6 +70,7 @@ TEST_F(GlobalTest, Birth)
     BirthSliceMM birth(*global);
     ASSERT_EQ(birth.step(), 0);
     ASSERT_GT(birth.propose, 0) << birth.propose;
+    ASSERT_EQ(&(birth.global), global);
 }
 
 TEST_F(GlobalTest, Value)
@@ -76,4 +78,5 @@ TEST_F(GlobalTest, Value)
     ValueSliceMM value(*global);
     ASSERT_EQ(value.step(), 0);
     ASSERT_GT(value.propose, 0) << value.propose;
+    ASSERT_EQ(&(value.global), global);
 }
