@@ -33,10 +33,6 @@ int main()
     DeathSliceMM death(global);
     ValueSliceMM value(global);
 
-    printf("%p %p\n", &global, &(birth.global));
-    printf("%p %p\n", &global, &(value.global));
-    printf("%p %p\n", &global, &(death.global));
-
     global.current_likelihood = global.likelihood(global.current_log_normalization);
     printf("Initial Likelihood: %f\n", global.current_likelihood);
 
@@ -74,7 +70,6 @@ int main()
             //
             // Birth
             //
-            printf("%p %p\n", &global, &(birth.global));
             if (birth.step() < 0)
             {
                 fprintf(stderr, "error: failed to do birth step\n");
@@ -86,7 +81,6 @@ int main()
             //
             // Death
             //
-            printf("%p %p\n", &global, &(death.global));
             if (death.step() < 0)
             {
                 fprintf(stderr, "error: failed to do death step\n");
@@ -98,7 +92,6 @@ int main()
             //
             // Value
             //
-            printf("%p %p\n", &global, &(value.global));
             if (value.step() < 0)
             {
                 fprintf(stderr, "error: failed to do value step\n");
@@ -106,6 +99,7 @@ int main()
             }
         }
         printf("current Likelihood: %f\n", global.current_likelihood);
+        printf("n steps %i %i\n", value.global.mean_residual_n, global.mean_residual_n);
 
     } // end MCMC loop
     printf("Value propose %i\n", value.propose);
