@@ -5,7 +5,6 @@
 #include "proposals.hpp"
 #include "mmobservations.hpp"
 
-
 class GlobalTest : public ::testing::Test
 {
 protected:
@@ -63,6 +62,8 @@ TEST_F(GlobalTest, Death)
     ASSERT_EQ(death.step(), 0);
     ASSERT_GT(death.propose, 0) << death.propose;
     ASSERT_EQ(&(death.global), global);
+    ASSERT_EQ(death.global.mean_residual_n, 1);
+    ASSERT_EQ(death.global.mean_residual_n, global->mean_residual_n);
 }
 
 TEST_F(GlobalTest, Birth)
@@ -71,6 +72,8 @@ TEST_F(GlobalTest, Birth)
     ASSERT_EQ(birth.step(), 0);
     ASSERT_GT(birth.propose, 0) << birth.propose;
     ASSERT_EQ(&(birth.global), global);
+    ASSERT_EQ(birth.global.mean_residual_n, 1);
+    ASSERT_EQ(birth.global.mean_residual_n, global->mean_residual_n);
 }
 
 TEST_F(GlobalTest, Value)
@@ -79,7 +82,6 @@ TEST_F(GlobalTest, Value)
     ASSERT_EQ(value.step(), 0);
     ASSERT_GT(value.propose, 0) << value.propose;
     ASSERT_EQ(&(value.global), global);
-    value.global.accept();
-    global->accept();
-    ASSERT_FALSE(true);
+    ASSERT_EQ(value.global.mean_residual_n, 1);
+    ASSERT_EQ(value.global.mean_residual_n, global->mean_residual_n);
 }
