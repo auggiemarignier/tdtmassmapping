@@ -2,6 +2,8 @@
 #include <vector>
 #include <iostream>
 
+#include "wavetomo2dutil.hpp"
+
 #include "proposals.hpp"
 #include "mmobservations.hpp"
 
@@ -62,7 +64,13 @@ TEST_F(GlobalTest, Death)
     ASSERT_EQ(death.step(), 0);
     ASSERT_GT(death.propose, 0) << death.propose;
     ASSERT_EQ(&(death.global), global);
-    ASSERT_EQ(death.global.mean_residual_n, 1);
+
+    int k = wavetree2d_sub_coeff_count(death.global.wt);
+    if (k > 1)
+    {
+        ASSERT_EQ(death.global.mean_residual_n, 1) << k;
+    }
+    
     ASSERT_EQ(death.global.mean_residual_n, global->mean_residual_n);
 }
 
