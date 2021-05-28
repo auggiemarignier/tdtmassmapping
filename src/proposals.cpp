@@ -213,16 +213,19 @@ void GlobalSliceMM::readdatafile(const char *filename)
 }
 
 DeathSliceMM::DeathSliceMM(GlobalSliceMM &_global)
-    : DeathSlice(_global)
+    : DeathSlice(_global),
+      global(_global)
 {
 }
 
 BirthSliceMM::BirthSliceMM(GlobalSliceMM &_global)
-    : BirthSlice(_global)
+    : BirthSlice(_global),
+      global(_global)
 {
 }
 
 ValueSliceMM::ValueSliceMM(GlobalSliceMM &_global)
-    : ValueSlice(_global)
+    : ValueSlice(_global),
+      global(_global)
 {
 }

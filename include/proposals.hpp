@@ -49,16 +49,22 @@ class DeathSliceMM : public DeathSlice
 {
 public:
     DeathSliceMM(GlobalSliceMM &global);
+
+    GlobalSliceMM &global;
 };
 
 class BirthSliceMM : public BirthSlice
 {
 public:
     BirthSliceMM(GlobalSliceMM &global);
+
+    GlobalSliceMM &global;
 };
 
 class ValueSliceMM : public ValueSlice
 {
 public:
     ValueSliceMM(GlobalSliceMM &global);
+
+    GlobalSliceMM &global;
 };
