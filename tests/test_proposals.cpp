@@ -79,4 +79,7 @@ TEST_F(GlobalTest, Value)
     ASSERT_EQ(value.step(), 0);
     ASSERT_GT(value.propose, 0) << value.propose;
     ASSERT_EQ(&(value.global), global);
+    value.global.accept();
+    global->accept();
+    ASSERT_FALSE(true);
 }

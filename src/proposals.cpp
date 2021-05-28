@@ -171,6 +171,7 @@ GlobalSliceMM::likelihood(double &log_normalization)
 
 void GlobalSliceMM::accept()
 {
+    INFO("Accepting MM");
     residuals_valid = true;
     for (int i = 0; i < residual_size; i++)
     {
