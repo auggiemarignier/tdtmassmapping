@@ -51,6 +51,9 @@ public:
     DeathSliceMM(GlobalSliceMM &global);
 
     GlobalSliceMM &global;
+
+private:
+    int compute_likelihood(int death_idx, double &proposed_likelihood, double &proposed_log_normalization);
 };
 
 class BirthSliceMM : public BirthSlice
@@ -59,6 +62,9 @@ public:
     BirthSliceMM(GlobalSliceMM &global);
 
     GlobalSliceMM &global;
+
+private:
+    int compute_likelihood(int birth_idx, double &proposed_likelihood, double &proposed_log_normalization);
 };
 
 class ValueSliceMM : public ValueSlice
@@ -67,4 +73,6 @@ public:
     ValueSliceMM(GlobalSliceMM &global);
 
     GlobalSliceMM &global;
+
+    int compute_likelihood(int valid_idx, double &proposed_likelihood, double &proposed_log_normalization);
 };

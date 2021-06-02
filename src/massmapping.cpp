@@ -115,5 +115,8 @@ int main()
 
     fclose(fp_ch);
 
+    double ln = 0.1;
+    value.compute_likelihood(5, ln, ln);
+
     return 0;
 }

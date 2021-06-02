@@ -134,6 +134,7 @@ GlobalSliceMM::~GlobalSliceMM()
 double
 GlobalSliceMM::likelihood(double &log_normalization)
 {
+    INFO("");
     //
     // Get tree model wavelet coefficients
     //
@@ -228,4 +229,29 @@ ValueSliceMM::ValueSliceMM(GlobalSliceMM &_global)
     : ValueSlice(_global),
       global(_global)
 {
+}
+
+int BirthSliceMM::compute_likelihood(int birth_idx,
+                                     double &proposed_likelihood,
+                                     double &proposed_log_normalization)
+{
+    proposed_likelihood = global.likelihood(proposed_log_normalization);
+    return 0;
+}
+
+int ValueSliceMM::compute_likelihood(int value_idx, double &proposed_likelihood, double &proposed_log_normalization)
+{
+    INFO("");
+    proposed_likelihood = global.likelihood(proposed_log_normalization);
+
+    return 0;
+}
+
+int DeathSliceMM::compute_likelihood(int death_idx,
+                                     double &proposed_likelihood,
+                                     double &proposed_log_normalization)
+{
+    proposed_likelihood = global.likelihood(proposed_log_normalization);
+
+    return 0;
 }

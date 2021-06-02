@@ -92,4 +92,5 @@ TEST_F(GlobalTest, Value)
     ASSERT_EQ(&(value.global), global);
     ASSERT_EQ(value.global.mean_residual_n, 1);
     ASSERT_EQ(value.global.mean_residual_n, global->mean_residual_n);
+    ASSERT_EQ(value.global.current_likelihood, 1) << global->current_likelihood;
 }
