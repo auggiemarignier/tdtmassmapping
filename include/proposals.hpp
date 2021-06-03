@@ -129,4 +129,9 @@ private:
                                            double &prop_parent_coeff,
                                            int &ii,
                                            int &ij) override;
+
+    int propose_proposal(int &prop_valid,
+                         int &prop_idx,
+                         int &prop_depth,
+                         double &prop_value) override;
 };
