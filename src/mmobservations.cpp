@@ -26,6 +26,29 @@ Observations::Observations(
     }
 }
 
+bool Observations::save_residuals(const char *filename,
+                                  const double *residuals,
+                                  const double *residuals_normed)
+{
+    const double *res = residuals;
+    const double *resn = residuals_normed;
+    FILE *fp = fopen(filename, "w");
+    if (fp == NULL)
+    {
+        return false;
+    }
+
+    for (int i = 0; i < n_obs; i++)
+    {
+        fprintf(fp, "%15.9f %15.9f\n", *res, *resn);
+        res++;
+        resn++;
+    }
+
+    fclose(fp);
+    return true;
+}
+
 std::vector<double> mmobservations::single_frequency_predictions(
     std::vector<double> model)
 {
