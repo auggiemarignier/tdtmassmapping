@@ -31,7 +31,6 @@ extern "C"
 
 #include "wavetreemapper.hpp"
 
-template <typename obs>
 class GlobalProposal
 {
 public:
@@ -170,8 +169,7 @@ int GlobalProposal_indextocoord(void *user, int index, int *i, int *j, int *k, i
     return 0;
 }
 
-template <typename obs>
-GlobalProposal<obs>::GlobalProposal(const char *filename,
+GlobalProposal::GlobalProposal(const char *filename,
                                     obs* _observations,
                                     const char *initial_model,
                                     const char *prior_file,
@@ -386,8 +384,7 @@ GlobalProposal<obs>::GlobalProposal(const char *filename,
     }
 }
 
-template <typename obs>
-GlobalProposal<obs>::~GlobalProposal()
+GlobalProposal::~GlobalProposal()
 {
     delete hierarchical;
     delete observations;
@@ -410,9 +407,8 @@ GlobalProposal<obs>::~GlobalProposal()
     wavetree_pp_destroy(proposal);
 }
 
-template <typename obs>
 double
-GlobalProposal<obs>::image_likelihood(const double *image_model,
+GlobalProposal::image_likelihood(const double *image_model,
                                       double &log_normalization)
 {
     log_normalization = 0.0;
@@ -423,9 +419,8 @@ GlobalProposal<obs>::image_likelihood(const double *image_model,
                                                      log_normalization);
 }
 
-template <typename obs>
 double
-GlobalProposal<obs>::likelihood(double &log_normalization)
+GlobalProposal::likelihood(double &log_normalization)
 {
     //
     // Get tree model wavelet coefficients
@@ -460,8 +455,7 @@ GlobalProposal<obs>::likelihood(double &log_normalization)
                                                      log_normalization);
 }
 
-template <typename obs>
-void GlobalProposal<obs>::reset_residuals()
+void GlobalProposal::reset_residuals()
 {
     mean_residual_n = 0;
     for (int i = 0; i < residual_size; i++)
@@ -500,14 +494,12 @@ void GlobalProposal<obs>::reset_residuals()
     }
 }
 
-template <typename obs>
-void GlobalProposal<obs>::invalidate_residuals()
+void GlobalProposal::invalidate_residuals()
 {
     residuals_valid = false;
 }
 
-template <typename obs>
-void GlobalProposal<obs>::accept()
+void GlobalProposal::accept()
 {
     residuals_valid = true;
     for (int i = 0; i < residual_size; i++)
@@ -520,14 +512,12 @@ void GlobalProposal<obs>::accept()
     update_residual_covariance();
 }
 
-template <typename obs>
-void GlobalProposal<obs>::reject()
+void GlobalProposal::reject()
 {
     update_residual_mean();
 }
 
-template <typename obs>
-void GlobalProposal<obs>::update_residual_mean()
+void GlobalProposal::update_residual_mean()
 {
     mean_residual_n++;
 
@@ -548,8 +538,7 @@ void GlobalProposal<obs>::update_residual_mean()
     }
 }
 
-template <typename obs>
-void GlobalProposal<obs>::update_residual_covariance()
+void GlobalProposal::update_residual_covariance()
 {
     double *p = last_valid_residual;
 
@@ -585,28 +574,24 @@ void GlobalProposal<obs>::update_residual_covariance()
     }
 }
 
-template <typename obs>
-int GlobalProposal<obs>::get_residual_size() const
+int GlobalProposal::get_residual_size() const
 {
     return residual_size;
 }
 
-template <typename obs>
 const double *
-GlobalProposal<obs>::get_mean_residuals() const
+GlobalProposal::get_mean_residuals() const
 {
     return mean_residual;
 }
 
-template <typename obs>
 const double *
-GlobalProposal<obs>::get_mean_normed_residuals() const
+GlobalProposal::get_mean_normed_residuals() const
 {
     return mean_residual_normed;
 }
 
-template <typename obs>
-bool GlobalProposal<obs>::save_residuals(const char *filename)
+bool GlobalProposal::save_residuals(const char *filename)
 {
     if (observations != nullptr)
     {
@@ -618,8 +603,7 @@ bool GlobalProposal<obs>::save_residuals(const char *filename)
     }
 }
 
-template <typename obs>
-bool GlobalProposal<obs>::save_residual_histogram(const char *filename) const
+bool GlobalProposal::save_residual_histogram(const char *filename) const
 {
     if (observations != nullptr)
     {
@@ -646,8 +630,7 @@ bool GlobalProposal<obs>::save_residual_histogram(const char *filename) const
     return true;
 }
 
-template <typename obs>
-bool GlobalProposal<obs>::save_residual_covariance(const char *filename) const
+bool GlobalProposal::save_residual_covariance(const char *filename) const
 {
     if (observations != nullptr)
     {
@@ -688,9 +671,8 @@ bool GlobalProposal<obs>::save_residual_covariance(const char *filename) const
     return true;
 }
 
-template <typename obs>
 generic_lift_inverse1d_step_t
-GlobalProposal<obs>::wavelet_inverse_function_from_id(int id)
+GlobalProposal::wavelet_inverse_function_from_id(int id)
 {
     switch (id)
     {
@@ -717,9 +699,8 @@ GlobalProposal<obs>::wavelet_inverse_function_from_id(int id)
     }
 }
 
-template <typename obs>
 generic_lift_forward1d_step_t
-GlobalProposal<obs>::wavelet_forward_function_from_id(int id)
+GlobalProposal::wavelet_forward_function_from_id(int id)
 {
     switch (id)
     {
@@ -746,8 +727,7 @@ GlobalProposal<obs>::wavelet_forward_function_from_id(int id)
     }
 }
 
-template <typename obs>
-void GlobalProposal<obs>::set_max_depth(int md)
+void GlobalProposal::set_max_depth(int md)
 {
     int maxd = wavetree2d_sub_maxdepth(wt);
     if (md > maxd)
