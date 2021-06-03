@@ -7,16 +7,17 @@
 
 class Observations
 {
+public:
     virtual double single_frequency_likelihood(std::vector<double> model,
-        const hierarchicalmodel *hmodel,
-        double *residuals,
-        double *residuals_normed,
-        double &log_normalization) = 0;
+                                               const hierarchicalmodel *hmodel,
+                                               double *residuals,
+                                               double *residuals_normed,
+                                               double &log_normalization) = 0;
 
     virtual std::vector<double> single_frequency_predictions(std::vector<double> model) = 0;
 };
 
-class mmobservations : Observations
+class mmobservations : public Observations
 {
 public:
     // Constructor that takes in vectors
