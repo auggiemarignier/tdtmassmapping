@@ -9,7 +9,7 @@ extern "C"
 
 Proposal::Proposal(GlobalProposal &_global)
     : global(_global),
-      name(NONE),
+      name(WT_PERTURB_NONE),
       propose(0),
       accept(0),
       propose_depth(new int[global.treemaxdepth + 1]),
@@ -25,7 +25,7 @@ Proposal::Proposal(GlobalProposal &_global)
     }
 }
 
-Proposal::Proposal(GlobalProposal &_global, NAME _name)
+Proposal::Proposal(GlobalProposal &_global, wavetree_perturb_t _name)
     : global(_global),
       name(_name),
       propose(0),

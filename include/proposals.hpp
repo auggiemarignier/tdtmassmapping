@@ -4,19 +4,11 @@
 
 #include <mpi.h>
 
-enum NAME
-{
-    NONE,
-    BIRTH,
-    DEATH,
-    VALUE
-};
-
 class Proposal
 {
 public:
     Proposal(GlobalProposal &global);
-    Proposal(GlobalProposal &global, NAME name);
+    Proposal(GlobalProposal &global, wavetree_perturb_t name);
     virtual ~Proposal()
     {
         delete[] propose_depth;
@@ -32,7 +24,7 @@ public:
     void initialize_mpi(MPI_Comm communicator);
 
     GlobalProposal &global;
-    NAME name;
+    wavetree_perturb_t name;
     int propose;
     int accept;
 
