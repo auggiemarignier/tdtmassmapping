@@ -26,6 +26,11 @@ protected:
                                     100,
                                     4);
 
-        proposal = new Proposal(*global, "Base");
+        proposal = new Proposal(*global);
     }
 };
+
+TEST_F(ProposalTest, NameEnum)
+{
+    ASSERT_EQ(proposal->name, 0);
+}
