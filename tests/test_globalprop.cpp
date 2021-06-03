@@ -7,22 +7,22 @@ class GlobalPropTest : public ::testing::Test
 {
 protected:
     mmobservations *observations;
-    GlobalProposal<mmobservations> *global;
+    GlobalProposal *global;
     void SetUp() override
     {
         std::vector<double> obs = {1, 2, 3, 4, 5};
         double sigma = 1.41;
         observations = new mmobservations(obs, sigma);
 
-        global = new GlobalProposal<mmobservations>(NULL,
-                                                    observations,
-                                                    NULL,
-                                                    "tutorial_prior.txt",
-                                                    8,
-                                                    8,
-                                                    1,
-                                                    100,
-                                                    4);
+        global = new GlobalProposal(NULL,
+                                    observations,
+                                    NULL,
+                                    "tutorial_prior.txt",
+                                    8,
+                                    8,
+                                    1,
+                                    100,
+                                    4);
     }
 };
 
