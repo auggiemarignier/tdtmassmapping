@@ -31,6 +31,8 @@ extern "C"
 
 #include "wavetreemapper.hpp"
 
+#include "mmobservations.hpp"
+
 class GlobalProposal
 {
 public:
@@ -46,7 +48,7 @@ public:
     };
 
     GlobalProposal(const char *filename,
-                   obs* observations,
+                   Observations observations,
                    const char *initial_model,
                    const char *prior_file,
                    int degreex,
@@ -92,7 +94,7 @@ public:
     int degreey;
     int degreez;
 
-    obs *observations;
+    Observations *observations;
 
     double *model;
     double *workspace;
@@ -170,7 +172,7 @@ int GlobalProposal_indextocoord(void *user, int index, int *i, int *j, int *k, i
 }
 
 GlobalProposal::GlobalProposal(const char *filename,
-                                    obs* _observations,
+                                    Observations* _observations,
                                     const char *initial_model,
                                     const char *prior_file,
                                     int _degreex,
@@ -238,7 +240,7 @@ GlobalProposal::GlobalProposal(const char *filename,
         }
         else
         {
-            obs observations(filename);
+            Observations observations(filename);
         }
     }
 
