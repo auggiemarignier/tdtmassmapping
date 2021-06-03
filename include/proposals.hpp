@@ -17,6 +17,8 @@ public:
 
     virtual int step();
 
+    bool primary() const;
+   
     std::string write_short_stats();
 
     std::string write_long_stats();
@@ -36,8 +38,6 @@ public:
     int mpi_rank;
 
 private:
-    bool primary() const;
-
     virtual int choose_proposal_location_and_value(int k,
                                                    double &ratio,
                                                    int &prop_depth,
@@ -48,17 +48,17 @@ private:
                                                    int &prop_valid,
                                                    double &prop_parent_coeff,
                                                    int &ii,
-                                                   int &ij) { return 0; };
+                                                   int &ij) { return -1; };
 
     virtual int communicate_proposal_location_and_value(int &prop_valid,
                                                         int &prop_idx,
                                                         int &prop_depth,
-                                                        double &prop_value) { return 0; };
+                                                        double &prop_value) { return -1; };
 
     virtual int propose_proposal(int &prop_valid,
                                  int &prop_idx,
                                  int &prop_depth,
-                                 double &prop_value) { return 0; };
+                                 double &prop_value) { return -1; };
 
     virtual int compute_reverse_proposal_probability(int prop_idx,
                                                      int prop_depth,
@@ -68,11 +68,11 @@ private:
                                                      double &prop_parent_coeff,
                                                      double &prop_prob,
                                                      double &reverse_prob,
-                                                     double &prior_prob) { return 0; };
+                                                     double &prior_prob) { return -1; };
 
     virtual int compute_likelihood(int prop_idx,
                                    double &proposed_likelihood,
-                                   double &proposed_log_normalization) { return 0; };
+                                   double &proposed_log_normalization) { return -1; };
 
     virtual int compute_acceptance(double proposed_likelihood,
                                    double proposed_log_normalization,
@@ -81,7 +81,7 @@ private:
                                    double prop_prob,
                                    double ratio,
                                    double prior_prob,
-                                   bool &accept_proposal) { return 0; };
+                                   bool &accept_proposal) { return -1; };
 
     virtual int communicate_acceptance(bool &accept_proposal);
 };
@@ -104,4 +104,4 @@ private:
                                            double &prop_parent_coeff,
                                            int &ii,
                                            int &ij) override;
-}
+};
