@@ -23,7 +23,7 @@ public:
         delete[] accept_depth;
     };
 
-    virtual int step() { return 0; };
+    virtual int step();
 
     std::string write_short_stats();
 

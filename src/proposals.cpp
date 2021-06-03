@@ -43,6 +43,123 @@ Proposal::Proposal(GlobalProposal &_global, NAME _name)
     }
 }
 
+int Proposal::step()
+{
+    propose++;
+
+    int k = wavetree2d_sub_coeff_count(global.wt);
+
+    if (wavetree2d_sub_set_invalid_perturbation(global.wt, name) < 0)
+    {
+        ERROR("failed to initialise birth perturbation\n");
+        return -1;
+    }
+
+    if (true) // figure this out for the three proposals
+    {
+        double ratio;
+        int prop_depth;
+        int prop_idx;
+        double choose_prob;
+        double prop_value;
+        int prop_valid = (name == 1 || name == 2) ? 1 : 0; // not sure why should be different for death proposal
+        double prop_parent_coeff;
+        double prop_prob;
+        double reverse_prob;
+        double prior_prob = 0.0;
+
+        double proposed_likelihood;
+        double proposed_log_normalization;
+
+        int ii;
+        int ij;
+
+        if (choose_proposal_location_and_value(k,
+                                               ratio,
+                                               prop_depth,
+                                               prop_idx,
+                                               choose_prob,
+                                               prop_value,
+                                               prop_prob,
+                                               prop_valid,
+                                               prop_parent_coeff,
+                                               ii,
+                                               ij) < 0)
+        {
+            return -1;
+        }
+
+        if (communicate_proposal_location_and_value(prop_valid,
+                                                    prop_idx,
+                                                    prop_depth,
+                                                    prop_value) < 0)
+        {
+            return -1;
+        }
+
+        if (prop_valid)
+        {
+            propose_depth[prop_depth]++;
+
+            if (propose_proposal(prop_valid,
+                                 prop_idx,
+                                 prop_depth,
+                                 prop_value) < 0)
+            {
+                return -1;
+            }
+
+            if (compute_likelihood(prop_idx,
+                                   proposed_likelihood,
+                                   proposed_log_normalization) < 0)
+            {
+                return -1;
+            }
+
+            bool accept_proposal = false;
+
+            if (compute_acceptance(proposed_likelihood,
+                                   proposed_log_normalization,
+                                   reverse_prob,
+                                   choose_prob,
+                                   prop_prob,
+                                   ratio,
+                                   prior_prob,
+                                   accept_proposal) < 0)
+            {
+                return -1;
+            }
+
+            if (communicate_acceptance(accept_proposal) < 0)
+            {
+                return -1;
+            }
+
+            if (accept_proposal)
+            {
+                accept++;
+                accept_depth[prop_depth]++;
+
+                // save to histogram
+
+                global.current_likelihood = proposed_likelihood;
+                global.current_log_normalization = proposed_log_normalization;
+                global.accept();
+
+                return 1;
+            }
+            else
+            {
+                // save to histogram
+
+                global.reject();
+
+                return 0;
+            }
+        }
+    }
+}
+
 std::string Proposal::write_short_stats()
 {
     return mkformatstring("%s %6d/%6d %7.3f",
