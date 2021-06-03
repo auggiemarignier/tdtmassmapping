@@ -2,6 +2,7 @@ extern "C"
 {
 #include "slog.h"
 };
+#include "wavetomo2dexception.hpp"
 
 #include "proposals.hpp"
 
@@ -62,4 +63,25 @@ void Proposal::initialize_mpi(MPI_Comm _communicator)
 bool Proposal::primary() const
 {
     return (communicator == MPI_COMM_NULL || mpi_rank == 0);
+}
+
+int Proposal::communicate_acceptance(bool &accept_proposal)
+{
+    if (communicator != MPI_COMM_NULL)
+    {
+        int ta;
+        if (mpi_rank == 0)
+        {
+            ta = (int)accept_proposal;
+        }
+        if (MPI_Bcast(&ta, 1, MPI_INT, 0, communicator) != MPI_SUCCESS)
+        {
+            throw WAVETOMO2DEXCEPTION("Failed to broadcast accept proposal\n");
+        }
+        if (mpi_rank != 0)
+        {
+            accept_proposal = (bool)ta;
+        }
+    }
+    return 0;
 }
