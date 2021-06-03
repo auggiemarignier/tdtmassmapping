@@ -85,3 +85,23 @@ private:
 
     virtual int communicate_acceptance(bool &accept_proposal);
 };
+
+class BirthProposal : public Proposal
+{
+public:
+    BirthProposal(GlobalProposal &global)
+        : Proposal(global, WT_PERTURB_BIRTH){};
+
+private:
+    int choose_proposal_location_and_value(int k,
+                                           double &ratio,
+                                           int &prop_depth,
+                                           int &prop_idx,
+                                           double &choose_prob,
+                                           double &prop_value,
+                                           double &prop_prob,
+                                           int &prop_valid,
+                                           double &prop_parent_coeff,
+                                           int &ii,
+                                           int &ij) override;
+}
