@@ -23,7 +23,7 @@ public:
         delete[] accept_depth;
     };
 
-    virtual int step();
+    virtual int step() { return 0; };
 
     std::string write_short_stats();
 
@@ -56,17 +56,17 @@ private:
                                                    int &prop_valid,
                                                    double &prop_parent_coeff,
                                                    int &ii,
-                                                   int &ij);
+                                                   int &ij) { return 0; };
 
     virtual int communicate_proposal_location_and_value(int &prop_valid,
                                                         int &prop_idx,
                                                         int &prop_depth,
-                                                        double &prop_value);
+                                                        double &prop_value) { return 0; };
 
     virtual int propose_proposal(int &prop_valid,
                                  int &prop_idx,
                                  int &prop_depth,
-                                 double &prop_value);
+                                 double &prop_value) { return 0; };
 
     virtual int compute_reverse_proposal_probability(int prop_idx,
                                                      int prop_depth,
@@ -76,11 +76,11 @@ private:
                                                      double &prop_parent_coeff,
                                                      double &prop_prob,
                                                      double &reverse_prob,
-                                                     double &prior_prob);
+                                                     double &prior_prob) { return 0; };
 
     virtual int compute_likelihood(int prop_idx,
                                    double &proposed_likelihood,
-                                   double &proposed_log_normalization);
+                                   double &proposed_log_normalization) { return 0; };
 
     virtual int compute_acceptance(double proposed_likelihood,
                                    double proposed_log_normalization,
@@ -89,7 +89,7 @@ private:
                                    double prop_prob,
                                    double ratio,
                                    double prior_prob,
-                                   bool &accept_proposal);
+                                   bool &accept_proposal) { return 0; };
 
     virtual int communicate_acceptance(bool &accept_proposal);
 };
