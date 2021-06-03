@@ -7,14 +7,14 @@ extern "C"
 #include "slog.h"
 };
 
-mmobservations::mmobservations(
+Observations::Observations(
     std::vector<double> _obs,
     std::vector<double> _sigma)
     : obs(_obs),
       sigma(_sigma),
       n_obs(_obs.size()) {}
 
-mmobservations::mmobservations(
+Observations::Observations(
     std::vector<double> _obs,
     double _sigma)
     : obs(_obs),
