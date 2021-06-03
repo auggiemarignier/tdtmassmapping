@@ -46,7 +46,7 @@ public:
     };
 
     GlobalProposal(const char *filename,
-                   Observations observations,
+                   Observations *observations,
                    const char *initial_model,
                    const char *prior_file,
                    int degreex,
