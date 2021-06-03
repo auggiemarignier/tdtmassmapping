@@ -260,7 +260,8 @@ GlobalProposal::image_likelihood(const double *image_model,
                                  double &log_normalization)
 {
     log_normalization = 0.0;
-    return observations->single_frequency_likelihood(image_model,
+    std::vector<double> image_model_v(image_model, image_model + size);
+    return observations->single_frequency_likelihood(image_model_v,
                                                      hierarchical,
                                                      residual,
                                                      residual_normed,
