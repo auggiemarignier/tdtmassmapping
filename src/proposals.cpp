@@ -7,7 +7,25 @@ extern "C"
 
 #include "proposals.hpp"
 
-Proposal::Proposal(GlobalProposal &_global, std::string _name)
+Proposal::Proposal(GlobalProposal &_global)
+    : global(_global),
+      name(NONE),
+      propose(0),
+      accept(0),
+      propose_depth(new int[global.treemaxdepth + 1]),
+      accept_depth(new int[global.treemaxdepth + 1]),
+      communicator(MPI_COMM_NULL),
+      mpi_size(-1),
+      mpi_rank(-1)
+{
+    for (int i = 0; i <= global.treemaxdepth; i++)
+    {
+        propose_depth[i] = 0;
+        accept_depth[i] = 0;
+    }
+}
+
+Proposal::Proposal(GlobalProposal &_global, NAME _name)
     : global(_global),
       name(_name),
       propose(0),

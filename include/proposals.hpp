@@ -4,10 +4,19 @@
 
 #include <mpi.h>
 
+enum NAME
+{
+    NONE,
+    BIRTH,
+    DEATH,
+    VALUE
+};
+
 class Proposal
 {
 public:
-    Proposal(GlobalProposal &global, std::string name);
+    Proposal(GlobalProposal &global);
+    Proposal(GlobalProposal &global, NAME name);
     virtual ~Proposal()
     {
         delete[] propose_depth;
@@ -23,7 +32,7 @@ public:
     void initialize_mpi(MPI_Comm communicator);
 
     GlobalProposal &global;
-    std::string name;
+    NAME name;
     int propose;
     int accept;
 
