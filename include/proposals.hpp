@@ -4,10 +4,10 @@
 
 #include <mpi.h>
 
-class Proposals
+class Proposal
 {
 public:
-    Proposal(GlobalProposal &global, std::sting name);
+    Proposal(GlobalProposal &global, std::string name);
     virtual ~Proposal()
     {
         delete[] propose_depth;
@@ -30,7 +30,13 @@ public:
     int *propose_depth;
     int *accept_depth;
 
+    MPI_Comm communicator;
+    int mpi_size;
+    int mpi_rank;
+
 private:
+    bool primary() const;
+
     virtual int choose_proposal_location_and_value(int k,
                                                    double &ratio,
                                                    int &prop_depth,
@@ -77,4 +83,4 @@ private:
                                    bool &accept_proposal);
 
     virtual int communicate_acceptance(bool &accept_proposal);
-}
+};
