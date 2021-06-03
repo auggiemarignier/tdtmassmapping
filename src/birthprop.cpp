@@ -100,19 +100,16 @@ int BirthProposal::propose_proposal(int &birth_valid,
                                     int &birth_depth,
                                     double &birth_value)
 {
-    if (birth_valid)
+    //
+    // BirthSlice the point (use birth from prior)
+    //
+    if (wavetree2d_sub_propose_birth(global.wt,
+                                     birth_idx,
+                                     birth_depth,
+                                     birth_value) < 0)
     {
-        //
-        // BirthSlice the point (use birth from prior)
-        //
-        if (wavetree2d_sub_propose_birth(global.wt,
-                                         birth_idx,
-                                         birth_depth,
-                                         birth_value) < 0)
-        {
-            ERROR("failed to birth point\n");
-            return -1;
-        }
+        ERROR("failed to birth point\n");
+        return -1;
     }
     return 0;
 }
