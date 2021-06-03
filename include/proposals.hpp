@@ -7,7 +7,7 @@
 class Proposals
 {
 public:
-    Proposal(GlobalProposal &global);
+    Proposal(GlobalProposal &global, std::sting name);
     virtual ~Proposal()
     {
         delete[] propose_depth;
@@ -23,6 +23,7 @@ public:
     void initialize_mpi(MPI_Comm communicator);
 
     GlobalProposal &global;
+    std::string name;
     int propose;
     int accept;
 

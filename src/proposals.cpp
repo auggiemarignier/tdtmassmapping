@@ -5,8 +5,9 @@ extern "C"
 
 #include "proposals.hpp"
 
-Proposal::Proposal(GlobalProposal &_global)
+Proposal::Proposal(GlobalProposal &_global, std::string _name)
     : global(_global),
+      name(_name),
       propose(0),
       accept(0),
       propose_depth(new int[global.treemaxdepth + 1]),
@@ -24,7 +25,7 @@ Proposal::Proposal(GlobalProposal &_global)
 
 std::string Proposal::write_short_stats()
 {
-    return mkformatstring("Birth %6d/%6d %7.3f",
+    return mkformatstring("%s %6d/%6d %7.3f",
                           accept,
                           propose,
                           propose == 0 ? 0.0 : 100.0 * (double)accept / (double)propose);
@@ -32,7 +33,7 @@ std::string Proposal::write_short_stats()
 
 std::string Proposal::write_long_stats()
 {
-    std::string s = mkformatstring("Birth: %6d %7.3f:",
+    std::string s = mkformatstring("%s: %6d %7.3f:",
                                    propose,
                                    propose == 0 ? 0.0 : 100.0 * (double)accept / (double)propose);
     for (int i = 0; i <= global.treemaxdepth; i++)
