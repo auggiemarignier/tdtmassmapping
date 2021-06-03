@@ -160,6 +160,21 @@ int Proposal::step()
     }
 }
 
+int Proposal::compute_likelihood(int prop_idx,
+                                 double &proposed_likelihood,
+                                 double &proposed_log_normalization)
+{
+    if (communicator == MPI_COMM_NULL)
+    {
+        proposed_likelihood = global.likelihood(proposed_log_normalization);
+    }
+    else
+    {
+        proposed_likelihood = global.likelihood_mpi(proposed_log_normalization);
+    }
+    return 0;
+}
+
 std::string Proposal::write_short_stats()
 {
     return mkformatstring("%s %6d/%6d %7.3f",

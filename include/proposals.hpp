@@ -97,7 +97,7 @@ private:
 
     virtual int compute_likelihood(int prop_idx,
                                    double &proposed_likelihood,
-                                   double &proposed_log_normalization) { return -1; };
+                                   double &proposed_log_normalization);
 
     virtual int compute_acceptance(double proposed_likelihood,
                                    double proposed_log_normalization,
