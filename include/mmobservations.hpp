@@ -5,7 +5,18 @@
 
 #include "hierarchicalmodel.hpp"
 
-class mmobservations
+class Observations
+{
+    virtual double single_frequency_likelihood(std::vector<double> model,
+        const hierarchicalmodel *hmodel,
+        double *residuals,
+        double *residuals_normed,
+        double &log_normalization) = 0;
+
+    virtual std::vector<double> single_frequency_predictions(std::vector<double> model) = 0;
+};
+
+class mmobservations : Observations
 {
 public:
     // Constructor that takes in vectors
@@ -19,9 +30,9 @@ public:
         const hierarchicalmodel *hmodel,
         double *residuals,
         double *residuals_normed,
-        double &log_normalization);
+        double &log_normalization) override;
 
-    std::vector<double> single_frequency_predictions(std::vector<double> model);
+    std::vector<double> single_frequency_predictions(std::vector<double> model) override;
 
     std::vector<double> obs;
     std::vector<double> sigma;
