@@ -51,7 +51,7 @@ int Proposal::step()
 
     if (wavetree2d_sub_set_invalid_perturbation(global.wt, name) < 0)
     {
-        ERROR("failed to initialise birth perturbation\n");
+        ERROR("failed to initialise %s perturbation\n", enum_to_string(name));
         return -1;
     }
 
@@ -199,6 +199,39 @@ void Proposal::initialize_mpi(MPI_Comm _communicator)
 bool Proposal::primary() const
 {
     return (communicator == MPI_COMM_NULL || mpi_rank == 0);
+}
+
+int Proposal::communicate_proposal_location_and_value(int &prop_valid,
+                                                      int &prop_idx,
+                                                      int &prop_depth,
+                                                      double &prop_value)
+{
+    if (communicator != MPI_COMM_NULL)
+    {
+        if (MPI_Bcast(&prop_valid, 1, MPI_INT, 0, communicator) != MPI_SUCCESS)
+        {
+            throw WAVETOMO2DEXCEPTION("Failed to broadcast %s valid\n", enum_to_string(name));
+        }
+
+        if (prop_valid)
+        {
+            if (MPI_Bcast(&prop_idx, 1, MPI_INT, 0, communicator) != MPI_SUCCESS)
+            {
+                throw WAVETOMO2DEXCEPTION("Failed to broadcast %s index\n", enum_to_string(name));
+            }
+
+            if (MPI_Bcast(&prop_depth, 1, MPI_INT, 0, communicator) != MPI_SUCCESS)
+            {
+                throw WAVETOMO2DEXCEPTION("Failed to broadcast %s depth\n", enum_to_string(name));
+            }
+
+            if (MPI_Bcast(&prop_value, 1, MPI_DOUBLE, 0, communicator) != MPI_SUCCESS)
+            {
+                throw WAVETOMO2DEXCEPTION("Failed to broadcast %s value\n", enum_to_string(name));
+            }
+        }
+    }
+    return 0;
 }
 
 int Proposal::communicate_acceptance(bool &accept_proposal)

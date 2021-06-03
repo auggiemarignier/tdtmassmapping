@@ -78,7 +78,7 @@ private:
     virtual int communicate_proposal_location_and_value(int &prop_valid,
                                                         int &prop_idx,
                                                         int &prop_depth,
-                                                        double &prop_value) { return -1; };
+                                                        double &prop_value);
 
     virtual int propose_proposal(int &prop_valid,
                                  int &prop_idx,
