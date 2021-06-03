@@ -1,9 +1,9 @@
 #include "globalprop.hpp"
 
-extern "C" {
-  #include "hnk_cartesian_nonsquare.h"
-
-  #include "slog.h"
+extern "C"
+{
+#include "hnk_cartesian_nonsquare.h"
+#include "slog.h"
 };
 
 static constexpr double LARGE_LIKELIHOOD = 1e99;
@@ -33,14 +33,14 @@ int GlobalProposal_indextocoord(void *user, int index, int *i, int *j, int *k, i
 }
 
 GlobalProposal::GlobalProposal(const char *filename,
-                                    Observations* _observations,
-                                    const char *initial_model,
-                                    const char *prior_file,
-                                    int _degreex,
-                                    int _degreey,
-                                    int seed,
-                                    int _kmax,
-                                    int xywavelet)
+                               Observations *_observations,
+                               const char *initial_model,
+                               const char *prior_file,
+                               int _degreex,
+                               int _degreey,
+                               int seed,
+                               int _kmax,
+                               int xywavelet)
     : kmax(_kmax),
       treemaxdepth(-1),
       wt(nullptr),
@@ -88,21 +88,6 @@ GlobalProposal::GlobalProposal(const char *filename,
     if (xywaveletf == nullptr)
     {
         throw WAVETOMO2DEXCEPTION("Invalid horizontal wavelet %d\n", xywavelet);
-    }
-
-    //
-    // Load observations
-    //
-    if (observations == NULL)
-    {
-        if (filename == NULL)
-        {
-            throw WAVETOMO2DEXCEPTION("Invalid filename\n");
-        }
-        else
-        {
-            Observations observations(filename);
-        }
     }
 
     hierarchical = new independentgaussianhierarchicalmodel();
@@ -272,7 +257,7 @@ GlobalProposal::~GlobalProposal()
 
 double
 GlobalProposal::image_likelihood(const double *image_model,
-                                      double &log_normalization)
+                                 double &log_normalization)
 {
     log_normalization = 0.0;
     return observations->single_frequency_likelihood(image_model,
