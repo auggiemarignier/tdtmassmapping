@@ -14,6 +14,8 @@ public:
     // Constructor that takes a vector of obs and the stddev
     Observations(std::vector<double> _obs, double _sigma);
 
+    virtual ~Observations(){};
+
     virtual double single_frequency_likelihood(std::vector<double> model,
                                                const hierarchicalmodel *hmodel,
                                                double *residuals,
