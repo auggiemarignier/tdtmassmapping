@@ -19,7 +19,8 @@ include(FetchContent)
 include(dependencies)
 
 set(SOURCES src/mmobservations.cpp
-            src/proposals.cpp)
+            src/proposals.cpp
+            src/globalprop.cpp)
 
 add_library(${PROJECT_LIB} STATIC ${SOURCES}                     
                             $<TARGET_OBJECTS:${TDTWAVETOMO_LIB}>
