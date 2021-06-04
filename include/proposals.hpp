@@ -4,7 +4,7 @@
 
 #include <mpi.h>
 
-string enum_to_string(wavetree_perturb_t type)
+std::string enum_to_string(wavetree_perturb_t type)
 {
     switch (type)
     {
