@@ -70,6 +70,8 @@ int Proposal::step()
         double prop_prob;
         double reverse_prob;
         double prior_prob = 0.0;
+        double value_prior_ratio = 1.0; // This must be 1 before calling
+        int prior_errors = 0;
 
         double proposed_likelihood;
         double proposed_log_normalization;
