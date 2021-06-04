@@ -88,6 +88,8 @@ int Proposal::step()
                                                prop_prob,
                                                prop_valid,
                                                prop_parent_coeff,
+                                               value_prior_ratio,
+                                               prior_errors,
                                                ii,
                                                ij) < 0)
         {

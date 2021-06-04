@@ -17,6 +17,8 @@ int BirthProposal::choose_proposal_location_and_value(int k,
                                                       double &birth_prob,
                                                       int &birth_valid,
                                                       double &birth_parent_coeff,
+                                                      double &value_prior_ratio,
+                                                      int &prior_errors,
                                                       int &ii,
                                                       int &ij)
 {
