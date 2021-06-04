@@ -102,6 +102,8 @@ private:
                                    double prior_prob) = 0;
 
     virtual int communicate_acceptance(bool &accept_proposal);
+
+    virtual bool k_valid(int &k) = 0;
 };
 
 class BirthProposal : public Proposal
@@ -145,6 +147,8 @@ private:
                            double prop_prob,
                            double ratio,
                            double prior_prob) override;
+
+    virtual bool k_valid(int &k) override;
 };
 
 class DeathProposal : public Proposal
@@ -195,4 +199,16 @@ private:
                            double prop_prob,
                            double ratio,
                            double prior_prob) override;
+   
+    virtual bool k_valid(int &k) override;
+};
+
+class ValueProposal : public Proposal
+{
+public:
+    ValueProposal(GlobalProposal &global)
+        : Proposal(global, WT_PERTURB_DEATH){};
+
+private:
+    virtual bool k_valid(int &k) override;
 };

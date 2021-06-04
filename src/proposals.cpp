@@ -50,15 +50,15 @@ int Proposal::step()
 {
     propose++;
 
-    int k = wavetree2d_sub_coeff_count(global.wt);
-
     if (wavetree2d_sub_set_invalid_perturbation(global.wt, name) < 0)
     {
         ERROR("failed to initialise %s perturbation\n", enum_to_string(name).c_str());
         return -1;
     }
 
-    if (true) // figure this out for the three proposals
+    int k = wavetree2d_sub_coeff_count(global.wt);
+
+    if (k_valid(k)) // figure this out for the three proposals
     {
         double ratio;
         int prop_depth;

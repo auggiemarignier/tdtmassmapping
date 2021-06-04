@@ -146,3 +146,5 @@ double DeathProposal::calculate_alpha(double proposed_likelihood,
            log(ratio) -       // Tree Prior
            log(prior_prob);   // Coefficient prior
 }
+
+bool DeathProposal::k_valid(int &k) { return k > 1; }

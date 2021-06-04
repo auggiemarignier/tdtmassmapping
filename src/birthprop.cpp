@@ -153,3 +153,5 @@ double BirthProposal::calculate_alpha(double proposed_likelihood,
            log(ratio) +       // Tree Prior
            log(prior_prob);   // Coefficient prior
 }
+
+bool BirthProposal::k_valid(int &k) { return k < global.kmax; }

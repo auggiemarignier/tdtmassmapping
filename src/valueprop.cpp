@@ -6,3 +6,6 @@ extern "C"
 #include "wavetomo2dexception.hpp"
 
 #include "proposals.hpp"
+
+
+bool ValueProposal::k_valid(int &k) { return true; }
