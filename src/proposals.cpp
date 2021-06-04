@@ -115,6 +115,19 @@ int Proposal::step()
                 return -1;
             }
 
+            if (compute_reverse_proposal_probability(prop_idx,
+                                                     prop_depth,
+                                                     prop_value,
+                                                     ii,
+                                                     ij,
+                                                     prop_parent_coeff,
+                                                     prop_prob,
+                                                     reverse_prob,
+                                                     prior_prob) < 0)
+            {
+                return -1;
+            }
+
             if (compute_likelihood(prop_idx,
                                    proposed_likelihood,
                                    proposed_log_normalization) < 0)
