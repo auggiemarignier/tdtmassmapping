@@ -114,15 +114,15 @@ int BirthProposal::propose_proposal(int &birth_valid,
     return 0;
 }
 
-int BirthProposal::compute_reverse_proposal_probability(int birth_idx,
-                                                        int birth_depth,
-                                                        double birth_value,
-                                                        int &ii,
-                                                        int &ij,
-                                                        double &birth_parent_coeff,
-                                                        double &birth_prob,
-                                                        double &reverse_prob,
-                                                        double &prior_prob)
+int BirthProposal::sub_reverse_proposal(int birth_idx,
+                                        int birth_depth,
+                                        double birth_value,
+                                        int &ii,
+                                        int &ij,
+                                        double &birth_parent_coeff,
+                                        double &birth_prob,
+                                        double &reverse_prob,
+                                        double &prior_prob)
 {
     if (wavetree2d_sub_reverse_birth_global(global.wt,
                                             global.treemaxdepth,
