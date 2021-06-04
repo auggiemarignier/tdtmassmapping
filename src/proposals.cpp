@@ -6,6 +6,7 @@ extern "C"
 #include "wavetomo2dexception.hpp"
 
 #include "proposals.hpp"
+#include "utils.hpp"
 
 Proposal::Proposal(GlobalProposal &_global)
     : global(_global),
