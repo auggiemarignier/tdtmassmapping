@@ -80,3 +80,52 @@ int DeathProposal::propose_proposal(int &death_valid,
     }
     return 0;
 }
+
+int DeathProposal::sub_reverse_proposal(int death_idx,
+                                        int death_depth,
+                                        double death_value,
+                                        int &ii,
+                                        int &ij,
+                                        double &death_parent_coeff,
+                                        double &death_prob,
+                                        double &reverse_prob,
+                                        double &prior_prob)
+{
+    if (wavetree2d_sub_2dindices(global.wt, death_idx, &ii, &ij) < 0)
+    {
+        ERROR("failed to compute 2d indices for death\n");
+        return -1;
+    }
+
+    if (wavetree2d_sub_get_coeff(global.wt,
+                                 wavetree2d_sub_parent_index(global.wt, death_idx),
+                                 &death_parent_coeff) < 0)
+    {
+        ERROR("failed to get parent coefficient for death\n");
+        return -1;
+    }
+
+    if (wavetree_pp_death2d(global.proposal,
+                            ii,
+                            ij,
+                            death_depth,
+                            global.treemaxdepth,
+                            death_parent_coeff,
+                            death_value,
+                            &death_prob) < 0)
+    {
+        ERROR("failed to get death probability\n");
+        return -1;
+    }
+
+    if (wavetree2d_sub_reverse_death_global(global.wt,
+                                            global.treemaxdepth,
+                                            death_depth,
+                                            death_idx,
+                                            &reverse_prob) < 0)
+    {
+        ERROR("failed to reverse death (global)\n");
+        return -1;
+    }
+    return 0;
+}

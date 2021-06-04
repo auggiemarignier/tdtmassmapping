@@ -177,4 +177,14 @@ private:
                          int &prop_idx,
                          int &prop_depth,
                          double &prop_value) override;
+
+    int sub_reverse_proposal(int prop_idx,
+                             int prop_depth,
+                             double prop_value,
+                             int &ii,
+                             int &ij,
+                             double &prop_parent_coeff,
+                             double &prop_prob,
+                             double &reverse_prob,
+                             double &prior_prob) override;
 };
