@@ -47,6 +47,8 @@ private:
                                                    double &prop_prob,
                                                    int &prop_valid,
                                                    double &prop_parent_coeff,
+                                                   double &value_prior_ratio,
+                                                   int &prior_errors,
                                                    int &ii,
                                                    int &ij) = 0;
 
@@ -122,6 +124,8 @@ private:
                                            double &prop_prob,
                                            int &prop_valid,
                                            double &prop_parent_coeff,
+                                           double &value_prior_ratio,
+                                           int &prior_errors,
                                            int &ii,
                                            int &ij) override;
 
@@ -167,6 +171,8 @@ private:
                                            double &prop_prob,
                                            int &prop_valid,
                                            double &prop_parent_coeff,
+                                           double &value_prior_ratio,
+                                           int &prior_errors,
                                            int &ii,
                                            int &ij) override;
 
@@ -199,7 +205,7 @@ private:
                            double prop_prob,
                            double ratio,
                            double prior_prob) override;
-   
+
     virtual bool k_valid(int &k) override;
 };
 
@@ -210,5 +216,19 @@ public:
         : Proposal(global, WT_PERTURB_DEATH){};
 
 private:
+    int choose_proposal_location_and_value(int k,
+                                           double &ratio,
+                                           int &prop_depth,
+                                           int &prop_idx,
+                                           double &choose_prob,
+                                           double &prop_value,
+                                           double &prop_prob,
+                                           int &prop_valid,
+                                           double &prop_parent_coeff,
+                                           double &value_prior_ratio,
+                                           int &prior_errors,
+                                           int &ii,
+                                           int &ij) override;
+    
     virtual bool k_valid(int &k) override;
 };
