@@ -48,7 +48,7 @@ private:
                                                    int &prop_valid,
                                                    double &prop_parent_coeff,
                                                    int &ii,
-                                                   int &ij) { return -1; };
+                                                   int &ij) = 0;
 
     virtual int communicate_proposal_location_and_value(int &prop_valid,
                                                         int &prop_idx,
@@ -58,7 +58,7 @@ private:
     virtual int propose_proposal(int &prop_valid,
                                  int &prop_idx,
                                  int &prop_depth,
-                                 double &prop_value) { return -1; };
+                                 double &prop_value) = 0;
 
     virtual int compute_reverse_proposal_probability(int prop_idx,
                                                      int prop_depth,
@@ -78,7 +78,7 @@ private:
                                      double &prop_parent_coeff,
                                      double &prop_prob,
                                      double &reverse_prob,
-                                     double &prior_prob) { return -1; };
+                                     double &prior_prob) = 0;
 
     virtual int compute_likelihood(int prop_idx,
                                    double &proposed_likelihood,
@@ -99,7 +99,7 @@ private:
                                    double choose_prob,
                                    double prop_prob,
                                    double ratio,
-                                   double prior_prob) { return -1; };
+                                   double prior_prob) = 0;
 
     virtual int communicate_acceptance(bool &accept_proposal);
 };
