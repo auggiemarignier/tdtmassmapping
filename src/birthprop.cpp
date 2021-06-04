@@ -114,12 +114,13 @@ int BirthProposal::propose_proposal(int &birth_valid,
     return 0;
 }
 
-int BirthProposal::compute_reverse_proposal_probability(int birth_depth,
-                                                        int birth_idx,
-                                                        int ii,
-                                                        int ij,
-                                                        double birth_parent_coeff,
+int BirthProposal::compute_reverse_proposal_probability(int birth_idx,
+                                                        int birth_depth,
                                                         double birth_value,
+                                                        int &ii,
+                                                        int &ij,
+                                                        double &birth_parent_coeff,
+                                                        double &birth_prob,
                                                         double &reverse_prob,
                                                         double &prior_prob)
 {
