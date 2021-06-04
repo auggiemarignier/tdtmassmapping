@@ -214,9 +214,19 @@ class ValueProposal : public Proposal
 {
 public:
     ValueProposal(GlobalProposal &global)
-        : Proposal(global, WT_PERTURB_DEATH){};
+        : Proposal(global, WT_PERTURB_VALUE){};
 
 private:
+    virtual int compute_reverse_proposal_probability(int prop_idx,
+                                                     int prop_depth,
+                                                     double prop_value,
+                                                     int &ii,
+                                                     int &ij,
+                                                     double &prop_parent_coeff,
+                                                     double &prop_prob,
+                                                     double &reverse_prob,
+                                                     double &prior_prob) override {};
+
     int choose_proposal_location_and_value(int k,
                                            double &ratio,
                                            int &prop_depth,
@@ -253,6 +263,16 @@ private:
                            int prop_idx,
                            double ratio,
                            double prior_prob) override;
+
+    int sub_reverse_proposal(int prop_idx,
+                             int prop_depth,
+                             double prop_value,
+                             int &ii,
+                             int &ij,
+                             double &prop_parent_coeff,
+                             double &prop_prob,
+                             double &reverse_prob,
+                             double &prior_prob) override {};
 
     virtual bool k_valid(int &k) override;
 };
