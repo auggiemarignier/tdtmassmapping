@@ -1,3 +1,5 @@
+#include <math.h>
+
 extern "C"
 {
 #include "slog.h"
@@ -251,14 +253,14 @@ int Proposal::communicate_proposal_location_and_value(int &prop_valid,
 }
 
 int Proposal::compute_reverse_proposal_probability(int prop_idx,
-                                                        int prop_depth,
-                                                        double prop_value,
-                                                        int &ii,
-                                                        int &ij,
-                                                        double &prop_parent_coeff,
-                                                        double &prop_prob,
-                                                        double &reverse_prob,
-                                                        double &prior_prob)
+                                                   int prop_depth,
+                                                   double prop_value,
+                                                   int &ii,
+                                                   int &ij,
+                                                   double &prop_parent_coeff,
+                                                   double &prop_prob,
+                                                   double &reverse_prob,
+                                                   double &prior_prob)
 {
     if (primary())
     {
@@ -286,6 +288,31 @@ int Proposal::compute_reverse_proposal_probability(int prop_idx,
                                                      global.treemaxdepth,
                                                      prop_parent_coeff,
                                                      prop_value);
+    }
+    return 0;
+}
+
+int Proposal::compute_acceptance(double proposed_likelihood,
+                                 double proposed_log_normalization,
+                                 double reverse_prob,
+                                 double choose_prob,
+                                 double prop_prob,
+                                 double ratio,
+                                 double prior_prob,
+                                 bool &accept_proposal)
+{
+    if (primary())
+    {
+        double u = log(global.random.uniform());
+        double alpha = calculate_alpha(proposed_likelihood,
+                                       proposed_log_normalization,
+                                       reverse_prob,
+                                       choose_prob,
+                                       prop_prob,
+                                       ratio,
+                                       prior_prob,
+                                       accept_proposal);
+        accept_proposal = u < alpha;
     }
     return 0;
 }

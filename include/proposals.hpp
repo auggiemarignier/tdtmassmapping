@@ -91,6 +91,15 @@ private:
                                    double prop_prob,
                                    double ratio,
                                    double prior_prob,
+                                   bool &accept_proposal);
+
+    virtual double calculate_alpha(double proposed_likelihood,
+                                   double proposed_log_normalization,
+                                   double reverse_prob,
+                                   double choose_prob,
+                                   double prop_prob,
+                                   double ratio,
+                                   double prior_prob,
                                    bool &accept_proposal) { return -1; };
 
     virtual int communicate_acceptance(bool &accept_proposal);
