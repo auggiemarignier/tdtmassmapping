@@ -72,37 +72,3 @@ TEST_F(DeathTest, DeathStep)
     ASSERT_EQ(death->propose, 1);
     ASSERT_TRUE(step_taken == 0 || step_taken == 1);
 }
-
-class ValueTest : public ::testing::Test
-{
-protected:
-    mmobservations *observations;
-    GlobalProposal *global;
-    ValueProposal *value;
-    void SetUp() override
-    {
-        std::vector<double> obs = {1, 2, 3, 4, 5};
-        double sigma = 1.41;
-        observations = new mmobservations(obs, sigma);
-
-        global = new GlobalProposal(NULL,
-                                    observations,
-                                    NULL,
-                                    "tutorial_prior.txt",
-                                    8,
-                                    8,
-                                    1,
-                                    100,
-                                    4);
-
-        value = new ValueProposal(*global);
-    }
-};
-
-TEST_F(ValueTest, ValueStep)
-{
-    ASSERT_EQ(value->name, 3);
-    int step_taken = value->step();
-    ASSERT_EQ(value->propose, 1);
-    ASSERT_TRUE(step_taken == 0 || step_taken == 1);
-}
