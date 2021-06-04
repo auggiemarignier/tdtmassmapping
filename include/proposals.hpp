@@ -68,7 +68,17 @@ private:
                                                      double &prop_parent_coeff,
                                                      double &prop_prob,
                                                      double &reverse_prob,
-                                                     double &prior_prob) { return -1; };
+                                                     double &prior_prob);
+
+    virtual int sub_reverse_proposal(int prop_idx,
+                                     int prop_depth,
+                                     double prop_value,
+                                     int &ii,
+                                     int &ij,
+                                     double &prop_parent_coeff,
+                                     double &prop_prob,
+                                     double &reverse_prob,
+                                     double &prior_prob) { return -1; };
 
     virtual int compute_likelihood(int prop_idx,
                                    double &proposed_likelihood,

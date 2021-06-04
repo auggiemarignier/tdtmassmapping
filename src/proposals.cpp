@@ -250,6 +250,46 @@ int Proposal::communicate_proposal_location_and_value(int &prop_valid,
     return 0;
 }
 
+int Proposal::compute_reverse_proposal_probability(int prop_idx,
+                                                        int prop_depth,
+                                                        double prop_value,
+                                                        int &ii,
+                                                        int &ij,
+                                                        double &prop_parent_coeff,
+                                                        double &prop_prob,
+                                                        double &reverse_prob,
+                                                        double &prior_prob)
+{
+    if (primary())
+    {
+        if (sub_reverse_proposal(prop_idx,
+                                 prop_depth,
+                                 prop_value,
+                                 ii,
+                                 ij,
+                                 prop_parent_coeff,
+                                 prop_prob,
+                                 reverse_prob,
+                                 prior_prob) < 0)
+        {
+            ERROR("failed to reverse Proposal\n");
+            return -1;
+        }
+
+        //
+        // Compute the prior ratio
+        //
+        prior_prob = wavetree_pp_prior_probability2d(global.proposal,
+                                                     ii,
+                                                     ij,
+                                                     prop_depth,
+                                                     global.treemaxdepth,
+                                                     prop_parent_coeff,
+                                                     prop_value);
+    }
+    return 0;
+}
+
 int Proposal::communicate_acceptance(bool &accept_proposal)
 {
     if (communicator != MPI_COMM_NULL)

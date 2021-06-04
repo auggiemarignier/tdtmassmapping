@@ -124,28 +124,14 @@ int BirthProposal::compute_reverse_proposal_probability(int birth_idx,
                                                         double &reverse_prob,
                                                         double &prior_prob)
 {
-    if (primary())
+    if (wavetree2d_sub_reverse_birth_global(global.wt,
+                                            global.treemaxdepth,
+                                            birth_depth,
+                                            birth_idx,
+                                            &reverse_prob) < 0)
     {
-        if (wavetree2d_sub_reverse_birth_global(global.wt,
-                                                global.treemaxdepth,
-                                                birth_depth,
-                                                birth_idx,
-                                                &reverse_prob) < 0)
-        {
-            ERROR("failed to reverse birth (global)\n");
-            return -1;
-        }
-
-        //
-        // Compute the prior ratio
-        //
-        prior_prob = wavetree_pp_prior_probability2d(global.proposal,
-                                                     ii,
-                                                     ij,
-                                                     birth_depth,
-                                                     global.treemaxdepth,
-                                                     birth_parent_coeff,
-                                                     birth_value);
+        ERROR("failed to reverse birth (global)\n");
+        return -1;
     }
     return 0;
 }
