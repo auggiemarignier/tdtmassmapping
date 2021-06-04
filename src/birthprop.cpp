@@ -143,6 +143,7 @@ double BirthProposal::calculate_alpha(double proposed_likelihood,
                                       double reverse_prob,
                                       double choose_prob,
                                       double birth_prob,
+                                      int prop_idx,
                                       double ratio,
                                       double prior_prob)
 {

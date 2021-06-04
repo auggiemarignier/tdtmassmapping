@@ -129,6 +129,7 @@ int Proposal::step()
                                    reverse_prob,
                                    choose_prob,
                                    prop_prob,
+                                   prop_idx,
                                    ratio,
                                    prior_prob,
                                    accept_proposal) < 0)
@@ -300,6 +301,7 @@ int Proposal::compute_acceptance(double proposed_likelihood,
                                  double reverse_prob,
                                  double choose_prob,
                                  double prop_prob,
+                                 int prop_idx,
                                  double ratio,
                                  double prior_prob,
                                  bool &accept_proposal)
@@ -312,6 +314,7 @@ int Proposal::compute_acceptance(double proposed_likelihood,
                                        reverse_prob,
                                        choose_prob,
                                        prop_prob,
+                                       prop_idx,
                                        ratio,
                                        prior_prob);
         accept_proposal = u < alpha;

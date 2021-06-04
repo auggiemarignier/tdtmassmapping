@@ -90,6 +90,7 @@ private:
                                    double reverse_prob,
                                    double choose_prob,
                                    double prop_prob,
+                                   int prop_idx,
                                    double ratio,
                                    double prior_prob,
                                    bool &accept_proposal);
@@ -99,6 +100,7 @@ private:
                                    double reverse_prob,
                                    double choose_prob,
                                    double prop_prob,
+                                   int prop_idx,
                                    double ratio,
                                    double prior_prob) = 0;
 
@@ -147,6 +149,7 @@ private:
                            double reverse_prob,
                            double choose_prob,
                            double prop_prob,
+                           int prop_idx,
                            double ratio,
                            double prior_prob) override;
 
@@ -200,6 +203,7 @@ private:
                            double reverse_prob,
                            double choose_prob,
                            double prop_prob,
+                           int prop_idx,
                            double ratio,
                            double prior_prob) override;
 
