@@ -76,6 +76,7 @@ GlobalProposal::GlobalProposal(const char *filename,
       coeff_hist(nullptr),
       random(seed),
       xywaveletf(nullptr),
+      temperature(1.0),
       cov_n(-1)
 {
     if (degreex < 0 || degreex >= 16 ||

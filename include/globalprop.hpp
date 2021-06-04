@@ -137,6 +137,8 @@ public:
 
     generic_lift_inverse1d_step_t xywaveletf;
 
+    double temperature;
+
     int cov_n;
     std::vector<int> cov_count;
     std::vector<double *> cov_delta;
