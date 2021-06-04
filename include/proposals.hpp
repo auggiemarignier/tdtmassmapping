@@ -99,8 +99,7 @@ private:
                                    double choose_prob,
                                    double prop_prob,
                                    double ratio,
-                                   double prior_prob,
-                                   bool &accept_proposal) { return -1; };
+                                   double prior_prob) { return -1; };
 
     virtual int communicate_acceptance(bool &accept_proposal);
 };
@@ -145,6 +144,5 @@ private:
                            double choose_prob,
                            double prop_prob,
                            double ratio,
-                           double prior_prob,
-                           bool &accept_proposal) override;
+                           double prior_prob) override;
 };

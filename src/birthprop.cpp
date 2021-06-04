@@ -142,8 +142,7 @@ double BirthProposal::calculate_alpha(double proposed_likelihood,
                                       double choose_prob,
                                       double birth_prob,
                                       double ratio,
-                                      double prior_prob,
-                                      bool &accept_proposal)
+                                      double prior_prob)
 {
     return (global.current_likelihood - proposed_likelihood) /
                global.temperature + // Likelihood ratio
