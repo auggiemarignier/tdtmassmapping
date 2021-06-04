@@ -310,8 +310,7 @@ int Proposal::compute_acceptance(double proposed_likelihood,
                                        choose_prob,
                                        prop_prob,
                                        ratio,
-                                       prior_prob,
-                                       accept_proposal);
+                                       prior_prob);
         accept_proposal = u < alpha;
     }
     return 0;
