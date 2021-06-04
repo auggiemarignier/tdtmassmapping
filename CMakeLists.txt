@@ -23,6 +23,7 @@ set(SOURCES src/mmobservations.cpp
             src/globalprop.cpp
             src/birthprop.cpp
             src/deathprop.cpp
+            src/valueprop.cpp
             src/utils.cpp)
 
 add_library(${PROJECT_LIB} STATIC ${SOURCES}                     
