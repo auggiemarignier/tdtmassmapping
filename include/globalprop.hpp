@@ -59,6 +59,7 @@ public:
     double image_likelihood(const double *image_model,
                             double &log_normalization);
     double likelihood(double &log_normalization);
+    double likelihood_mpi(double &log_normalization) { return 1.0; } //TODO: implement this
     void reset_residuals();
     void invalidate_residuals();
     void accept();
