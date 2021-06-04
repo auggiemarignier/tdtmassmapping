@@ -56,3 +56,27 @@ int DeathProposal::choose_death_location(int k,
     }
     return 0;
 }
+
+int DeathProposal::propose_proposal(int &death_valid,
+                                    int &death_idx,
+                                    int &death_depth,
+                                    double &death_value)
+{
+    if (death_valid)
+    {
+        if (coefficient_histogram_propose_death(global.coeff_hist, death_idx) < 0)
+        {
+            ERROR("failed to update histogram for death proposal\n");
+            return -1;
+        }
+        if (wavetree2d_sub_propose_death(global.wt,
+                                         death_idx,
+                                         death_depth,
+                                         &death_value) < 0)
+        {
+            ERROR("failed to propose death\n");
+            return -1;
+        }
+    }
+    return 0;
+}

@@ -172,4 +172,9 @@ private:
                               int &death_idx,
                               double &choose_prob,
                               int &death_valid);
+
+    int propose_proposal(int &prop_valid,
+                         int &prop_idx,
+                         int &prop_depth,
+                         double &prop_value) override;
 };
