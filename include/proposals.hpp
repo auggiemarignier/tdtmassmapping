@@ -245,5 +245,14 @@ private:
                                  int &prop_depth,
                                  double &prop_value) override;
 
+    double calculate_alpha(double proposed_likelihood,
+                           double proposed_log_normalization,
+                           double reverse_prob,
+                           double choose_prob,
+                           double prop_prob,
+                           int prop_idx,
+                           double ratio,
+                           double prior_prob) override;
+
     virtual bool k_valid(int &k) override;
 };

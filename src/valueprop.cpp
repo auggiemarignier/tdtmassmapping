@@ -129,4 +129,26 @@ int ValueProposal::propose_proposal(int &valid_proposal,
     return 0;
 }
 
+double ValueProposal::calculate_alpha(double proposed_likelihood,
+                                      double proposed_log_normalization,
+                                      double reverse_prob,
+                                      double choose_prob,
+                                      double death_prob,
+                                      int prop_idx,
+                                      double value_prior_ratio,
+                                      double prior_prob)
+{
+    double alpha = (log(value_prior_ratio) +
+                    (global.current_likelihood - proposed_likelihood) /
+                        global.temperature);
+
+    if (coefficient_histogram_sample_value_alpha(global.coeff_hist, prop_idx, exp(alpha)) < 0)
+    {
+        ERROR("failed to sample alpha\n");
+        return -1;
+    }
+
+    return alpha;
+}
+
 bool ValueProposal::k_valid(int &k) { return true; }
