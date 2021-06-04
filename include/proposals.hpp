@@ -47,7 +47,6 @@ private:
                                                    double &prop_prob,
                                                    int &prop_valid,
                                                    double &prop_parent_coeff,
-                                                   double &value_prior_ratio,
                                                    int &prior_errors,
                                                    int &ii,
                                                    int &ij) = 0;
@@ -124,7 +123,6 @@ private:
                                            double &prop_prob,
                                            int &prop_valid,
                                            double &prop_parent_coeff,
-                                           double &value_prior_ratio,
                                            int &prior_errors,
                                            int &ii,
                                            int &ij) override;
@@ -171,7 +169,6 @@ private:
                                            double &prop_prob,
                                            int &prop_valid,
                                            double &prop_parent_coeff,
-                                           double &value_prior_ratio,
                                            int &prior_errors,
                                            int &ii,
                                            int &ij) override;
@@ -225,7 +222,6 @@ private:
                                            double &prop_prob,
                                            int &prop_valid,
                                            double &prop_parent_coeff,
-                                           double &value_prior_ratio,
                                            int &prior_errors,
                                            int &ii,
                                            int &ij) override;

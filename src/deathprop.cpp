@@ -16,7 +16,6 @@ int DeathProposal::choose_proposal_location_and_value(int k,
                                                       double &prop_prob,
                                                       int &prop_valid,
                                                       double &prop_parent_coeff,
-                                                      double &value_prior_ratio,
                                                       int &prior_errors,
                                                       int &ii,
                                                       int &ij)

@@ -16,18 +16,18 @@ int ValueProposal::choose_proposal_location_and_value(int k,
                                                       double &prop_prob,
                                                       int &prop_valid,
                                                       double &prop_parent_coeff,
-                                                      double &value_prior_ratio,
                                                       int &prior_errors,
                                                       int &ii,
                                                       int &ij)
 {
+    ratio = 1.0; // This must be 1 before calling
     return choose_value_location_and_value(prop_depth,
                                            prop_idx,
                                            choose_prob,
                                            prop_value,
                                            ii,
                                            ij,
-                                           value_prior_ratio,
+                                           ratio,
                                            prior_errors,
                                            prop_valid);
 }
