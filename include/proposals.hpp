@@ -196,3 +196,12 @@ private:
                            double ratio,
                            double prior_prob) override;
 };
+
+class ValueProposal : public Proposal
+{
+public:
+    ValueProposal(GlobalProposal &global)
+        : Proposal(global, WT_PERTURB_VALUE){};
+
+    int step() override;
+};
