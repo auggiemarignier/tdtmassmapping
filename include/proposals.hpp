@@ -146,3 +146,30 @@ private:
                            double ratio,
                            double prior_prob) override;
 };
+
+class DeathProposal : public Proposal
+{
+public:
+    DeathProposal(GlobalProposal &global)
+        : Proposal(global, WT_PERTURB_DEATH){};
+
+private:
+    int choose_proposal_location_and_value(int k,
+                                           double &ratio,
+                                           int &prop_depth,
+                                           int &prop_idx,
+                                           double &choose_prob,
+                                           double &prop_value,
+                                           double &prop_prob,
+                                           int &prop_valid,
+                                           double &prop_parent_coeff,
+                                           int &ii,
+                                           int &ij) override;
+
+    int choose_death_location(int k,
+                              double &ratio,
+                              int &death_depth,
+                              int &death_idx,
+                              double &choose_prob,
+                              int &death_valid);
+};
