@@ -240,5 +240,10 @@ private:
                                         int &prior_errors,
                                         int &valid_proposal);
 
+    virtual int propose_proposal(int &prop_valid,
+                                 int &prop_idx,
+                                 int &prop_depth,
+                                 double &prop_value) override;
+
     virtual bool k_valid(int &k) override;
 };

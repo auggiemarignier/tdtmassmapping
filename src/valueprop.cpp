@@ -28,7 +28,7 @@ int ValueProposal::choose_proposal_location_and_value(int k,
                                            ii,
                                            ij,
                                            value_prior_ratio,
-                                           prior_erros,
+                                           prior_errors,
                                            prop_valid);
 }
 
@@ -110,6 +110,22 @@ int ValueProposal::choose_value_location_and_value(int &value_depth,
         }
     }
 
+    return 0;
+}
+
+int ValueProposal::propose_proposal(int &valid_proposal,
+                                    int &value_idx,
+                                    int &value_depth,
+                                    double &value)
+{
+    if (valid_proposal)
+    {
+        if (wavetree2d_sub_propose_value(global.wt, value_idx, value_depth, value) < 0)
+        {
+            ERROR("failed to propose value\n");
+            return -1;
+        }
+    }
     return 0;
 }
 
