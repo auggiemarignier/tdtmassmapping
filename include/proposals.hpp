@@ -229,6 +229,16 @@ private:
                                            int &prior_errors,
                                            int &ii,
                                            int &ij) override;
-    
+
+    int choose_value_location_and_value(int &value_depth,
+                                        int &value_idx,
+                                        double &choose_prob,
+                                        double &value,
+                                        int &ii,
+                                        int &ij,
+                                        double &value_prior_ratio,
+                                        int &prior_errors,
+                                        int &valid_proposal);
+
     virtual bool k_valid(int &k) override;
 };
