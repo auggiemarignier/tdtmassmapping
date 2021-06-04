@@ -129,3 +129,20 @@ int DeathProposal::sub_reverse_proposal(int death_idx,
     }
     return 0;
 }
+
+double DeathProposal::calculate_alpha(double proposed_likelihood,
+                                      double proposed_log_normalization,
+                                      double reverse_prob,
+                                      double choose_prob,
+                                      double death_prob,
+                                      double ratio,
+                                      double prior_prob)
+{
+    return (global.current_likelihood - proposed_likelihood) /
+               global.temperature + // Likelihood ratio
+           log(reverse_prob) -
+           log(choose_prob) + // Depth/Node proposal ratio
+           log(death_prob) +  // Coefficient proposal
+           log(ratio) -       // Tree Prior
+           log(prior_prob);   // Coefficient prior
+}

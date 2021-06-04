@@ -187,4 +187,12 @@ private:
                              double &prop_prob,
                              double &reverse_prob,
                              double &prior_prob) override;
+
+    double calculate_alpha(double proposed_likelihood,
+                           double proposed_log_normalization,
+                           double reverse_prob,
+                           double choose_prob,
+                           double prop_prob,
+                           double ratio,
+                           double prior_prob) override;
 };
