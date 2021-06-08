@@ -13,7 +13,7 @@ protected:
     BirthProposal *birth;
     void SetUp() override
     {
-        std::vector<double> obs = {1, 2, 3, 4, 5};
+        std::vector<double> obs = {0, 1, 2, 3};
         double sigma = 1.41;
         observations = new mmobservations(obs, sigma);
 
@@ -21,10 +21,10 @@ protected:
                                     observations,
                                     NULL,
                                     "tutorial_prior.txt",
-                                    8,
-                                    8,
                                     1,
-                                    100,
+                                    1,
+                                    1,
+                                    4,
                                     4);
 
         birth = new BirthProposal(*global);
@@ -49,7 +49,7 @@ protected:
     BirthProposal *birth;
     void SetUp() override
     {
-        std::vector<double> obs = {1, 2, 3, 4, 5};
+        std::vector<double> obs = {0, 1, 2, 3};
         double sigma = 1.41;
         observations = new mmobservations(obs, sigma);
 
@@ -57,10 +57,10 @@ protected:
                                     observations,
                                     NULL,
                                     "tutorial_prior.txt",
-                                    8,
-                                    8,
                                     1,
-                                    100,
+                                    1,
+                                    1,
+                                    4,
                                     4);
 
         death = new DeathProposal(*global);
@@ -88,7 +88,7 @@ protected:
     ValueProposal *value;
     void SetUp() override
     {
-        std::vector<double> obs = {1, 2, 3, 4, 5};
+        std::vector<double> obs = {0, 1, 2, 3};
         double sigma = 1.41;
         observations = new mmobservations(obs, sigma);
 
@@ -96,10 +96,10 @@ protected:
                                     observations,
                                     NULL,
                                     "tutorial_prior.txt",
-                                    8,
-                                    8,
                                     1,
-                                    100,
+                                    1,
+                                    1,
+                                    4,
                                     4);
 
         value = new ValueProposal(*global);
