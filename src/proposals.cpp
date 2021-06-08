@@ -65,7 +65,7 @@ int Proposal::step()
         int prop_idx;
         double choose_prob;
         double prop_value;
-        int prop_valid = (name == 1 || name == 2) ? 1 : 0; // not sure why should be different for death proposal
+        int prop_valid = (name == 1 || name == 3) ? 0 : 1; // not sure why should be different for death proposal
         double prop_parent_coeff;
         double prop_prob;
         double reverse_prob;
