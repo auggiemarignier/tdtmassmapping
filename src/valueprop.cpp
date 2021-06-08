@@ -151,4 +151,18 @@ double ValueProposal::calculate_alpha(double proposed_likelihood,
     return alpha;
 }
 
+int ValueProposal::coefficient_histogram_accept(coefficient_histogram_t *c,
+                                              int index,
+                                              double value)
+{
+    return coefficient_histogram_accept_value(global.coeff_hist, index, value);
+}
+
+int ValueProposal::coefficient_histogram_reject(coefficient_histogram_t *c,
+                                              int index,
+                                              double value)
+{
+    return coefficient_histogram_reject_value(global.coeff_hist, index, value);
+}
+
 bool ValueProposal::k_valid(int &k) { return true; }

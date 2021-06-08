@@ -160,7 +160,17 @@ int Proposal::step()
                 accept++;
                 accept_depth[prop_depth]++;
 
-                // save to histogram
+                if (coefficient_histogram_accept(global.coeff_hist, prop_idx, prop_value) < 0)
+                {
+                    ERROR("failed to update histogram for %s acceptance\n", enum_to_string(name).c_str());
+                    return -1;
+                }
+
+                if (wavetree2d_sub_commit(global.wt) < 0)
+                {
+                    ERROR("failed to commit %s\n", enum_to_string(name).c_str());
+                    return -1;
+                }
 
                 global.current_likelihood = proposed_likelihood;
                 global.current_log_normalization = proposed_log_normalization;
@@ -170,7 +180,17 @@ int Proposal::step()
             }
             else
             {
-                // save to histogram
+                if (coefficient_histogram_reject(global.coeff_hist, prop_idx, prop_value) < 0)
+                {
+                    ERROR("failed to update histogram for %s rejection\n", enum_to_string(name).c_str());
+                    return -1;
+                }
+
+                if (wavetree2d_sub_undo(global.wt) < 0)
+                {
+                    ERROR("failed to undo %s\n", enum_to_string(name).c_str());
+                    return -1;
+                }
 
                 global.reject();
 

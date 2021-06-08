@@ -156,4 +156,18 @@ double BirthProposal::calculate_alpha(double proposed_likelihood,
            log(prior_prob);   // Coefficient prior
 }
 
+int BirthProposal::coefficient_histogram_accept(coefficient_histogram_t *c,
+                                                int index,
+                                                double value)
+{
+    return coefficient_histogram_accept_birth(global.coeff_hist, index, value);
+}
+
+int BirthProposal::coefficient_histogram_reject(coefficient_histogram_t *c,
+                                                int index,
+                                                double value)
+{
+    return coefficient_histogram_reject_birth(global.coeff_hist, index, value);
+}
+
 bool BirthProposal::k_valid(int &k) { return k < global.kmax; }

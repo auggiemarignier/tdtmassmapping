@@ -106,6 +106,14 @@ private:
 
     virtual int communicate_acceptance(bool &accept_proposal);
 
+    virtual int coefficient_histogram_accept(coefficient_histogram_t *c,
+                                             int index,
+                                             double value) = 0;
+
+    virtual int coefficient_histogram_reject(coefficient_histogram_t *c,
+                                             int index,
+                                             double value) = 0;
+
     virtual bool k_valid(int &k) = 0;
 };
 
@@ -152,6 +160,14 @@ private:
                            int prop_idx,
                            double ratio,
                            double prior_prob) override;
+
+    virtual int coefficient_histogram_accept(coefficient_histogram_t *c,
+                                             int index,
+                                             double value) override;
+
+    virtual int coefficient_histogram_reject(coefficient_histogram_t *c,
+                                             int index,
+                                             double value) override;
 
     virtual bool k_valid(int &k) override;
 };
@@ -206,6 +222,14 @@ private:
                            int prop_idx,
                            double ratio,
                            double prior_prob) override;
+
+    virtual int coefficient_histogram_accept(coefficient_histogram_t *c,
+                                             int index,
+                                             double value) override;
+
+    virtual int coefficient_histogram_reject(coefficient_histogram_t *c,
+                                             int index,
+                                             double value) override;
 
     virtual bool k_valid(int &k) override;
 };
@@ -273,6 +297,14 @@ private:
                              double &prop_prob,
                              double &reverse_prob,
                              double &prior_prob) override { return 0; };
+
+    virtual int coefficient_histogram_accept(coefficient_histogram_t *c,
+                                             int index,
+                                             double value) override;
+
+    virtual int coefficient_histogram_reject(coefficient_histogram_t *c,
+                                             int index,
+                                             double value) override;
 
     virtual bool k_valid(int &k) override;
 };

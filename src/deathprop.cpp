@@ -149,4 +149,18 @@ double DeathProposal::calculate_alpha(double proposed_likelihood,
            log(prior_prob);   // Coefficient prior
 }
 
+int DeathProposal::coefficient_histogram_accept(coefficient_histogram_t *c,
+                                                int index,
+                                                double value)
+{
+    return coefficient_histogram_accept_death(global.coeff_hist, index);
+}
+
+int DeathProposal::coefficient_histogram_reject(coefficient_histogram_t *c,
+                                                int index,
+                                                double value)
+{
+    return 0;
+}
+
 bool DeathProposal::k_valid(int &k) { return k > 1; }
