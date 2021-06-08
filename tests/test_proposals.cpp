@@ -45,6 +45,7 @@ protected:
     mmobservations *observations;
     GlobalProposal *global;
     DeathProposal *death;
+    BirthProposal *birth;
     void SetUp() override
     {
         std::vector<double> obs = {1, 2, 3, 4, 5};
@@ -62,6 +63,10 @@ protected:
                                     4);
 
         death = new DeathProposal(*global);
+
+        // need to birth before you can kill a node
+        birth = new BirthProposal(*global);
+        birth->step();
     }
 };
 
