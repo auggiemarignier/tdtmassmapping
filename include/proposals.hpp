@@ -225,7 +225,7 @@ private:
                                                      double &prop_parent_coeff,
                                                      double &prop_prob,
                                                      double &reverse_prob,
-                                                     double &prior_prob) override {};
+                                                     double &prior_prob) override { return 0; };
 
     int choose_proposal_location_and_value(int k,
                                            double &ratio,
@@ -272,7 +272,7 @@ private:
                              double &prop_parent_coeff,
                              double &prop_prob,
                              double &reverse_prob,
-                             double &prior_prob) override {};
+                             double &prior_prob) override { return 0; };
 
     virtual bool k_valid(int &k) override;
 };
