@@ -4,6 +4,12 @@
 #include "wavetomo2dutil.hpp"
 
 #include "proposals.hpp"
+#include "mmobservations.hpp"
+
+extern "C"
+{
+#include "slog.h"
+};
 
 int main()
 {
@@ -11,8 +17,9 @@ int main()
     const char *prior_file = "tutorial_prior.txt";
     const char *output_prefix = "../outputs/";
 
-    int total = 10;
+    int total = 10000;
     int seed = 1;
+    int verbosity = 1000;
 
     int kmax = 100;
 
@@ -22,16 +29,19 @@ int main()
     int degreex = 8;
     int degreey = 8;
 
-    GlobalSliceMM global(input_obs,
-                         prior_file,
-                         degreex,
-                         degreey,
-                         seed,
-                         kmax,
-                         wavelet_xy);
-    BirthSliceMM birth(global);
-    DeathSliceMM death(global);
-    ValueSliceMM value(global);
+    mmobservations observations(input_obs);
+
+    GlobalProposal global(&observations,
+                          NULL,
+                          prior_file,
+                          degreex,
+                          degreey,
+                          seed,
+                          kmax,
+                          wavelet_xy);
+    BirthProposal birth(global);
+    DeathProposal death(global);
+    ValueProposal value(global);
 
     global.current_likelihood = global.likelihood(global.current_log_normalization);
     printf("Initial Likelihood: %f\n", global.current_likelihood);
@@ -65,58 +75,150 @@ int main()
     {
         double u = global.random.uniform();
 
-        if (u < Pb)
+        if (u < Pb) // Birth
         {
-            //
-            // Birth
-            //
             if (birth.step() < 0)
             {
                 fprintf(stderr, "error: failed to do birth step\n");
                 return -1;
             }
         }
-        else if (u < (2.0 * Pb))
+        else if (u < (2.0 * Pb)) // Death
         {
-            //
-            // Death
-            //
             if (death.step() < 0)
             {
                 fprintf(stderr, "error: failed to do death step\n");
                 return -1;
             }
         }
-        else
+        else // Value
         {
-            //
-            // Value
-            //
             if (value.step() < 0)
             {
                 fprintf(stderr, "error: failed to do value step\n");
                 return -1;
             }
         }
-        printf("current Likelihood: %f\n", global.current_likelihood);
-        printf("n steps %i %i\n", value.global.mean_residual_n, global.mean_residual_n);
 
+        if (chain_history_full(global.ch))
+        {
+            // Flush chain history to file
+            if (chain_history_write(global.ch,
+                                    (ch_write_t)fwrite,
+                                    fp_ch) < 0)
+            {
+                fprintf(stderr, "error: failed to write chain history segment to file\n");
+                return -1;
+            }
+            if (chain_history_reset(global.ch) < 0)
+            {
+                fprintf(stderr, "error: failed to reset chain history\n");
+                return -1;
+            }
+        }
+
+        chain_history_change_t step;
+        if (wavetree2d_sub_get_last_perturbation(global.wt, &step) < 0)
+        {
+            fprintf(stderr, "error: failed to get last step\n");
+            return -1;
+        }
+        step.header.likelihood = global.current_likelihood;
+        step.header.temperature = global.temperature;
+        step.header.hierarchical = global.hierarchical->getparameter(0);
+        if (chain_history_add_step(global.ch, &step) < 0)
+        {
+            fprintf(stderr, "error: failed to add step to chain history\n");
+            return -1;
+        }
+
+        int current_k = wavetree2d_sub_coeff_count(global.wt);
+        if (verbosity > 0 && (i + 1) % verbosity == 0)
+        {
+            INFO("%6d: %f %d dc %f lambda %f:\n",
+                 i + 1,
+                 global.current_likelihood,
+                 current_k,
+                 wavetree2d_sub_dc(global.wt),
+                 global.hierarchical->getparameter(0));
+            INFO(birth.write_long_stats().c_str());
+            INFO(death.write_long_stats().c_str());
+            INFO(value.write_long_stats().c_str());
+        }
+        khistogram[current_k - 1]++;
     } // end MCMC loop
-    printf("Value propose %i\n", value.propose);
-    printf("birth propose %i\n", birth.propose);
-    printf("death propose %i\n", death.propose);
 
-    printf("Value accept %i\n", value.accept);
-    printf("birth accept %i\n", birth.accept);
-    printf("death accept %i\n", death.accept);
+    filename = mkfilename(output_prefix, "khistogram.txt");
+    FILE *fp = fopen(filename.c_str(), "w");
+    if (fp == NULL)
+    {
+        fprintf(stderr, "error: failed to create khistogram file\n");
+        return -1;
+    }
+    for (int i = 0; i < kmax; i++)
+    {
+        fprintf(fp, "%d %d\n", i + 1, khistogram[i]);
+    }
+    fclose(fp);
+    delete[] khistogram;
 
-    printf("MCMC loop done\n");
-    printf("Final Likelihood: %f\n", global.current_likelihood);
-
+    // If there are remaining steps to save
+    if (chain_history_nsteps(global.ch) > 1)
+    {
+        // Flush chain history to file
+        if (chain_history_write(global.ch,
+                                (ch_write_t)fwrite,
+                                fp_ch) < 0)
+        {
+            fprintf(stderr, "error: failed to write chain history segment to file\n");
+            return -1;
+        }
+    }
     fclose(fp_ch);
+    chain_history_destroy(global.ch);
 
-    double ln = 0.1;
-    value.compute_likelihood(5, ln, ln);
+    filename = mkfilename(output_prefix, "acceptance.txt");
+    fp = fopen(filename.c_str(), "w");
+    if (fp == NULL)
+    {
+        fprintf(stderr, "error: failed to create acceptance file\n");
+        return -1;
+    }
+    fprintf(fp, birth.write_long_stats().c_str());
+    fprintf(fp, "\n");
+    fprintf(fp, death.write_long_stats().c_str());
+    fprintf(fp, "\n");
+    fprintf(fp, value.write_long_stats().c_str());
+    fprintf(fp, "\n");
+    fclose(fp);
+
+    filename = mkfilename(output_prefix, "final_model.txt");
+    if (wavetree2d_sub_save(global.wt, filename.c_str()) < 0)
+    {
+        fprintf(stderr, "error: failed to save final model\n");
+        return -1;
+    }
+
+    filename = mkfilename(output_prefix, "residuals.txt");
+    if (!global.save_residuals(filename.c_str()))
+    {
+        ERROR("Failed to create residuals file");
+        return -1;
+    }
+
+    filename = mkfilename(output_prefix, "residuals_hist.txt");
+    if (!global.save_residual_histogram(filename.c_str()))
+    {
+        ERROR("Failed to save residual histogram");
+        return -1;
+    }
+
+    filename = mkfilename(output_prefix, "residuals_cov.txt");
+    if (!global.save_residual_covariance(filename.c_str()))
+    {
+        ERROR("Failed to save residual covariance");
+        return -1;
+    }
 
     return 0;
 }
