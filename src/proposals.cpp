@@ -217,6 +217,7 @@ int Proposal::compute_likelihood(int prop_idx,
 std::string Proposal::write_short_stats()
 {
     return mkformatstring("%s %6d/%6d %7.3f",
+                          enum_to_string(name).c_str(),
                           accept,
                           propose,
                           propose == 0 ? 0.0 : 100.0 * (double)accept / (double)propose);
@@ -225,6 +226,7 @@ std::string Proposal::write_short_stats()
 std::string Proposal::write_long_stats()
 {
     std::string s = mkformatstring("%s: %6d %7.3f:",
+                                   enum_to_string(name).c_str(),
                                    propose,
                                    propose == 0 ? 0.0 : 100.0 * (double)accept / (double)propose);
     for (int i = 0; i <= global.treemaxdepth; i++)
