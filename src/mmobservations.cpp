@@ -46,8 +46,8 @@ Observations::Observations(const char *filename)
         {
             obs.push_back(element);
             mean += element;
-            n_obs++;
         }
+        n_obs = obs.size();
         mean /= n_obs;
         for (size_t i = 0; i < n_obs; i++)
         {
