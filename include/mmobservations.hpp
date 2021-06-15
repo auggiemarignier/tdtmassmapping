@@ -14,6 +14,9 @@ public:
     // Constructor that takes a vector of obs and the stddev
     Observations(std::vector<double> _obs, double _sigma);
 
+    // Constructor that takes a filename
+    Observations(const char *filename);
+
     virtual ~Observations(){};
 
     virtual double single_frequency_likelihood(std::vector<double> model,
@@ -43,6 +46,10 @@ public:
     // Constructor that takes a vector of obs and the stddev
     mmobservations(std::vector<double> _obs, double _sigma)
         : Observations(_obs, _sigma){};
+
+    // Constructor that takes a filename
+    mmobservations(const char *filename)
+        : Observations(filename){};
 
     double single_frequency_likelihood(
         std::vector<double> model,

@@ -1,18 +1,23 @@
 #include <vector>
 #include <iostream>
+#include <fstream>
+#include <math.h>
 
 #include "mmobservations.hpp"
 extern "C"
 {
 #include "slog.h"
 };
+#include "wavetomo2dexception.hpp"
 
 Observations::Observations(
     std::vector<double> _obs,
     std::vector<double> _sigma)
     : obs(_obs),
       sigma(_sigma),
-      n_obs(_obs.size()) {}
+      n_obs(_obs.size())
+{
+}
 
 Observations::Observations(
     std::vector<double> _obs,
@@ -23,6 +28,42 @@ Observations::Observations(
     for (int i = 0; i < n_obs; i++)
     {
         sigma.push_back(_sigma);
+    }
+}
+
+Observations::Observations(const char *filename)
+{
+    INFO("Opening file %s \n", filename);
+
+    std::ifstream file(filename);
+    double element;
+    double mean = 0;
+    double var = 0;
+    double stddev = 0;
+    if (file.is_open())
+    {
+        while (file >> element)
+        {
+            obs.push_back(element);
+            mean += element;
+            n_obs++;
+        }
+        mean /= n_obs;
+        for (int i = 0; i < n_obs; i++)
+        {
+            var += (obs[i] - mean) * (obs[i] - mean);
+        }
+        var /= n_obs;
+        stddev = sqrt(var);
+        for (int i = 0; i < n_obs; i++)
+        {
+            sigma.push_back(stddev);
+        }
+        file.close();
+    }
+    else
+    {
+        throw WAVETOMO2DEXCEPTION("File not opened %s", filename);
     }
 }
 
