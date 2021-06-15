@@ -8,7 +8,6 @@ extern "C"
 {
 #include "slog.h"
 };
-#include "wavetomo2dexception.hpp"
 
 Observations::Observations(
     std::vector<double> _obs,
@@ -63,7 +62,7 @@ Observations::Observations(const char *filename)
     }
     else
     {
-        throw WAVETOMO2DEXCEPTION("File not opened %s", filename);
+        throw ERROR("File not opened %s", filename);
     }
 }
 
