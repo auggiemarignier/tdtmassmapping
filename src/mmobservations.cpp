@@ -25,7 +25,7 @@ Observations::Observations(
     : obs(_obs),
       n_obs(_obs.size())
 {
-    for (int i = 0; i < n_obs; i++)
+    for (size_t i = 0; i < n_obs; i++)
     {
         sigma.push_back(_sigma);
     }
@@ -49,13 +49,13 @@ Observations::Observations(const char *filename)
             n_obs++;
         }
         mean /= n_obs;
-        for (int i = 0; i < n_obs; i++)
+        for (size_t i = 0; i < n_obs; i++)
         {
             var += (obs[i] - mean) * (obs[i] - mean);
         }
         var /= n_obs;
         stddev = sqrt(var);
-        for (int i = 0; i < n_obs; i++)
+        for (size_t i = 0; i < n_obs; i++)
         {
             sigma.push_back(stddev);
         }
@@ -79,7 +79,7 @@ bool Observations::save_residuals(const char *filename,
         return false;
     }
 
-    for (int i = 0; i < n_obs; i++)
+    for (size_t i = 0; i < n_obs; i++)
     {
         fprintf(fp, "%15.9f %15.9f\n", *res, *resn);
         res++;
@@ -106,7 +106,7 @@ double mmobservations::single_frequency_likelihood(
 {
     std::vector<double> predictions = single_frequency_predictions(model);
 
-    for (int i = 0; i < obs.size(); i++)
+    for (size_t i = 0; i < obs.size(); i++)
     {
         residuals[i] = obs[i] - predictions[i];
     }
