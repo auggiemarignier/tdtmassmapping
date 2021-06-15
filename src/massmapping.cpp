@@ -186,11 +186,11 @@ int main()
         fprintf(stderr, "error: failed to create acceptance file\n");
         return -1;
     }
-    fprintf(fp, birth.write_long_stats().c_str());
+    fprintf(fp, "%s", birth.write_long_stats().c_str());
     fprintf(fp, "\n");
-    fprintf(fp, death.write_long_stats().c_str());
+    fprintf(fp, "%s", death.write_long_stats().c_str());
     fprintf(fp, "\n");
-    fprintf(fp, value.write_long_stats().c_str());
+    fprintf(fp, "%s", value.write_long_stats().c_str());
     fprintf(fp, "\n");
     fclose(fp);
 
