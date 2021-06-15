@@ -58,7 +58,7 @@ int Proposal::step()
 
     int k = wavetree2d_sub_coeff_count(global.wt);
 
-    if (k_valid(k)) // figure this out for the three proposals
+    if (k_valid(k))
     {
         double ratio;
         int prop_depth;
