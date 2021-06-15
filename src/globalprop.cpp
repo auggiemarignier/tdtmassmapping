@@ -235,7 +235,7 @@ GlobalProposal::GlobalProposal(Observations *_observations,
 GlobalProposal::~GlobalProposal()
 {
     delete hierarchical;
-    delete observations;
+
     delete[] zoffset;
 
     delete[] model;
