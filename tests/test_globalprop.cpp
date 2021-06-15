@@ -14,8 +14,7 @@ protected:
         double sigma = 1.41;
         observations = new mmobservations(obs, sigma);
 
-        global = new GlobalProposal(NULL,
-                                    observations,
+        global = new GlobalProposal(observations,
                                     NULL,
                                     "tutorial_prior.txt",
                                     8,

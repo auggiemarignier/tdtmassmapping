@@ -45,8 +45,7 @@ public:
         WAVELET_MAX = 5
     };
 
-    GlobalProposal(const char *filename,
-                   Observations *observations,
+    GlobalProposal(Observations *observations,
                    const char *initial_model,
                    const char *prior_file,
                    int degreex,

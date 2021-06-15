@@ -32,8 +32,7 @@ int GlobalProposal_indextocoord(void *user, int index, int *i, int *j, int *k, i
     return 0;
 }
 
-GlobalProposal::GlobalProposal(const char *filename,
-                               Observations *_observations,
+GlobalProposal::GlobalProposal(Observations *_observations,
                                const char *initial_model,
                                const char *prior_file,
                                int _degreex,
