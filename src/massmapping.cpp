@@ -148,6 +148,8 @@ int main()
         khistogram[current_k - 1]++;
     } // end MCMC loop
 
+    INFO("MCMC loop complete. Tidying up.");
+
     filename = mkfilename(output_prefix, "khistogram.txt");
     FILE *fp = fopen(filename.c_str(), "w");
     if (fp == NULL)
@@ -220,5 +222,6 @@ int main()
         return -1;
     }
 
+    INFO("DONE");
     return 0;
 }
