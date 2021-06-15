@@ -1,10 +1,9 @@
 #include <iostream>
 #include <gsl/gsl_rng.h>
 
-#include "wavetomo2dutil.hpp"
-
 #include "proposals.hpp"
 #include "mmobservations.hpp"
+#include "utils.hpp"
 
 extern "C"
 {

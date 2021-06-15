@@ -2,7 +2,6 @@ extern "C"
 {
 #include "slog.h"
 };
-#include "wavetomo2dutil.hpp"
 
 #include "proposals.hpp"
 
