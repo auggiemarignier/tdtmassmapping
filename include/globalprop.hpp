@@ -22,12 +22,8 @@ extern "C"
 #include "generic_lift.h"
 };
 
-#include "coordinate.hpp"
-
 #include "rng.hpp"
 #include "hierarchicalmodel.hpp"
-
-#include "wavetreemapper.hpp"
 
 #include "mmobservations.hpp"
 

@@ -81,13 +81,13 @@ GlobalProposal::GlobalProposal(Observations *_observations,
     if (degreex < 0 || degreex >= 16 ||
         degreey < 0 || degreey >= 16)
     {
-        throw WAVETOMO2DEXCEPTION("Degree(s) out of range: %d x %d x %d\n", degreex, degreey, degreez);
+        throw ERROR("Degree(s) out of range: %d x %d x %d\n", degreex, degreey, degreez);
     }
 
     xywaveletf = wavelet_inverse_function_from_id(xywavelet);
     if (xywaveletf == nullptr)
     {
-        throw WAVETOMO2DEXCEPTION("Invalid horizontal wavelet %d\n", xywavelet);
+        throw ERROR("Invalid horizontal wavelet %d\n", xywavelet);
     }
 
     hierarchical = new independentgaussianhierarchicalmodel();
@@ -96,7 +96,7 @@ GlobalProposal::GlobalProposal(Observations *_observations,
     wt = wavetree2d_sub_create(degreex, degreey, 0.0);
     if (wt == NULL)
     {
-        throw WAVETOMO2DEXCEPTION("Failed to create wavetree\n");
+        throw ERROR("Failed to create wavetree\n");
     }
 
     width = wavetree2d_sub_get_width(wt);
@@ -135,7 +135,7 @@ GlobalProposal::GlobalProposal(Observations *_observations,
     {
         if (wavetree2d_sub_initialize(wt, 0.0) < 0)
         {
-            throw WAVETOMO2DEXCEPTION("Failed to initialize wavetree\n");
+            throw ERROR("Failed to initialize wavetree\n");
         }
     }
     else
@@ -143,7 +143,7 @@ GlobalProposal::GlobalProposal(Observations *_observations,
 
         if (wavetree2d_sub_load(wt, initial_model) < 0)
         {
-            throw WAVETOMO2DEXCEPTION("Failed to load initial model: %s\n", initial_model);
+            throw ERROR("Failed to load initial model: %s\n", initial_model);
         }
 
         INFO("Loaded model with %d coefficients\n", wavetree2d_sub_coeff_count(wt));
@@ -163,7 +163,7 @@ GlobalProposal::GlobalProposal(Observations *_observations,
                                                 kmax);
     if (hnk == NULL)
     {
-        throw WAVETOMO2DEXCEPTION("Failed to create hnk table\n");
+        throw ERROR("Failed to create hnk table\n");
     }
 
     //
@@ -172,7 +172,7 @@ GlobalProposal::GlobalProposal(Observations *_observations,
     ch = chain_history_create(CHAIN_STEPS);
     if (ch == nullptr)
     {
-        throw WAVETOMO2DEXCEPTION("Failed to create chain history\n");
+        throw ERROR("Failed to create chain history\n");
     }
 
     //
@@ -184,7 +184,7 @@ GlobalProposal::GlobalProposal(Observations *_observations,
                                               wt);
     if (coeff_hist == NULL)
     {
-        throw WAVETOMO2DEXCEPTION("Failed to create coefficient histogram\n");
+        throw ERROR("Failed to create coefficient histogram\n");
     }
 
     //
@@ -195,7 +195,7 @@ GlobalProposal::GlobalProposal(Observations *_observations,
         proposal = wavetree_pp_load(prior_file, seed, coeff_hist);
         if (proposal == NULL)
         {
-            throw WAVETOMO2DEXCEPTION("Failed to load proposal file\n");
+            throw ERROR("Failed to load proposal file\n");
         }
 
         for (int i = 0; i < ncoeff; i++)
@@ -205,7 +205,7 @@ GlobalProposal::GlobalProposal(Observations *_observations,
             int ii, ij;
             if (wavetree2d_sub_2dindices(wt, i, &ii, &ij) < 0)
             {
-                throw WAVETOMO2DEXCEPTION("Failed to get 2d indices\n");
+                throw ERROR("Failed to get 2d indices\n");
             }
 
             double vmin, vmax;
@@ -218,7 +218,7 @@ GlobalProposal::GlobalProposal(Observations *_observations,
                                           &vmin,
                                           &vmax) < 0)
             {
-                throw WAVETOMO2DEXCEPTION("Failed to get coefficient range\n");
+                throw ERROR("Failed to get coefficient range\n");
             }
 
             if (coefficient_histogram_set_range(coeff_hist,
@@ -226,7 +226,7 @@ GlobalProposal::GlobalProposal(Observations *_observations,
                                                 vmin,
                                                 vmax) < 0)
             {
-                throw WAVETOMO2DEXCEPTION("Failed to set coefficient histogram range\n");
+                throw ERROR("Failed to set coefficient histogram range\n");
             }
         }
     }
@@ -277,7 +277,7 @@ GlobalProposal::likelihood(double &log_normalization)
     memset(model, 0, sizeof(double) * size);
     if (wavetree2d_sub_map_to_array(wt, model, size) < 0)
     {
-        throw WAVETOMO2DEXCEPTION("Failed to map model to array\n");
+        throw ERROR("Failed to map model to array\n");
     }
 
     //
@@ -292,7 +292,7 @@ GlobalProposal::likelihood(double &log_normalization)
                                xywaveletf,
                                SUBTILE) < 0)
     {
-        throw WAVETOMO2DEXCEPTION("Failed to do inverse transform on coefficients\n");
+        throw ERROR("Failed to do inverse transform on coefficients\n");
     }
 
     log_normalization = 0.0;

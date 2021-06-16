@@ -24,3 +24,43 @@ std::string enum_to_string(wavetree_perturb_t type)
         return "PT Model Exchange";
     }
 }
+
+std::string mkfilename(const char *prefix, const char *file)
+{
+    if (prefix == nullptr)
+    {
+        return std::string(file);
+    }
+    else
+    {
+        return std::string(prefix) + file;
+    }
+}
+
+std::string mkformatstring(const char *fmt, ...)
+{
+    static char *buffer = nullptr;
+    static int buffer_size = -1;
+
+    if (buffer == nullptr)
+    {
+        buffer_size = 512;
+        buffer = new char[buffer_size];
+    }
+
+    va_list ap;
+    int size;
+
+    va_start(ap, fmt);
+    size = vsnprintf(buffer, buffer_size, fmt, ap);
+    while (size >= buffer_size)
+    {
+        delete[] buffer;
+        buffer_size *= 2;
+        buffer = new char[buffer_size];
+        size = vsnprintf(buffer, buffer_size, fmt, ap);
+    }
+    va_end(ap);
+
+    return std::string(buffer);
+}
