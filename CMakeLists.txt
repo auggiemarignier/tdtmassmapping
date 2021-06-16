@@ -16,7 +16,7 @@ option(tests "Enable testing" on)
 
 include(ExternalProject)
 include(FetchContent)
-include(dependencies)
+include(GetTDTBase)
 
 set(SOURCES src/mmobservations.cpp
             src/proposals.cpp
@@ -24,25 +24,22 @@ set(SOURCES src/mmobservations.cpp
             src/birthprop.cpp
             src/deathprop.cpp
             src/valueprop.cpp
+            src/rng.cpp
+            src/hierarchicalmodel.cpp
             src/utils.cpp)
 
-add_library(${PROJECT_LIB} STATIC ${SOURCES}                     
-                            $<TARGET_OBJECTS:${TDTWAVETOMO_LIB}>
-                            ${TRAVELTIMEEXCEPTION})
+add_library(${PROJECT_LIB} STATIC ${SOURCES})
 set_target_properties(${PROJECT_LIB} PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
-add_dependencies(${PROJECT_LIB} ${TDTWAVETOMO})
+add_dependencies(${PROJECT_LIB} ${TDTBASE})
 
 find_package(GSL REQUIRED)
 find_package(GMP REQUIRED)
 target_link_libraries(${PROJECT_LIB}
-                        GSL::gsl
-                        ${GMP_LIBRARY}
-                        ${TRAVELTIME_SRC}/libtraveltime2d.a
-                        ${TDTBASE_LIBS})
+                      GSL::gsl
+                      ${GMP_LIBRARY}
+                      ${TDTBASE_LIBS})
 
-include_directories(include ${TDTWAVETOMO_INCLUDE}
-                            ${TDTBASE_INCLUDE}
-                            ${TRAVELTIME_INCLUDE}
+include_directories(include ${TDTBASE_INCLUDE}
                             ${GMP_INCLUDE_DIR})
 
 configure_file(data/Bolshoi_7_clean_256.txt ${CMAKE_CURRENT_BINARY_DIR}/Bolshoi_7_clean_256.txt)
