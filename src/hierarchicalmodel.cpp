@@ -26,8 +26,6 @@
 #include <math.h>
 #include <string.h>
 
-#include "wavetomo2dexception.hpp"
-
 #include "hierarchicalmodel.hpp"
 
 extern "C" {
@@ -108,7 +106,7 @@ independentgaussianhierarchicalmodel::getparameter(int i) const
   if (i == 0) {
     return lambda;
   } else {
-    throw WAVETOMO2DEXCEPTION("Invalid index\n");
+    throw ERROR("Invalid index\n");
   }
 }
 
@@ -117,12 +115,12 @@ independentgaussianhierarchicalmodel::setparameter(int i, double v)
 {
   if (i == 0) {
     if (v <= 0.0) {
-      throw WAVETOMO2DEXCEPTION("Sigma out of range\n");
+      throw ERROR("Sigma out of range\n");
     }
 
     lambda = v;
   } else {
-    throw WAVETOMO2DEXCEPTION("Invalid index\n");
+    throw ERROR("Invalid index\n");
   }
 }
   
