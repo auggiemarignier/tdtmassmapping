@@ -27,8 +27,6 @@ extern "C"
 #include "rng.hpp"
 #include "hierarchicalmodel.hpp"
 
-#include "wavetreemapper.hpp"
-
 #include "mmobservations.hpp"
 
 class GlobalProposal
