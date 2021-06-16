@@ -1,3 +1,4 @@
+#include <math.h>
 extern "C"
 {
 #include "slog.h"
