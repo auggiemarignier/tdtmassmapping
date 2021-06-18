@@ -38,3 +38,10 @@ l, b, w, h = axd["C"].get_position(original=False).bounds
 axd["C"].set_position([l + 0.15, 0.01, w, h])
 
 plt.show()
+
+fig = plt.figure(figsize=(10, 5), constrained_layout=True)
+khist = np.loadtxt("../outputs/khistogram.txt")
+plt.bar(khist[:, 0], khist[:, 1])
+plt.xlabel("Number of parameters")
+plt.ylabel("Count")
+plt.show()
