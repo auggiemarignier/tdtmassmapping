@@ -47,6 +47,8 @@ struct user_data
     generic_lift_inverse1d_step_t hwaveletf;
 
     wavetree2d_sub_t *wt;
+
+    FILE *fp_out;
 };
 
 static const double CREDIBLE_INTERVAL = 0.95;
@@ -64,7 +66,6 @@ static double head_from_histogram(int *hist, double vmin, double vmax, int bins,
 static double tail_from_histogram(int *hist, double vmin, double vmax, int bins, int drop);
 static double hpd_from_histogram(int *hist, double vmin, double vmax, int bins, double hpd_interval, double &hpd_min, double &hpd_max);
 
-
 int main(int argc, char *argv[])
 {
     int c;
@@ -75,6 +76,7 @@ int main(int argc, char *argv[])
     const char *input_file;
     const char *output_file;
     const char *stddev_file;
+    const char *likelihood_file;
 
     int degree_x;
     int degree_y;
@@ -120,6 +122,7 @@ int main(int argc, char *argv[])
     input_file = "../outputs/ch.dat";
     output_file = "../outputs/mean.txt";
     stddev_file = NULL;
+    likelihood_file = "../outputs/likelihood.txt";
 
     mode_file = NULL;
     median_file = NULL;
@@ -212,6 +215,17 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+    //
+    // Likelihood output
+    //
+    fp_out = fopen(likelihood_file, "w");
+    if (fp_out == NULL)
+    {
+        fprintf(stderr, "error: failed to open likelihood file\n");
+        return -1;
+    }
+    data.fp_out = fp_out;
+
     /*
    * Process the chain history
    */
@@ -243,6 +257,7 @@ int main(int argc, char *argv[])
     printf("%d records\n", data.counter);
     printf("%d total\n", data.thincounter);
     fclose(fp_in);
+    fclose(fp_out);
 
     /*
    * Mean output
@@ -536,6 +551,7 @@ static int process(int stepi,
 
     if ((d->thincounter >= d->skip) && (d->thin <= 1 || ((d->thincounter - d->skip) % d->thin) == 0))
     {
+        fprintf(d->fp_out, "%.6f\n", step->header.likelihood);
 
         memset(d->model, 0, sizeof(double) * d->size);
 
