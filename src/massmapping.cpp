@@ -37,6 +37,7 @@ static void usage(const char *pname);
 
 int main(int argc, char *argv[])
 {
+    // Defaults
     char *input_obs = nullptr;
     char *prior_file = nullptr;
     char *output_prefix = nullptr;
@@ -53,10 +54,11 @@ int main(int argc, char *argv[])
     int degreex = 8;
     int degreey = 8;
 
+    // Command line options
     int option_index = 0;
     while (true)
     {
-        c = getopt_long(argc, argv, short_options, long_options, &option_index);
+        int c = getopt_long(argc, argv, short_options, long_options, &option_index);
         if (c == -1)
         {
             break;
@@ -134,6 +136,24 @@ int main(int argc, char *argv[])
         }
     }
 
+    // Check files
+    if (input_obs == NULL)
+    {
+        fprintf(stderr, "Please provide an input file\n");
+        return -1;
+    }
+    if (prior_file == NULL)
+    {
+        fprintf(stderr, "Please provide a prior file\n");
+        return -1;
+    }
+    if (output_prefix == NULL)
+    {
+        fprintf(stderr, "Please provide an output directory\n");
+        return -1;
+    }
+
+    // Setup
     mmobservations observations(input_obs);
 
     GlobalProposal global(&observations,
@@ -341,8 +361,8 @@ static void usage(const char *pname)
             " -M|--prior <file>               Prior/Proposal file\n"
             " -o|--output <path>              Output prefix for output files\n"
             "\n"
-            " -x|--degree-x <int>             Number of samples in x/lon direction as power of 2\n"
-            " -y|--degree-y <int>             Number of samples in y/lat direction as power of 2\n"
+            " -x|--degree-x <int>             Number of samples in x direction as power of 2\n"
+            " -y|--degree-y <int>             Number of samples in y direction as power of 2\n"
             "\n"
             " -t|--total <int>                Total number of iterations\n"
             " -S|--seed <int>                 Random number seed\n"
@@ -351,7 +371,7 @@ static void usage(const char *pname)
             "\n"
             " -B|--birth-probability <float>  Birth probability\n"
             "\n"
-            " -w|--wavelet-xy <int>           Wavelet basis to use for lon/lat plane\n"
+            " -w|--wavelet-xy <int>           Wavelet basis to use for x/y plane\n"
             "\n"
             " -v|--verbosity <int>            Number steps between status printouts (0 = disable)\n"
             " -h|--help                       Show usage information\n"
