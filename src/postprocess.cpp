@@ -72,9 +72,9 @@ int main(int argc, char *argv[])
 
     chain_history_t *ch;
 
-    char *input_file;
-    char *output_file;
-    char *stddev_file;
+    const char *input_file;
+    const char *output_file;
+    const char *stddev_file;
 
     int degree_x;
     int degree_y;
@@ -83,14 +83,14 @@ int main(int argc, char *argv[])
     int skip;
     int maxsteps;
 
-    char *mode_file;
-    char *median_file;
-    char *credible_min;
-    char *credible_max;
-    char *histogram;
-    char *hpd_min;
-    char *hpd_max;
-    char *hpd_range;
+    const char *mode_file;
+    const char *median_file;
+    const char *credible_min;
+    const char *credible_max;
+    const char *histogram;
+    const char *hpd_min;
+    const char *hpd_max;
+    const char *hpd_range;
 
     int bins;
     double vmin;
