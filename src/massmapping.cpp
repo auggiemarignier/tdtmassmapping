@@ -1,5 +1,6 @@
 #include <iostream>
 #include <gsl/gsl_rng.h>
+#include <getopt.h>
 
 #include "proposals.hpp"
 #include "mmobservations.hpp"
@@ -10,7 +11,30 @@ extern "C"
 #include "slog.h"
 };
 
-int main()
+static char short_options[] = "i:M:o:x:y:t:S:k:B:w:vh";
+static struct option long_options[] = {
+  {"input", required_argument, 0, 'i'},
+  {"prior-file", required_argument, 0, 'M'},
+  {"output", required_argument, 0, 'o'},
+
+  {"degree-x", required_argument, 0, 'x'},
+  {"degree-y", required_argument, 0, 'y'},
+
+  {"total", required_argument, 0, 't'},
+  {"seed", required_argument, 0, 'S'},
+
+  {"kmax", required_argument, 0, 'k'},
+  {"birth-probability", required_argument, 0, 'B'},
+
+  {"wavelet-lateral", required_argument, 0, 'w'},
+
+  {"verbosity", required_argument, 0, 'v'},
+  {"help", no_argument, 0, 'h'},
+  
+  {0, 0, 0, 0}
+};
+
+int main(int argc, char *argv[])
 {
     const char *input_obs = "Bolshoi_7_clean_256.txt";
     const char *prior_file = "tutorial_prior.txt";
