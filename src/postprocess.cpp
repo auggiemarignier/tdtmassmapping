@@ -32,8 +32,6 @@ struct user_data
     int width;
     int height;
     int size;
-    double *zoffset;
-    int zoffset_n;
 
     double *mean;
     double *variance;
@@ -52,7 +50,6 @@ struct user_data
 };
 
 static const double CREDIBLE_INTERVAL = 0.95;
-static const int SUBTILE = 1;
 
 static int process(int i,
                    void *user,
@@ -76,7 +73,6 @@ int main(int argc, char *argv[])
     chain_history_t *ch;
 
     char *input_file;
-    char *zoffset_file;
     char *output_file;
     char *stddev_file;
 
@@ -122,8 +118,7 @@ int main(int argc, char *argv[])
     degree_y = 8;
 
     input_file = "../outputs/ch.dat";
-    zoffset_file = NULL;
-    output_file = NULL;
+    output_file = "../outputs/mean.txt";
     stddev_file = NULL;
 
     mode_file = NULL;
@@ -175,27 +170,6 @@ int main(int argc, char *argv[])
     data.size = wavetree2d_sub_get_size(data.wt);
 
     printf("Image: %d x %d\n", data.width, data.height);
-
-    if (zoffset_file != NULL)
-    {
-        data.zoffset = load_zoffset(zoffset_file, data.zoffset_n);
-        if (data.zoffset == NULL)
-        {
-            fprintf(stderr, "error: failed to load zoffset file\n");
-            return -1;
-        }
-
-        if (data.zoffset_n != 1)
-        {
-            fprintf(stderr, "error: invalid zoffset file\n");
-            return -1;
-        }
-    }
-    else
-    {
-        data.zoffset = NULL;
-        data.zoffset_n = 0;
-    }
 
     data.mean = new double[data.size];
     memset(data.mean, 0, sizeof(double) * data.size);
@@ -586,18 +560,7 @@ static int process(int stepi,
                                    d->hwaveletf,
                                    SUBTILE) < 0)
         {
-            throw WAVETOMO2DEXCEPTION("Failed to do inverse transform on coefficients\n");
-        }
-
-        //
-        // Add zoffset
-        //
-        if (d->zoffset != NULL)
-        {
-            for (int i = 0; i < d->size; i++)
-            {
-                d->model[i] += d->zoffset[0];
-            }
+            throw ERROR("Failed to do inverse transform on coefficients\n");
         }
 
         /*
