@@ -1,5 +1,6 @@
 #include <iostream>
 #include <gsl/gsl_rng.h>
+#include <getopt.h>
 
 #include "proposals.hpp"
 #include "mmobservations.hpp"
@@ -10,11 +11,36 @@ extern "C"
 #include "slog.h"
 };
 
-int main()
+static char short_options[] = "i:M:o:x:y:t:S:k:B:w:vh";
+static struct option long_options[] = {
+    {"input", required_argument, 0, 'i'},
+    {"prior-file", required_argument, 0, 'M'},
+    {"output", required_argument, 0, 'o'},
+
+    {"degree-x", required_argument, 0, 'x'},
+    {"degree-y", required_argument, 0, 'y'},
+
+    {"total", required_argument, 0, 't'},
+    {"seed", required_argument, 0, 'S'},
+
+    {"kmax", required_argument, 0, 'k'},
+    {"birth-probability", required_argument, 0, 'B'},
+
+    {"wavelet-lateral", required_argument, 0, 'w'},
+
+    {"verbosity", required_argument, 0, 'v'},
+    {"help", no_argument, 0, 'h'},
+
+    {0, 0, 0, 0}};
+
+static void usage(const char *pname);
+
+int main(int argc, char *argv[])
 {
-    const char *input_obs = "Bolshoi_7_clean_256.txt";
-    const char *prior_file = "tutorial_prior.txt";
-    const char *output_prefix = "../outputs/";
+    // Defaults
+    char *input_obs = nullptr;
+    char *prior_file = nullptr;
+    char *output_prefix = nullptr;
 
     int total = 10000;
     int seed = 1;
@@ -28,6 +54,106 @@ int main()
     int degreex = 8;
     int degreey = 8;
 
+    // Command line options
+    int option_index = 0;
+    while (true)
+    {
+        int c = getopt_long(argc, argv, short_options, long_options, &option_index);
+        if (c == -1)
+        {
+            break;
+        }
+        switch (c)
+        {
+        case 'i':
+            input_obs = optarg;
+            break;
+        case 'M':
+            prior_file = optarg;
+            break;
+        case 'o':
+            output_prefix = optarg;
+            break;
+        case 'x':
+            degreex = atoi(optarg);
+            if (degreex < 1 || degreex > 16)
+            {
+                fprintf(stderr, "error: degree x must be between 1 and 16 inclusive\n");
+                return -1;
+            }
+            break;
+        case 'y':
+            degreey = atoi(optarg);
+            if (degreey < 1 || degreey > 16)
+            {
+                fprintf(stderr, "error: degree y must be between 1 and 16 inclusive\n");
+                return -1;
+            }
+            break;
+        case 't':
+            total = atoi(optarg);
+            if (total < 1)
+            {
+                fprintf(stderr, "error: total must be greater than 0\n");
+                return -1;
+            }
+            break;
+        case 'S':
+            seed = atoi(optarg);
+            break;
+        case 'k':
+            kmax = atoi(optarg);
+            if (kmax < 1)
+            {
+                fprintf(stderr, "error: kmax must be greater than 0\n");
+                return -1;
+            }
+            break;
+        case 'B':
+            Pb = atof(optarg);
+            if (Pb < 0.0 || Pb > 0.5)
+            {
+                fprintf(stderr, "error: birth probability must be between 0 and 0.5\n");
+                return -1;
+            }
+            break;
+        case 'w':
+            wavelet_xy = atoi(optarg);
+            if (wavelet_xy < 0 || wavelet_xy > GlobalProposal::WAVELET_MAX)
+            {
+                fprintf(stderr, "error: horizontal wavelet must be in range 0 .. %d\n", (int)GlobalProposal::WAVELET_MAX);
+                return -1;
+            }
+            break;
+        case 'v':
+            verbosity = atoi(optarg);
+            break;
+        case 'h':
+        default:
+            usage(argv[0]);
+            return -1;
+            break;
+        }
+    }
+
+    // Check files
+    if (input_obs == NULL)
+    {
+        fprintf(stderr, "Please provide an input file\n");
+        return -1;
+    }
+    if (prior_file == NULL)
+    {
+        fprintf(stderr, "Please provide a prior file\n");
+        return -1;
+    }
+    if (output_prefix == NULL)
+    {
+        fprintf(stderr, "Please provide an output directory\n");
+        return -1;
+    }
+
+    // Setup
     mmobservations observations(input_obs);
 
     GlobalProposal global(&observations,
@@ -223,4 +349,32 @@ int main()
 
     INFO("DONE");
     return 0;
+}
+
+static void usage(const char *pname)
+{
+    fprintf(stderr,
+            "usage: %s [options]\n"
+            "where options is one or more of:\n"
+            "\n"
+            " -i|--input <file>               Input observations file\n"
+            " -M|--prior <file>               Prior/Proposal file\n"
+            " -o|--output <path>              Output prefix for output files\n"
+            "\n"
+            " -x|--degree-x <int>             Number of samples in x direction as power of 2\n"
+            " -y|--degree-y <int>             Number of samples in y direction as power of 2\n"
+            "\n"
+            " -t|--total <int>                Total number of iterations\n"
+            " -S|--seed <int>                 Random number seed\n"
+            "\n"
+            " -k|--kmax <int>                 Max. no. of coefficients\n"
+            "\n"
+            " -B|--birth-probability <float>  Birth probability\n"
+            "\n"
+            " -w|--wavelet-xy <int>           Wavelet basis to use for x/y plane\n"
+            "\n"
+            " -v|--verbosity <int>            Number steps between status printouts (0 = disable)\n"
+            " -h|--help                       Show usage information\n"
+            "\n",
+            pname);
 }

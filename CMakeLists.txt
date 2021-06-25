@@ -42,9 +42,6 @@ target_link_libraries(${PROJECT_LIB}
 include_directories(include ${TDTBASE_INCLUDE}
                             ${GMP_INCLUDE_DIR})
 
-configure_file(data/Bolshoi_7_clean_256.txt ${CMAKE_CURRENT_BINARY_DIR}/Bolshoi_7_clean_256.txt)
-configure_file(data/tutorial_prior.txt ${CMAKE_CURRENT_BINARY_DIR}/tutorial_prior.txt)
-
 if(tests)
     enable_testing()
     include(CTest)
@@ -53,6 +50,8 @@ if(tests)
                         GIT_TAG master)
     FetchContent_MakeAvailable(googletest)
     add_subdirectory(tests)
+    configure_file(data/Bolshoi_7_clean_256.txt ${CMAKE_CURRENT_BINARY_DIR}/Bolshoi_7_clean_256.txt)
+    configure_file(data/tutorial_prior.txt ${CMAKE_CURRENT_BINARY_DIR}/tutorial_prior.txt)
 endif()
 
 add_executable(${PROJECT_NAME} src/massmapping.cpp)

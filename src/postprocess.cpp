@@ -66,6 +66,41 @@ static double head_from_histogram(int *hist, double vmin, double vmax, int bins,
 static double tail_from_histogram(int *hist, double vmin, double vmax, int bins, int drop);
 static double hpd_from_histogram(int *hist, double vmin, double vmax, int bins, double hpd_interval, double &hpd_min, double &hpd_max);
 
+static char short_options[] = "x:y:i:o:D:l:t:s:m:M:c:C:g:p:P:Q:b:v:V:S:w:h";
+static struct option long_options[] = {
+    {"degree-x", required_argument, 0, 'x'},
+    {"degree-y", required_argument, 0, 'y'},
+
+    {"input", required_argument, 0, 'i'},
+    {"output", required_argument, 0, 'o'},
+    {"stddev", required_argument, 0, 'D'},
+    {"likelihood", required_argument, 0, 'l'},
+    {"thin", required_argument, 0, 't'},
+    {"skip", required_argument, 0, 's'},
+
+    {"mode", required_argument, 0, 'm'},
+    {"median", required_argument, 0, 'M'},
+    {"credible-min", required_argument, 0, 'c'},
+    {"credible-max", required_argument, 0, 'C'},
+    {"histogram", required_argument, 0, 'g'},
+
+    {"hpd-min", required_argument, 0, 'p'},
+    {"hpd-max", required_argument, 0, 'P'},
+    {"hpd-range", required_argument, 0, 'Q'},
+
+    {"bins", required_argument, 0, 'b'},
+    {"vmin", required_argument, 0, 'v'},
+    {"vmax", required_argument, 0, 'V'},
+
+    {"maxsteps", required_argument, 0, 'S'},
+
+    {"wavelet-lateral", required_argument, 0, 'w'},
+
+    {"help", no_argument, 0, 'h'},
+    {0, 0, 0, 0}};
+
+static void usage(const char *pname);
+
 int main(int argc, char *argv[])
 {
     int c;
@@ -119,10 +154,10 @@ int main(int argc, char *argv[])
     degree_x = 8;
     degree_y = 8;
 
-    input_file = "../outputs/ch.dat";
-    output_file = "../outputs/mean.txt";
+    input_file = NULL;
+    output_file = NULL;
     stddev_file = NULL;
-    likelihood_file = "../outputs/likelihood.txt";
+    likelihood_file = NULL;
 
     mode_file = NULL;
     median_file = NULL;
@@ -147,6 +182,110 @@ int main(int argc, char *argv[])
 
     vmin = 0.001;
     vmax = 1.0;
+
+    while (1)
+    {
+        c = getopt_long(argc, argv, short_options, long_options, &option_index);
+        if (c == -1)
+        {
+            break;
+        }
+        switch (c)
+        {
+        case 'x':
+            degree_x = atoi(optarg);
+            if (degree_x < 1)
+            {
+                fprintf(stderr, "error: invalid degree x\n");
+                return -1;
+            }
+            break;
+        case 'y':
+            degree_y = atoi(optarg);
+            if (degree_y < 1)
+            {
+                fprintf(stderr, "error: invalid degree y\n");
+                return -1;
+            }
+            break;
+        case 'i':
+            input_file = optarg;
+            break;
+        case 'l':
+            likelihood_file = optarg;
+            break;
+        case 'o':
+            output_file = optarg;
+            break;
+        case 'D':
+            stddev_file = optarg;
+            break;
+        case 't':
+            thin = atoi(optarg);
+            break;
+        case 's':
+            skip = atoi(optarg);
+            break;
+        case 'm':
+            mode_file = optarg;
+            break;
+        case 'M':
+            median_file = optarg;
+            break;
+        case 'c':
+            credible_min = optarg;
+            break;
+        case 'C':
+            credible_max = optarg;
+            break;
+        case 'g':
+            histogram = optarg;
+            break;
+        case 'p':
+            hpd_min = optarg;
+            break;
+        case 'P':
+            hpd_max = optarg;
+            break;
+        case 'Q':
+            hpd_range = optarg;
+            break;
+        case 'b':
+            bins = atoi(optarg);
+            if (bins < 1)
+            {
+                fprintf(stderr, "error: bins must be 1 or greater\n");
+                return -1;
+            }
+            break;
+        case 'v':
+            vmin = atof(optarg);
+            break;
+        case 'V':
+            vmax = atof(optarg);
+            break;
+        case 'S':
+            maxsteps = atoi(optarg);
+            if (maxsteps < 1000)
+            {
+                fprintf(stderr, "error: maxsteps should be 1000 or greater\n");
+                return -1;
+            }
+            break;
+        case 'w':
+            waveleth = atoi(optarg);
+            if (waveleth < 0 || waveleth > GlobalProposal::WAVELET_MAX)
+            {
+                fprintf(stderr, "error: horizontal wavelet must be between 0 and %d\n", (int)GlobalProposal::WAVELET_MAX);
+                return -1;
+            }
+            break;
+        case 'h':
+        default:
+            usage(argv[0]);
+            return -1;
+        }
+    }
 
     ch = chain_history_create(maxsteps);
     if (ch == NULL)
@@ -778,4 +917,40 @@ static double hpd_from_histogram(int *hist, double vmin, double vmax, int bins, 
     hpd_max = minright;
 
     return minwidth;
+}
+
+static void usage(const char *pname)
+{
+    fprintf(stderr,
+            "usage: %s [options]\n"
+            "where options is one or more of:\n"
+            "\n"
+            " -x|--degree-x <int>              Number of longitude/x samples as power of 2\n"
+            " -y|--degree-y <int>              Number of latitude/y samples as power of 2\n"
+            "\n"
+            " -i|--input <file>                Input ch file\n"
+            " -o|--output <file>               Output mean model file\n"
+            " -D|--stddev <file>               Output std dev. file\n"
+            " -l|--lieklihood <file>           OUtput likelihoods file\n"
+            "\n"
+            " -t|--thin <int>                  Only processing every ith sample\n"
+            " -s|--skip <int>                  Skip n samples from beginning\n"
+            "\n"
+            " -m|--mode <file>                 Output mode\n"
+            " -M|--median <file>               Output median\n"
+            " -c|--credible-min <file>         Output credible min file\n"
+            " -C|--credible-max <file>         Output credible max file\n"
+            " -g|--histogram <file>            Output histogram file\n"
+            "\n"
+            " -b|--bins <int>                  No. histogram bins\n"
+            " -v|--vmin <float>                Lower range for histogram\n"
+            " -V|--vmax <float>                Upper range for histogram\n"
+            "\n"
+            " -S|--maxsteps <int>              Chain history max steps\n"
+            "\n"
+            " -w|--wavelet-lateral <int>       Wavelet for vertical direction\n"
+            "\n"
+            " -h|--help            Show usage\n"
+            "\n",
+            pname);
 }
