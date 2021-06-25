@@ -11,7 +11,7 @@ extern "C"
 #include "slog.h"
 };
 
-static char short_options[] = "i:M:o:x:y:t:S:k:B:w:vh";
+static char short_options[] = "i:M:o:x:y:t:S:k:B:w:v:h";
 static struct option long_options[] = {
     {"input", required_argument, 0, 'i'},
     {"prior-file", required_argument, 0, 'M'},
