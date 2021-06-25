@@ -13,6 +13,7 @@ set(CMAKE_VERBOSE_MAKEFILE OFF)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 option(tests "Enable testing" on)
+option(install "Install targets on system" on)
 
 include(ExternalProject)
 include(FetchContent)
@@ -59,3 +60,8 @@ target_link_libraries(${PROJECT_NAME} ${PROJECT_LIB})
 
 add_executable(${PROJECT_NAME}_pp src/postprocess.cpp)
 target_link_libraries(${PROJECT_NAME}_pp ${PROJECT_LIB})
+
+if(install)
+    install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_pp RUNTIME)
+    install(TARGETS ${PROJECT_LIB} LIBRARY)
+endif()
