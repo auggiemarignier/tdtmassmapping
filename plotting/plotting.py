@@ -11,8 +11,8 @@ vmax = truth.max()
 
 cmap = cm.inferno
 
-mosaic = """AB
-            C."""
+mosaic = """ABC
+            D.."""
 fig = plt.figure(figsize=(10, 5), constrained_layout=True)
 axd = fig.subplot_mosaic(
     mosaic,
@@ -27,15 +27,19 @@ axd["B"].imshow(mean, vmin=vmin, vmax=vmax, cmap=cmap)
 axd["B"].set_title("Mean TDT")
 axd["B"].axis("off")
 
+axd["C"].imshow(truth - mean, cmap="binary")
+axd["C"].set_title("Truth - Mean")
+axd["C"].axis("off")
+
 fig.colorbar(
     cm.ScalarMappable(norm=Normalize(vmin=vmin, vmax=vmax), cmap=cmap),
-    axd["C"],
+    axd["D"],
     orientation="horizontal",
     shrink=0.1,
 )
-axd["C"].axis("off")
-l, b, w, h = axd["C"].get_position(original=False).bounds
-axd["C"].set_position([l + 0.15, 0.01, w, h])
+axd["D"].axis("off")
+l, b, w, h = axd["D"].get_position(original=False).bounds
+axd["D"].set_position([l + 0.15, 0.01, w, h])
 
 plt.show()
 
