@@ -59,12 +59,11 @@ img_width = 256
 max_depth = 3
 dot_string = generate_dot_string(img_width, max_depth)
 
-wavs_arr = np.loadtxt("outputs/wavelets.txt", skiprows=899)
-mask = np.zeros_like(wavs_arr)
-for i in range(mask.shape[0]):
-    if depth_from_index(i, img_width) > max_depth:
-        mask[i] = 1
-wavs_arr = wavs_arr[np.logical_not(mask)]
+usecols = []
+for i in range(img_width ** 2):
+    if depth_from_index(i, img_width) <= max_depth:
+        usecols.append(i)
+wavs_arr = np.loadtxt("outputs/wavelets.txt", usecols=usecols)
 
 graphs = pydot.graph_from_dot_data(dot_string)
 graph = graphs[0]
