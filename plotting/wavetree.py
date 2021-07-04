@@ -4,6 +4,31 @@ import matplotlib.pyplot as plt
 import pydot
 
 
+def index_to_2d(index, width):
+    ii = index % width
+    ij = (index - ii) // width
+    return ii, ij
+
+
+def index_from_2d(ii, ij, width):
+    return ij * width + ii
+
+
+def parent_index(index, width):
+    if index >= width**2 or index < 0:
+        raise ValueError()
+    if index == 0:
+        return 0
+    ii, ij = index_to_2d(index, width)
+    ii = ii // 2
+    ij = ij // 2
+    return index_from_2d(ii, ij, width)
+
+
+def depth_from_index(index, width):
+    return 1 + depth_from_index(parent_index(index, width), width) if index != 0 else 0
+
+
 dot_string = """graph my_graph {
     a -- b1 -- c1 -- d1;
     a -- b1 -- c1 -- d2;
@@ -70,9 +95,17 @@ nx.draw_networkx_nodes(
     G, pos, nodelist=["b1", "b2", "b3"], node_color="blue", **common_options
 )
 nx.draw_networkx_nodes(
-    G, pos, nodelist=[f"c{i}" for i in range(1, 13)], node_color="green", **common_options
+    G,
+    pos,
+    nodelist=[f"c{i}" for i in range(1, 13)],
+    node_color="green",
+    **common_options,
 )
 nx.draw_networkx_nodes(
-    G, pos, nodelist=[f"d{i}" for i in range(1, 49)], node_color="yellow", **common_options
+    G,
+    pos,
+    nodelist=[f"d{i}" for i in range(1, 49)],
+    node_color="yellow",
+    **common_options,
 )
 plt.show()
