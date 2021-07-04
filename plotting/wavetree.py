@@ -44,7 +44,7 @@ def branch_string(index, width, depth):
 def tree_string(width, maxdepth):
     assert maxdepth <= np.log2(width)
     strings = []
-    for index in range(width**2):
+    for index in range(width ** 2):
         depth = depth_from_index(index, width)
         if depth == maxdepth:
             strings.append(branch_string(index, width, maxdepth))
@@ -70,8 +70,13 @@ graph = graphs[0]
 G = from_pydot(graph)
 pos = nx.kamada_kawai_layout(G)
 
+
 plt.figure(figsize=(20, 8))
-common_options = {"node_size": 100}
-nx.draw(G, pos, node_color="white", **common_options)
-nx.draw_networkx_nodes(G, pos, node_color=wavs_arr, **common_options)
+vmax = max([np.abs(wavs_arr.min()), wavs_arr.max()])
+node_options = {"node_size": 100, "vmax": vmax, "vmin": -vmax, "cmap": "bwr"}
+edge_options = {}
+nx.draw_networkx(
+    G, pos, node_color="w", edge_color="w", with_labels=False, **node_options, **edge_options
+)
+nx.draw_networkx_nodes(G, pos, node_color=wavs_arr[-1], **node_options)
 plt.show()
