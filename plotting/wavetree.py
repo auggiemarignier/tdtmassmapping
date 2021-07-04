@@ -1,6 +1,7 @@
 import networkx as nx
 from networkx.drawing.nx_pydot import from_pydot
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 import pydot
 import numpy as np
 
@@ -71,12 +72,37 @@ G = from_pydot(graph)
 pos = nx.kamada_kawai_layout(G)
 
 
-plt.figure(figsize=(20, 8))
+class UpdateGraph:
+    def __init__(self, graph, pos, ax, colours_array, node_options={}, edge_options={}):
+        self.graph = graph
+        self.pos = pos
+        self.ax = ax
+        self.colours_array = colours_array  # (nframes, nnodes)
+        self.node_options = node_options
+        self.edge_options = edge_options
+        nx.draw_networkx(
+            self.graph,
+            self.pos,
+            ax=self.ax,
+            node_color="w",
+            edge_color="k",
+            with_labels=False,
+            **self.node_options,
+            **self.edge_options,
+        )
+
+    def __call__(self, i):
+        nx.draw_networkx_nodes(
+            self.graph, self.pos, ax=self.ax, node_color=self.colours_array[i], **self.node_options
+        )
+        self.ax.set_title(f"Iteration {i}")
+
+
+fig, ax = plt.subplots(figsize=(20, 8))
 vmax = max([np.abs(wavs_arr.min()), wavs_arr.max()])
-node_options = {"node_size": 100, "vmax": vmax, "vmin": -vmax, "cmap": "bwr"}
+node_options = {"node_size": 100, "vmax": vmax, "vmin": -vmax, "cmap": "seismic"}
 edge_options = {}
-nx.draw_networkx(
-    G, pos, node_color="w", edge_color="w", with_labels=False, **node_options, **edge_options
-)
-nx.draw_networkx_nodes(G, pos, node_color=wavs_arr[-1], **node_options)
+
+ud = UpdateGraph(G, pos, ax, wavs_arr, node_options, edge_options)
+ani = FuncAnimation(fig, ud, frames=wavs_arr.shape[0], interval=1)
 plt.show()
