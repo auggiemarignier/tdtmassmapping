@@ -60,20 +60,19 @@ max_depth = 3
 dot_string = generate_dot_string(img_width, max_depth)
 
 wavs_arr = np.loadtxt("outputs/wavelets.txt", skiprows=899)
-
+mask = np.zeros_like(wavs_arr)
+for i in range(mask.shape[0]):
+    if depth_from_index(i, img_width) > max_depth:
+        mask[i] = 1
+wavs_arr = wavs_arr[np.logical_not(mask)]
 
 graphs = pydot.graph_from_dot_data(dot_string)
 graph = graphs[0]
-
-plt.figure(figsize=(20, 8))
 G = from_pydot(graph)
 pos = nx.kamada_kawai_layout(G)
 
+plt.figure(figsize=(20, 8))
 common_options = {"node_size": 100}
-# nx.draw(G, pos, node_color="white", **common_options)
-nx.draw_networkx_nodes(G, pos, nodelist=["0"], node_color="red", **common_options)
-nx.draw_networkx_nodes(
-    G, pos, nodelist=["1", "256", "257"], node_color="blue", **common_options
-)
+nx.draw(G, pos, node_color="white", **common_options)
 nx.draw_networkx_nodes(G, pos, node_color=wavs_arr, **common_options)
 plt.show()
