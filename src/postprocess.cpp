@@ -311,8 +311,6 @@ int main(int argc, char *argv[])
     data.height = wavetree2d_sub_get_height(data.wt);
     data.size = wavetree2d_sub_get_size(data.wt);
 
-    printf("Image: %d x %d\n", data.width, data.height);
-
     data.mean = new double[data.size];
     memset(data.mean, 0, sizeof(double) * data.size);
 
@@ -393,8 +391,6 @@ int main(int argc, char *argv[])
             return -1;
         }
     }
-    printf("%d records\n", data.counter);
-    printf("%d total\n", data.thincounter);
     fclose(fp_in);
     fclose(fp_out);
 
