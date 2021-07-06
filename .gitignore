@@ -1,5 +1,7 @@
 build/
 bin/
 .vscode/
+.venv/
 outputs/
+runs/
 *.o
