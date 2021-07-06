@@ -52,12 +52,14 @@ fig = plt.figure(figsize=(10, 5), constrained_layout=True)
 axd = fig.subplot_mosaic(mosaic)
 
 khist = np.loadtxt(f"{directory}/khistogram.txt")
-axd["A"].bar(khist[:, 0], khist[:, 1])
+last_nonzero_k = np.argwhere(khist[:, 1]).shape[0]
+axd["A"].bar(khist[:last_nonzero_k, 0], khist[:last_nonzero_k, 1])
 axd["A"].set_xlabel("Number of parameters")
 axd["A"].set_ylabel("Count")
 
 likelihoods = np.loadtxt(f"{directory}/likelihood.txt")
 axd["B"].plot(likelihoods)
+axd["B"].set_yscale("log")
 axd["B"].set_xlabel("Sample number")
 axd["B"].set_ylabel("-log(likelihood)")
 
