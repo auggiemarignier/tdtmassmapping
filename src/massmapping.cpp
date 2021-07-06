@@ -272,12 +272,10 @@ int main(int argc, char *argv[])
         int current_k = wavetree2d_sub_coeff_count(global.wt);
         if (verbosity > 0 && (i + 1) % verbosity == 0)
         {
-            INFO("%6d: %f %d dc %f lambda %f:\n",
+            INFO("\n%6d: %f %d:",
                  i + 1,
                  global.current_likelihood,
-                 current_k,
-                 wavetree2d_sub_dc(global.wt),
-                 global.hierarchical->getparameter(0));
+                 current_k);
             INFO(birth.write_long_stats().c_str());
             INFO(death.write_long_stats().c_str());
             INFO(value.write_long_stats().c_str());
