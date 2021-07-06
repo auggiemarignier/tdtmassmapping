@@ -2,9 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.colors import Normalize
+import sys
 
+
+directory = sys.argv[1]
 truth = np.loadtxt("../data/Bolshoi_7_clean_256.txt").reshape((256, 256))
-mean = np.loadtxt("../outputs/mean.txt")
+mean = np.loadtxt(f"{directory}/mean.txt")
 
 vmin = truth.min()
 vmax = truth.max()
@@ -48,12 +51,12 @@ mosaic = """A
 fig = plt.figure(figsize=(10, 5), constrained_layout=True)
 axd = fig.subplot_mosaic(mosaic)
 
-khist = np.loadtxt("../outputs/khistogram.txt")
+khist = np.loadtxt(f"{directory}/khistogram.txt")
 axd["A"].bar(khist[:, 0], khist[:, 1])
 axd["A"].set_xlabel("Number of parameters")
 axd["A"].set_ylabel("Count")
 
-likelihoods = np.loadtxt("../outputs/likelihood.txt")
+likelihoods = np.loadtxt(f"{directory}/likelihood.txt")
 axd["B"].plot(likelihoods)
 axd["B"].set_xlabel("Sample number")
 axd["B"].set_ylabel("-log(likelihood)")
