@@ -11,7 +11,7 @@ extern "C"
 #include "slog.h"
 };
 
-static char short_options[] = "i:M:o:x:y:t:S:k:B:w:v:h";
+static char short_options[] = "i:M:o:x:y:t:S:k:B:w:v:l:h";
 static struct option long_options[] = {
     {"input", required_argument, 0, 'i'},
     {"prior-file", required_argument, 0, 'M'},
@@ -29,6 +29,7 @@ static struct option long_options[] = {
     {"wavelet-lateral", required_argument, 0, 'w'},
 
     {"verbosity", required_argument, 0, 'v'},
+    {"logfile", required_argument, 0, 'l'},
     {"help", no_argument, 0, 'h'},
 
     {0, 0, 0, 0}};
@@ -41,6 +42,7 @@ int main(int argc, char *argv[])
     char *input_obs = nullptr;
     char *prior_file = nullptr;
     char *output_prefix = nullptr;
+    char *logfile = nullptr;
 
     int total = 10000;
     int seed = 1;
@@ -128,6 +130,9 @@ int main(int argc, char *argv[])
         case 'v':
             verbosity = atoi(optarg);
             break;
+        case 'l':
+            logfile = optarg;
+            break;
         case 'h':
         default:
             usage(argv[0]);
@@ -152,6 +157,13 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Please provide an output directory\n");
         return -1;
     }
+    if (logfile != NULL)
+    {
+        if (slog_set_output_file(logfile, 1) < 0)
+        {
+            return -1;
+        }
+    }
 
     // Setup
     mmobservations observations(input_obs);
@@ -169,7 +181,7 @@ int main(int argc, char *argv[])
     ValueProposal value(global);
 
     global.current_likelihood = global.likelihood(global.current_log_normalization);
-    printf("Initial Likelihood: %f\n", global.current_likelihood);
+    INFO("Initial Likelihood: %f\n", global.current_likelihood);
 
     int *khistogram = new int[kmax];
     for (int i = 0; i < kmax; i++)
@@ -184,7 +196,7 @@ int main(int argc, char *argv[])
                                  global.temperature,
                                  global.hierarchical->getparameter(0)) < 0)
     {
-        fprintf(stderr, "error: failed to initialise chain history\n");
+        ERROR("failed to initialise chain history\n");
         return -1;
     }
 
@@ -192,7 +204,7 @@ int main(int argc, char *argv[])
     fp_ch = fopen(filename.c_str(), "w");
     if (fp_ch == NULL)
     {
-        fprintf(stderr, "error: failed to create chain history file\n");
+        ERROR("failed to create chain history file\n");
         return -1;
     }
 
@@ -204,7 +216,7 @@ int main(int argc, char *argv[])
         {
             if (birth.step() < 0)
             {
-                fprintf(stderr, "error: failed to do birth step\n");
+                ERROR("failed to do birth step\n");
                 return -1;
             }
         }
@@ -212,7 +224,7 @@ int main(int argc, char *argv[])
         {
             if (death.step() < 0)
             {
-                fprintf(stderr, "error: failed to do death step\n");
+                ERROR("failed to do death step\n");
                 return -1;
             }
         }
@@ -220,7 +232,7 @@ int main(int argc, char *argv[])
         {
             if (value.step() < 0)
             {
-                fprintf(stderr, "error: failed to do value step\n");
+                ERROR("failed to do value step\n");
                 return -1;
             }
         }
@@ -232,12 +244,12 @@ int main(int argc, char *argv[])
                                     (ch_write_t)fwrite,
                                     fp_ch) < 0)
             {
-                fprintf(stderr, "error: failed to write chain history segment to file\n");
+                ERROR("failed to write chain history segment to file\n");
                 return -1;
             }
             if (chain_history_reset(global.ch) < 0)
             {
-                fprintf(stderr, "error: failed to reset chain history\n");
+                ERROR("failed to reset chain history\n");
                 return -1;
             }
         }
@@ -245,7 +257,7 @@ int main(int argc, char *argv[])
         chain_history_change_t step;
         if (wavetree2d_sub_get_last_perturbation(global.wt, &step) < 0)
         {
-            fprintf(stderr, "error: failed to get last step\n");
+            ERROR("failed to get last step\n");
             return -1;
         }
         step.header.likelihood = global.current_likelihood;
@@ -253,7 +265,7 @@ int main(int argc, char *argv[])
         step.header.hierarchical = global.hierarchical->getparameter(0);
         if (chain_history_add_step(global.ch, &step) < 0)
         {
-            fprintf(stderr, "error: failed to add step to chain history\n");
+            ERROR("failed to add step to chain history\n");
             return -1;
         }
 
@@ -279,7 +291,7 @@ int main(int argc, char *argv[])
     FILE *fp = fopen(filename.c_str(), "w");
     if (fp == NULL)
     {
-        fprintf(stderr, "error: failed to create khistogram file\n");
+        ERROR("failed to create khistogram file\n");
         return -1;
     }
     for (int i = 0; i < kmax; i++)
@@ -297,7 +309,7 @@ int main(int argc, char *argv[])
                                 (ch_write_t)fwrite,
                                 fp_ch) < 0)
         {
-            fprintf(stderr, "error: failed to write chain history segment to file\n");
+            ERROR("failed to write chain history segment to file\n");
             return -1;
         }
     }
@@ -308,7 +320,7 @@ int main(int argc, char *argv[])
     fp = fopen(filename.c_str(), "w");
     if (fp == NULL)
     {
-        fprintf(stderr, "error: failed to create acceptance file\n");
+        ERROR("failed to create acceptance file\n");
         return -1;
     }
     fprintf(fp, "%s", birth.write_long_stats().c_str());
@@ -322,7 +334,7 @@ int main(int argc, char *argv[])
     filename = mkfilename(output_prefix, "final_model.txt");
     if (wavetree2d_sub_save(global.wt, filename.c_str()) < 0)
     {
-        fprintf(stderr, "error: failed to save final model\n");
+        ERROR("failed to save final model\n");
         return -1;
     }
 
