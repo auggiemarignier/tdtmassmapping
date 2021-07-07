@@ -11,9 +11,10 @@ extern "C"
 #include "slog.h"
 };
 
-static char short_options[] = "i:M:o:x:y:t:S:k:B:w:v:l:h";
+static char short_options[] = "i:I:M:o:x:y:t:S:k:B:w:v:l:h";
 static struct option long_options[] = {
     {"input", required_argument, 0, 'i'},
+    {"initial_model", required_argument, 0, 'I'},
     {"prior-file", required_argument, 0, 'M'},
     {"output", required_argument, 0, 'o'},
 
@@ -40,6 +41,7 @@ int main(int argc, char *argv[])
 {
     // Defaults
     char *input_obs = nullptr;
+    char *initial_model = nullptr;
     char *prior_file = nullptr;
     char *output_prefix = nullptr;
     char *logfile = nullptr;
@@ -69,6 +71,9 @@ int main(int argc, char *argv[])
         {
         case 'i':
             input_obs = optarg;
+            break;
+        case 'I':
+            initial_model = optarg;
             break;
         case 'M':
             prior_file = optarg;
@@ -169,7 +174,7 @@ int main(int argc, char *argv[])
     mmobservations observations(input_obs);
 
     GlobalProposal global(&observations,
-                          NULL,
+                          initial_model,
                           prior_file,
                           degreex,
                           degreey,
@@ -368,6 +373,7 @@ static void usage(const char *pname)
             "where options is one or more of:\n"
             "\n"
             " -i|--input <file>               Input observations file\n"
+            " -I|--inital_model <file>        Initial model file for restarts\n"
             " -M|--prior <file>               Prior/Proposal file\n"
             " -o|--output <path>              Output prefix for output files\n"
             "\n"
