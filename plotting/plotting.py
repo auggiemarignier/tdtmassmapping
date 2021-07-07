@@ -3,12 +3,25 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.colors import Normalize
 import sys
+import os
 
 
 directory = sys.argv[1]
 truth = np.loadtxt("../data/Bolshoi_7_clean_256.txt").reshape((256, 256))
 mean = np.loadtxt(f"{directory}/mean.txt")
 std = np.loadtxt(f"{directory}/stddev.txt")
+khist = np.loadtxt(f"{directory}/khistogram.txt")
+last_nonzero_k = np.argwhere(khist[:, 1]).max()
+likelihoods = np.loadtxt(f"{directory}/likelihood.txt")
+
+while os.path.isdir(f"{directory}/restart/"):
+    directory += "/restart"
+    if os.path.isfile(f"{directory}/mean.txt"):
+        mean += np.loadtxt(f"{directory}/mean.txt")
+        std += np.loadtxt(f"{directory}/stddev.txt")  # note this assumes NO correlation between pixels
+        likelihoods = np.concatenate([likelihoods, np.loadtxt(f"{directory}/likelihood.txt")])
+        khist[:, 1] += np.loadtxt(f"{directory}/khistogram.txt", usecols=1)
+        last_nonzero_k = np.argwhere(khist[:, 1]).max()
 
 vmin = truth.min()
 vmax = truth.max()
@@ -61,13 +74,10 @@ mosaic = """A
 fig = plt.figure(figsize=(10, 5), constrained_layout=True)
 axd = fig.subplot_mosaic(mosaic)
 
-khist = np.loadtxt(f"{directory}/khistogram.txt")
-last_nonzero_k = np.argwhere(khist[:, 1]).shape[0]
 axd["A"].bar(khist[:last_nonzero_k, 0], khist[:last_nonzero_k, 1])
 axd["A"].set_xlabel("Number of parameters")
 axd["A"].set_ylabel("Count")
 
-likelihoods = np.loadtxt(f"{directory}/likelihood.txt")
 axd["B"].plot(likelihoods)
 axd["B"].set_yscale("log")
 axd["B"].set_xlabel("Sample number")
