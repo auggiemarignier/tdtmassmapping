@@ -24,8 +24,9 @@ while os.path.isdir(f"{directory}/restart/"):
         likelihoods = np.concatenate([likelihoods, np.loadtxt(f"{directory}/likelihood.txt")])
         khist[:, 1] += np.loadtxt(f"{directory}/khistogram.txt", usecols=1)
         last_nonzero_k = np.argwhere(khist[:, 1]).max()
-mean /= len(restarts)
-std /= len(restarts)
+if len(restarts) > 0:
+    mean /= len(restarts)
+    std /= len(restarts)
 diff = np.abs(truth - mean)
 
 vmin = truth.min()
