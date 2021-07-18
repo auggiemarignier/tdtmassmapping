@@ -1,6 +1,8 @@
 import networkx as nx
 from networkx.drawing.nx_pydot import from_pydot
 import matplotlib.pyplot as plt
+from matplotlib import cm
+from matplotlib.colors import Normalize
 import pydot
 import numpy as np
 
@@ -84,12 +86,12 @@ def read_model(filename):
 
 
 model, birth_set = read_model("outputs/final_model.txt")
+indexes = model.nonzero()[0]
+children = birth_set.nonzero()[0]
 
 img_width = 256
 max_depth = 7
-dot_string = generate_dot_string(
-    img_width, indexes=model.nonzero()[0], birth_set=birth_set.nonzero()[0]
-)
+dot_string = generate_dot_string(img_width, indexes=indexes, birth_set=children)
 
 graphs = pydot.graph_from_dot_data(dot_string)
 graph = graphs[0]
@@ -97,13 +99,13 @@ G = from_pydot(graph)
 pos = nx.kamada_kawai_layout(G)
 
 fig, ax = plt.subplots(figsize=(20, 8))
-node_options = {"node_size": 100, "cmap": "viridis"}
+cmap = "viridis"
+node_options = {
+    "node_size": 100,
+    "node_color": indexes,
+    "cmap": cmap,
+}
 edge_options = {}
-nx.draw_networkx(
-    G,
-    pos,
-    ax=ax,
-    **node_options,
-    **edge_options
-)
+nx.draw_networkx(G, pos, ax=ax, **node_options, **edge_options)
+fig.colorbar(cm.ScalarMappable(norm=Normalize(vmin=indexes.min(), vmax=indexes.max()), cmap=cmap), orientation="horizontal")
 plt.show()
