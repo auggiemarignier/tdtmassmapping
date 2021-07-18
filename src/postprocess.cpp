@@ -49,6 +49,7 @@ struct user_data
     wavetree2d_sub_t *wt;
 
     FILE *fp_out;
+    FILE *fp_wavs;
 };
 
 static const double CREDIBLE_INTERVAL = 0.95;
@@ -66,7 +67,7 @@ static double head_from_histogram(int *hist, double vmin, double vmax, int bins,
 static double tail_from_histogram(int *hist, double vmin, double vmax, int bins, int drop);
 static double hpd_from_histogram(int *hist, double vmin, double vmax, int bins, double hpd_interval, double &hpd_min, double &hpd_max);
 
-static char short_options[] = "x:y:i:o:D:l:t:s:m:M:c:C:g:p:P:Q:b:v:V:S:w:h";
+static char short_options[] = "x:y:i:o:D:l:W:t:s:m:M:c:C:g:p:P:Q:b:v:V:S:w:h";
 static struct option long_options[] = {
     {"degree-x", required_argument, 0, 'x'},
     {"degree-y", required_argument, 0, 'y'},
@@ -75,6 +76,7 @@ static struct option long_options[] = {
     {"output", required_argument, 0, 'o'},
     {"stddev", required_argument, 0, 'D'},
     {"likelihood", required_argument, 0, 'l'},
+    {"wavelets", required_argument, 0, 'W'},
     {"thin", required_argument, 0, 't'},
     {"skip", required_argument, 0, 's'},
 
@@ -112,6 +114,7 @@ int main(int argc, char *argv[])
     const char *output_file;
     const char *stddev_file;
     const char *likelihood_file;
+    const char *wavelets_file;
 
     int degree_x;
     int degree_y;
@@ -158,6 +161,7 @@ int main(int argc, char *argv[])
     output_file = NULL;
     stddev_file = NULL;
     likelihood_file = NULL;
+    wavelets_file = NULL;
 
     mode_file = NULL;
     median_file = NULL;
@@ -213,6 +217,9 @@ int main(int argc, char *argv[])
             break;
         case 'l':
             likelihood_file = optarg;
+            break;
+        case 'W':
+            wavelets_file = optarg;
             break;
         case 'o':
             output_file = optarg;
@@ -363,6 +370,16 @@ int main(int argc, char *argv[])
     }
     data.fp_out = fp_out;
 
+    //
+    // Wavelets output
+    //
+    data.fp_wavs = fopen(wavelets_file, "w");
+    if (data.fp_wavs == NULL)
+    {
+        fprintf(stderr, "error: failed to open wavelets file\n");
+        return -1;
+    }
+
     /*
    * Process the chain history
    */
@@ -393,6 +410,7 @@ int main(int argc, char *argv[])
     }
     fclose(fp_in);
     fclose(fp_out);
+    fclose(data.fp_wavs);
 
     /*
    * Mean output
@@ -701,6 +719,12 @@ static int process(int stepi,
             fprintf(stderr, "process: failed to map to array\n");
             return -1;
         }
+
+        for (i = 0; i < d->size; i++)
+        {
+            fprintf(d->fp_wavs, "%f ", d->model[i]);
+        }
+        fprintf(d->fp_wavs, "\n");
 
         if (generic_lift_inverse2d(d->model,
                                    d->width,
