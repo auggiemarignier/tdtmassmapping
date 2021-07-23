@@ -4,5 +4,6 @@ bin/
 .venv/
 outputs/
 runs/
+data/
 *.o
 *.ipynb*
