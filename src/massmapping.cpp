@@ -6,6 +6,8 @@
 #include "mmobservations.hpp"
 #include "utils.hpp"
 
+#include "globalprop.cpp"
+
 extern "C"
 {
 #include "slog.h"
@@ -57,6 +59,8 @@ int main(int argc, char *argv[])
     int wavelet_xy = 4;
     int degreex = 8;
     int degreey = 8;
+
+    double *model;
 
     // Command line options
     int option_index = 0;
@@ -340,6 +344,40 @@ int main(int argc, char *argv[])
         ERROR("failed to save final model\n");
         return -1;
     }
+
+    filename = mkfilename(output_prefix, "final_model_pix.txt");
+    model = new double[global.size];
+    memset(model, 0, sizeof(double) * global.size);
+    if (wavetree2d_sub_map_to_array(global.wt, model, global.size) < 0)
+    {
+        throw ERROR("Failed to map model to array\n");
+    }
+    if (generic_lift_inverse2d(model,
+                               global.width,
+                               global.height,
+                               global.width,
+                               global.workspace,
+                               global.xywaveletf,
+                               global.xywaveletf,
+                               SUBTILE) < 0)
+    {
+        throw ERROR("Failed to do inverse transform on coefficients\n");
+    }
+    fp = fopen(filename.c_str(), "w");
+    if (fp == NULL)
+    {
+        ERROR("failed to create final_model_pix.txt file\n");
+        return -1;
+    }
+    for (int j = 0; j < global.height; j++)
+    {
+        for (int i = 0; i < global.width; i++)
+        {
+            fprintf(fp, "%10.6f ", model[j * global.width + i]);
+        }
+        fprintf(fp, "\n");
+    }
+    fclose(fp);
 
     filename = mkfilename(output_prefix, "residuals.txt");
     if (!global.save_residuals(filename.c_str()))
