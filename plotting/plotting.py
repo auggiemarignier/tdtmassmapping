@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.colors import Normalize
+from matplotlib.lines import Line2D
 import sys
 import os
 
@@ -20,8 +21,12 @@ while os.path.isdir(f"{directory}/restart/"):
     directory += "/restart"
     if os.path.isfile(f"{directory}/mean.txt"):
         mean += np.loadtxt(f"{directory}/mean.txt")
-        std += np.loadtxt(f"{directory}/stddev.txt")  # note this assumes NO correlation between pixels
-        likelihoods = np.concatenate([likelihoods, np.loadtxt(f"{directory}/likelihood.txt")])
+        std += np.loadtxt(
+            f"{directory}/stddev.txt"
+        )  # note this assumes NO correlation between pixels
+        likelihoods = np.concatenate(
+            [likelihoods, np.loadtxt(f"{directory}/likelihood.txt")]
+        )
         khist[:, 1] += np.loadtxt(f"{directory}/khistogram.txt", usecols=1)
         last_nonzero_k = np.argwhere(khist[:, 1]).max()
 
@@ -79,7 +84,7 @@ fig.colorbar(
     axd["G"],
     shrink=0.1,
 )
-axd["G"].yaxis.set_ticks_position('left')
+axd["G"].yaxis.set_ticks_position("left")
 
 plt.show()
 
@@ -95,6 +100,10 @@ axd["A"].set_ylabel("Count")
 axd["B"].plot(likelihoods)
 for r in restarts:
     axd["B"].axvline(r, c="k", ls="--")
+if len(restarts) > 0:
+    axd["B"].legend(
+        handles=[Line2D([0], [0], linestyle="--", color="k", label="Restart")]
+    )
 axd["B"].set_yscale("log")
 axd["B"].set_xlabel("Sample number")
 axd["B"].set_ylabel("-log(likelihood)")
