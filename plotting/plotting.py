@@ -7,7 +7,7 @@ import os
 
 
 directory = sys.argv[1]
-truth = np.loadtxt("../data/Bolshoi_7_clean_256.txt").reshape((256, 256))
+truth = np.loadtxt(f"{directory}/truth.txt").reshape((256, 256))
 mean = np.loadtxt(f"{directory}/mean.txt")
 std = np.loadtxt(f"{directory}/stddev.txt")
 khist = np.loadtxt(f"{directory}/khistogram.txt")
