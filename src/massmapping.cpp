@@ -5,13 +5,8 @@
 #include "proposals.hpp"
 #include "mmobservations.hpp"
 #include "utils.hpp"
-
 #include "globalprop.cpp"
-
-extern "C"
-{
-#include "slog.h"
-};
+#include "log.hpp"
 
 static char short_options[] = "i:I:M:o:x:y:t:S:k:B:w:v:l:h";
 static struct option long_options[] = {

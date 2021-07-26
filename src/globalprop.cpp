@@ -1,9 +1,9 @@
 #include "globalprop.hpp"
+#include "log.hpp"
 
 extern "C"
 {
 #include "hnk_cartesian_nonsquare.h"
-#include "slog.h"
 };
 
 static constexpr double LARGE_LIKELIHOOD = 1e99;

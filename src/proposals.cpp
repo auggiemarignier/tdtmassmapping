@@ -1,10 +1,6 @@
 #include <math.h>
 
-extern "C"
-{
-#include "slog.h"
-};
-
+#include "log.hpp"
 #include "proposals.hpp"
 #include "utils.hpp"
 

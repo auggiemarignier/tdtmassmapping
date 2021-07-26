@@ -4,10 +4,7 @@
 #include <math.h>
 
 #include "mmobservations.hpp"
-extern "C"
-{
-#include "slog.h"
-};
+#include "log.hpp"
 
 Observations::Observations(
     std::vector<double> _obs,

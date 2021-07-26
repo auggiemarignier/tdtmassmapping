@@ -1,9 +1,6 @@
 #include <math.h>
-extern "C"
-{
-#include "slog.h"
-};
 
+#include "log.hpp"
 #include "proposals.hpp"
 
 int DeathProposal::choose_proposal_location_and_value(int k,
