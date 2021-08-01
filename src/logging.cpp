@@ -2,7 +2,7 @@
 
 #include <stdarg.h>
 
-Logger::Logger() : filename(nullptr), log_file(NULL){};
+Logger::Logger() : filename(nullptr), log_file(stderr){};
 
 void Logger::open_log_file()
 {
