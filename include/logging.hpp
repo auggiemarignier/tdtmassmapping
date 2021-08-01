@@ -46,10 +46,10 @@ struct Logger
     void write_log(logger_level_t level, const char *fmt, ...);
     void close_log();
 
-    std::string log_error(const char *fmt, ...);
-    std::string log_warning(const char *fmt, ...);
-    std::string log_info(const char *fmt, ...);
-    std::string log_deug(const char *fmt, ...);
+    void log_error(const char *fmt, ...);
+    void log_warning(const char *fmt, ...);
+    void log_info(const char *fmt, ...);
+    void log_debug(const char *fmt, ...);
 
     const char *filename;
     FILE *log_file;
