@@ -1,5 +1,5 @@
 #include "globalprop.hpp"
-#include "log.hpp"
+#include "logging.hpp"
 
 extern "C"
 {

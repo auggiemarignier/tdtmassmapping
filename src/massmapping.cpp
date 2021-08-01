@@ -6,7 +6,7 @@
 #include "mmobservations.hpp"
 #include "utils.hpp"
 #include "globalprop.cpp"
-#include "log.hpp"
+#include "logging.hpp"
 
 static char short_options[] = "i:I:M:o:x:y:t:S:k:B:w:v:l:h";
 static struct option long_options[] = {
