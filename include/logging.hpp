@@ -42,7 +42,7 @@ struct Logger
 {
     Logger();
 
-    FILE open_log_file();
+    void open_log_file();
     void write_log(logger_level_t level, const char *fmt, ...);
     void close_log();
 
