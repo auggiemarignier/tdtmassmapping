@@ -35,6 +35,9 @@ extern "C"
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
 #define ERROR(logger, fmt, ...) logger.write_log(ERROR, fmt, ##__VA_ARGS__)
+#define WARNING(logger, fmt, ...) logger.write_log(WARNING, fmt, ##__VA_ARGS__)
+#define INFO(logger, fmt, ...) logger.write_log(INFO, fmt, ##__VA_ARGS__)
+#define DEBUG(logger, fmt, ...) logger.write_log(DEBUG, fmt, ##__VA_ARGS__)
 
 typedef enum
 {
