@@ -4,6 +4,12 @@
 
 Logger::Logger() : filename(nullptr), log_file(stderr){};
 
+Logger::Logger(const char *filename) : filename(filename), log_file(NULL)
+{
+    open_log_file();
+    write_log(INFO, "Beginning logs\n");
+};
+
 void Logger::open_log_file()
 {
     if (filename !=  nullptr)

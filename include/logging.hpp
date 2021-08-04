@@ -18,6 +18,7 @@ typedef enum
 struct Logger
 {
     Logger();
+    Logger(const char *filename);
 
     void open_log_file();
     void write_log(logger_level_t level, const char *fmt, ...);
