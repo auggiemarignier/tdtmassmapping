@@ -1,24 +1,28 @@
 #include "logging.hpp"
 
 #include <stdarg.h>
-#include <time.h>
 
-Logger::Logger() : filename(nullptr), log_file(stderr){};
+static char *timestamp();
+
+Logger::Logger() : filename(nullptr), log_file(stderr)
+{
+    write_log(INFO, "Beginning logs %s", timestamp());
+};
 
 Logger::Logger(const char *filename) : filename(filename), log_file(NULL)
 {
     open_log_file();
-    write_log(INFO, "Beginning logs\n");
+    write_log(INFO, "Beginning logs %s", timestamp());
 };
 
 Logger::~Logger()
 {
-    write_log(INFO, "Ending logs\n");
+    write_log(INFO, "Ending logs %s", timestamp());
 }
 
 void Logger::open_log_file()
 {
-    if (filename !=  nullptr)
+    if (filename != nullptr)
     {
         log_file = fopen(filename, "w");
         if (log_file == NULL)
@@ -37,7 +41,7 @@ void Logger::write_log(logger_level_t level, const char *fmt, ...)
     if (level == ERROR)
         fprintf(log_file, "ERROR:\t%s[%d] ", __FILE__, __LINE__);
     else if (level == WARNING)
-        fprintf(log_file, "WARNING:\t");
+        fprintf(log_file, "WARNING: ");
     else if (level == INFO)
         fprintf(log_file, "INFO:\t");
     else
@@ -51,3 +55,16 @@ void Logger::write_log(logger_level_t level, const char *fmt, ...)
     fprintf(log_file, "\n");
 }
 
+static char *timestamp()
+{
+    const char *TIME_FORMAT = "%Y-%m-%d %H:%M:%S";
+    static char buffer[32];
+    time_t tmp;
+    struct tm *t;
+
+    tmp = time(NULL);
+    t = localtime(&tmp);
+    strftime(buffer, sizeof(buffer), TIME_FORMAT, t);
+
+    return buffer;
+}
