@@ -1,6 +1,7 @@
 #include "logging.hpp"
 
 #include <stdarg.h>
+#include <time.h>
 
 Logger::Logger() : filename(nullptr), log_file(stderr){};
 
@@ -9,6 +10,11 @@ Logger::Logger(const char *filename) : filename(filename), log_file(NULL)
     open_log_file();
     write_log(INFO, "Beginning logs\n");
 };
+
+Logger::~Logger()
+{
+    write_log(INFO, "Ending logs\n");
+}
 
 void Logger::open_log_file()
 {

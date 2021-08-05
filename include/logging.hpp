@@ -19,6 +19,7 @@ struct Logger
 {
     Logger();
     Logger(const char *filename);
+    ~Logger();
 
     void open_log_file();
     void write_log(logger_level_t level, const char *fmt, ...);
