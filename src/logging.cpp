@@ -1,23 +1,15 @@
 #include "logging.hpp"
 
 #include <stdarg.h>
+#include <iostream>
 
 static char *timestamp();
 
-Logger::Logger() : filename(nullptr), log_file(stderr)
-{
-    write_log(INFO, "Beginning logs %s", timestamp());
-};
 
-Logger::Logger(const char *filename) : filename(filename), log_file(NULL)
+Logger& Logger::Get()
 {
-    open_log_file();
-    write_log(INFO, "Beginning logs %s", timestamp());
-};
-
-Logger::~Logger()
-{
-    write_log(INFO, "Ending logs %s", timestamp());
+    static Logger instance;
+    return instance;
 }
 
 void Logger::open_log_file()

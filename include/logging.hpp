@@ -3,10 +3,10 @@
 
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
-#define ERROR(logger, fmt, ...) logger.write_log(ERROR, fmt, ##__VA_ARGS__)
-#define WARNING(logger, fmt, ...) logger.write_log(WARNING, fmt, ##__VA_ARGS__)
-#define INFO(logger, fmt, ...) logger.write_log(INFO, fmt, ##__VA_ARGS__)
-#define DEBUG(logger, fmt, ...) logger.write_log(DEBUG, fmt, ##__VA_ARGS__)
+#define ERROR(fmt, ...) Logger::Get().write_log(ERROR, fmt, ##__VA_ARGS__)
+#define WARNING(fmt, ...) Logger::Get().write_log(WARNING, fmt, ##__VA_ARGS__)
+#define INFO(fmt, ...) Logger::Get().write_log(INFO, fmt, ##__VA_ARGS__)
+#define DEBUG(fmt, ...) Logger::Get().write_log(DEBUG, fmt, ##__VA_ARGS__)
 
 typedef enum
 {
@@ -16,16 +16,21 @@ typedef enum
     DEBUG = 4
 } logger_level_t;
 
-struct Logger
+class Logger
 {
-    Logger();
-    Logger(const char *filename);
-    ~Logger();
+public:
+    Logger(const Logger &) = delete;
+    Logger operator= ( const Logger & ) = delete;
 
-    void open_log_file();
+    static Logger &Get();
+
     void write_log(logger_level_t level, const char *fmt, ...);
+    void open_log_file();
     void close_log();
 
+private:
+    Logger(){};
+    
     const char *filename;
     FILE *log_file;
 };
