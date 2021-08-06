@@ -4,7 +4,7 @@
 
 static char *timestamp();
 
-Logger& Logger::Get()
+Logger &Logger::Get()
 {
     static Logger instance;
     return instance;
@@ -28,14 +28,23 @@ void Logger::open_log_imp(const char *filename)
 
 void Logger::write_log_imp(logger_level_t level, const char *sourcefile, const char *function, int lineno, const char *fmt, va_list args)
 {
-    if (level == ERROR)
+    switch (level)
+    {
+    case ERROR:
         fprintf(log_file, "ERROR:\t%s[%d] ", sourcefile, lineno);
-    else if (level == WARNING)
+        break;
+    case WARNING:
         fprintf(log_file, "WARNING: ");
-    else if (level == INFO)
+        break;
+    case INFO:
         fprintf(log_file, "INFO:\t");
-    else
+        break;
+    case DEBUG:
         fprintf(log_file, "DEBUG:\t%s:%s[%d] ", sourcefile, function, lineno);
+        break;
+    default:
+        break;
+    }
 
     vfprintf(log_file, fmt, args);
     fprintf(log_file, "\n");
