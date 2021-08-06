@@ -3,10 +3,10 @@
 
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
-#define ERROR(fmt, ...) Logger::Get().write_log(ERROR, fmt, ##__VA_ARGS__)
-#define WARNING(fmt, ...) Logger::Get().write_log(WARNING, fmt, ##__VA_ARGS__)
-#define INFO(fmt, ...) Logger::Get().write_log(INFO, fmt, ##__VA_ARGS__)
-#define DEBUG(fmt, ...) Logger::Get().write_log(DEBUG, fmt, ##__VA_ARGS__)
+#define ERROR(fmt, ...) Logger::Get().write_log(ERROR, __FILE__, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__)
+#define WARNING(fmt, ...) Logger::Get().write_log(WARNING, __FILE__, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__)
+#define INFO(fmt, ...) Logger::Get().write_log(INFO, __FILE__, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__)
+#define DEBUG(fmt, ...) Logger::Get().write_log(DEBUG, __FILE__, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__)
 
 typedef enum
 {
@@ -20,17 +20,17 @@ class Logger
 {
 public:
     Logger(const Logger &) = delete;
-    Logger operator= ( const Logger & ) = delete;
+    Logger operator=(const Logger &) = delete;
 
     static Logger &Get();
 
-    void write_log(logger_level_t level, const char *fmt, ...);
+    void write_log(logger_level_t level, const char *sourcefile, const char *function, int lineno, const char *fmt, ...);
     void open_log_file();
     void close_log();
 
 private:
     Logger(){};
-    
+
     const char *filename;
     FILE *log_file;
 };

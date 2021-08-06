@@ -28,16 +28,16 @@ void Logger::open_log_file()
     }
 }
 
-void Logger::write_log(logger_level_t level, const char *fmt, ...)
+void Logger::write_log(logger_level_t level, const char *sourcefile, const char *function, int lineno, const char *fmt, ...)
 {
     if (level == ERROR)
-        fprintf(log_file, "ERROR:\t%s[%d] ", __FILE__, __LINE__);
+        fprintf(log_file, "ERROR:\t%s[%d] ", sourcefile, lineno);
     else if (level == WARNING)
         fprintf(log_file, "WARNING: ");
     else if (level == INFO)
         fprintf(log_file, "INFO:\t");
     else
-        fprintf(log_file, "DEBUG:\t%s:%s[%d] ", __FILE__, __FUNCTION__, __LINE__);
+        fprintf(log_file, "DEBUG:\t%s:%s[%d] ", sourcefile, function, lineno);
 
     va_list args;
     va_start(args, fmt);
