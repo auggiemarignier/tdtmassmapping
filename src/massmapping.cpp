@@ -161,15 +161,10 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Please provide an output directory\n");
         return -1;
     }
-    if (logfile != NULL)
-    {
-        if (slog_set_output_file(logfile, 1) < 0)
-        {
-            return -1;
-        }
-    }
 
     // Setup
+    Logger::open_log(logfile);
+
     mmobservations observations(input_obs);
 
     GlobalProposal global(&observations,
