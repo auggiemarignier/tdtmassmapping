@@ -27,6 +27,7 @@ set(SOURCES src/mmobservations.cpp
             src/valueprop.cpp
             src/rng.cpp
             src/hierarchicalmodel.cpp
+            src/logging.cpp
             src/utils.cpp)
 
 add_library(${PROJECT_LIB} STATIC ${SOURCES})
