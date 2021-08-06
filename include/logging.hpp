@@ -29,6 +29,8 @@ public:
 
     static Logger &Get();
 
+    ~Logger();
+
     static void write_log(logger_level_t level, const char *sourcefile, const char *function, int lineno, const char *fmt, ...)
     {
         va_list args;
@@ -55,4 +57,5 @@ private:
     void write_log_imp(logger_level_t level, const char *sourcefile, const char *function, int lineno, const char *fmt, va_list arg);
 
     FILE *log_file;
+    bool log_open = false;
 };

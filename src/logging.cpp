@@ -10,6 +10,12 @@ Logger &Logger::Get()
     return instance;
 }
 
+Logger::~Logger()
+{
+    Logger::close_log();
+    Logger::log_open = false;
+}
+
 void Logger::open_log_imp(const char *filename)
 {
     if (filename != nullptr)
@@ -22,12 +28,15 @@ void Logger::open_log_imp(const char *filename)
     }
     else
         log_file = stderr;
-
+    Logger::log_open = true;
     fprintf(log_file, "Starting logs %s\n\n", timestamp());
 }
 
 void Logger::write_log_imp(logger_level_t level, const char *sourcefile, const char *function, int lineno, const char *fmt, va_list args)
 {
+    if (!Logger::log_open) // Nothing ever gets logged
+        return;
+    
     switch (level)
     {
     case ERROR:
@@ -52,9 +61,12 @@ void Logger::write_log_imp(logger_level_t level, const char *sourcefile, const c
 
 void Logger::close_log_imp()
 {
-    fprintf(log_file, "\nClosing logs %s\n", timestamp());
-    if (log_file != stderr)
-        fclose(log_file);
+    if (Logger::log_open)
+    {
+        fprintf(log_file, "\nClosing logs %s\n", timestamp());
+        if (log_file != stderr)
+            fclose(log_file);
+    }
 }
 
 static char *timestamp()
