@@ -1,12 +1,15 @@
+#pragma once
+
 #include <string>
 #include <time.h>
+#include <stdarg.h>
 
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
-#define ERROR(fmt, ...) Logger::Get().write_log(ERROR, __FILE__, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__)
-#define WARNING(fmt, ...) Logger::Get().write_log(WARNING, __FILE__, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__)
-#define INFO(fmt, ...) Logger::Get().write_log(INFO, __FILE__, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__)
-#define DEBUG(fmt, ...) Logger::Get().write_log(DEBUG, __FILE__, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__)
+#define ERROR(fmt, ...) Logger::write_log(ERROR, __FILE__, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__)
+#define WARNING(fmt, ...) Logger::write_log(WARNING, __FILE__, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__)
+#define INFO(fmt, ...) Logger::write_log(INFO, __FILE__, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__)
+#define DEBUG(fmt, ...) Logger::write_log(DEBUG, __FILE__, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__)
 
 typedef enum
 {
@@ -24,11 +27,31 @@ public:
 
     static Logger &Get();
 
-    void write_log(logger_level_t level, const char *sourcefile, const char *function, int lineno, const char *fmt, ...);
-    void open_log_file(const char *filename);
-    void close_log();
+    static void write_log(logger_level_t level, const char *sourcefile, const char *function, int lineno, const char *fmt, ...)
+    {
+        va_list args;
+        va_start(args, fmt);
+        Logger::Get().write_log_imp(level, sourcefile, function, lineno, fmt, args);
+        va_end(args);
+    }
+
+    static void open_log(const char *filename)
+    {
+        Logger::Get().open_log_imp(filename);
+    }
+    
+    static void close_log()
+    {
+        Logger::Get().close_log_imp();
+    }
 
 private:
     Logger(){};
+    void open_log_imp(const char *filename);
+    void close_log_imp();
+
+    void write_log_imp(logger_level_t level, const char *sourcefile, const char *function, int lineno, const char *fmt, va_list arg);
+
+
     FILE *log_file;
 };
