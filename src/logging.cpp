@@ -1,10 +1,8 @@
 #include "logging.hpp"
 
 #include <stdarg.h>
-#include <iostream>
 
 static char *timestamp();
-
 
 Logger& Logger::Get()
 {
@@ -12,7 +10,7 @@ Logger& Logger::Get()
     return instance;
 }
 
-void Logger::open_log_file()
+void Logger::open_log_file(const char *filename)
 {
     if (filename != nullptr)
     {
@@ -23,9 +21,7 @@ void Logger::open_log_file()
         }
     }
     else
-    {
         log_file = stderr;
-    }
 }
 
 void Logger::write_log(logger_level_t level, const char *sourcefile, const char *function, int lineno, const char *fmt, ...)

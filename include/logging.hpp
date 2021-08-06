@@ -25,12 +25,10 @@ public:
     static Logger &Get();
 
     void write_log(logger_level_t level, const char *sourcefile, const char *function, int lineno, const char *fmt, ...);
-    void open_log_file();
+    void open_log_file(const char *filename);
     void close_log();
 
 private:
     Logger(){};
-
-    const char *filename;
     FILE *log_file;
 };
