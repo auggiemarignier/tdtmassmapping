@@ -10,13 +10,15 @@
 #define WARNING(fmt, ...) Logger::write_log(WARNING, __FILE__, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__)
 #define INFO(fmt, ...) Logger::write_log(INFO, __FILE__, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__)
 #define DEBUG(fmt, ...) Logger::write_log(DEBUG, __FILE__, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__)
+#define LOG(fmt, ...) Logger::write_log(BLANK, __FILE__, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__)
 
 typedef enum
 {
     ERROR = 0,
     WARNING = 1,
     INFO = 3,
-    DEBUG = 4
+    DEBUG = 4,
+    BLANK = 5
 } logger_level_t;
 
 class Logger
@@ -51,7 +53,6 @@ private:
     void close_log_imp();
 
     void write_log_imp(logger_level_t level, const char *sourcefile, const char *function, int lineno, const char *fmt, va_list arg);
-
 
     FILE *log_file;
 };
