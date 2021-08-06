@@ -4,6 +4,19 @@
 #include <time.h>
 #include <stdarg.h>
 
+#ifdef ERROR
+#undef ERROR
+#endif
+#ifdef WARNING
+#undef WARNING
+#endif
+#ifdef INFO
+#undef INFO
+#endif
+#ifdef DEBUG
+#undef DEBUG
+#endif
+
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 
 #define ERROR(fmt, ...) Logger::write_log(ERROR, __FILE__, __FUNCTION__, __LINE__, fmt, ##__VA_ARGS__)
@@ -31,7 +44,7 @@ public:
 
     ~Logger();
 
-    static void write_log(logger_level_t level, const char *sourcefile, const char *function, int lineno, const char *fmt, ...)
+    static void *write_log(logger_level_t level, const char *sourcefile, const char *function, int lineno, const char *fmt, ...)
     {
         va_list args;
         va_start(args, fmt);
@@ -43,7 +56,7 @@ public:
     {
         Logger::Get().open_log_imp(filename);
     }
-    
+
     static void close_log()
     {
         Logger::Get().close_log_imp();
@@ -54,7 +67,7 @@ private:
     void open_log_imp(const char *filename);
     void close_log_imp();
 
-    void write_log_imp(logger_level_t level, const char *sourcefile, const char *function, int lineno, const char *fmt, va_list arg);
+    void *write_log_imp(logger_level_t level, const char *sourcefile, const char *function, int lineno, const char *fmt, va_list arg);
 
     FILE *log_file;
     bool log_open = false;

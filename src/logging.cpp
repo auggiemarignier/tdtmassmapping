@@ -32,11 +32,11 @@ void Logger::open_log_imp(const char *filename)
     fprintf(log_file, "Starting logs %s\n\n", timestamp());
 }
 
-void Logger::write_log_imp(logger_level_t level, const char *sourcefile, const char *function, int lineno, const char *fmt, va_list args)
+void *Logger::write_log_imp(logger_level_t level, const char *sourcefile, const char *function, int lineno, const char *fmt, va_list args)
 {
     if (!log_open) // Nothing ever gets logged
-        return;
-    
+        return nullptr;
+
     switch (level)
     {
     case ERROR:
