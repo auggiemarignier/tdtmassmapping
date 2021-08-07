@@ -27,7 +27,7 @@
 #include <string.h>
 
 #include "hierarchicalmodel.hpp"
-#include "log.hpp"
+#include "logging.hpp"
 
 std::map<std::string, hierarchicalmodel::reader_function_t> hierarchicalmodel::readers =
   {

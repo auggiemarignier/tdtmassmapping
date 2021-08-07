@@ -1,6 +1,6 @@
 #include <math.h>
 
-#include "log.hpp"
+#include "logging.hpp"
 #include "proposals.hpp"
 
 int ValueProposal::choose_proposal_location_and_value(int k,

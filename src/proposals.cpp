@@ -1,6 +1,6 @@
 #include <math.h>
 
-#include "log.hpp"
+#include "logging.hpp"
 #include "proposals.hpp"
 #include "utils.hpp"
 
