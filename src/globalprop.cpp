@@ -154,7 +154,7 @@ GlobalProposal::GlobalProposal(Observations *_observations,
     //
     if (kmax > ncoeff)
     {
-        INFO("Warning: kmax truncated to %d\n", ncoeff);
+        WARNING("kmax truncated to %d\n", ncoeff);
         kmax = ncoeff;
     }
 

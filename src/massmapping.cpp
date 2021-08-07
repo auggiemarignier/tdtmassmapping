@@ -207,6 +207,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+    fflush(Logger::Get().log_file);
     for (int i = 0; i < total; i++) // start MCMC loop
     {
         double u = global.random.uniform();
@@ -271,13 +272,15 @@ int main(int argc, char *argv[])
         int current_k = wavetree2d_sub_coeff_count(global.wt);
         if (verbosity > 0 && (i + 1) % verbosity == 0)
         {
-            INFO("\n%6d: %f %d:",
+            INFO("Iteration %6d: Current Likelihood: %f Current k: %d\n",
                  i + 1,
                  global.current_likelihood,
                  current_k);
             INFO(birth.write_long_stats().c_str());
             INFO(death.write_long_stats().c_str());
             INFO(value.write_long_stats().c_str());
+            LOG("\n");
+            fflush(Logger::Get().log_file);
         }
         khistogram[current_k - 1]++;
     } // end MCMC loop
