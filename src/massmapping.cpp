@@ -207,7 +207,7 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    fflush(Logger::Get().log_file);
+    Logger::flush();
     for (int i = 0; i < total; i++) // start MCMC loop
     {
         double u = global.random.uniform();
@@ -280,7 +280,7 @@ int main(int argc, char *argv[])
             INFO(death.write_long_stats().c_str());
             INFO(value.write_long_stats().c_str());
             LOG("\n");
-            fflush(Logger::Get().log_file);
+            Logger::flush();
         }
         khistogram[current_k - 1]++;
     } // end MCMC loop

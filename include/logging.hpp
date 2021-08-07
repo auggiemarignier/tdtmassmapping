@@ -62,14 +62,20 @@ public:
         Logger::Get().close_log_imp();
     }
 
-    FILE *log_file;
+    static void flush()
+    {
+        Logger::Get().flush_imp();
+    }
+
 
 private:
     Logger(){};
     void open_log_imp(const char *filename);
     void close_log_imp();
+    void flush_imp();
 
     void *write_log_imp(logger_level_t level, const char *sourcefile, const char *function, int lineno, const char *fmt, va_list arg);
 
+    FILE *log_file;
     bool log_open = false;
 };

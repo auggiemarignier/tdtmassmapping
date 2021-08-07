@@ -69,6 +69,11 @@ void Logger::close_log_imp()
     }
 }
 
+void Logger::flush_imp()
+{
+    fflush(log_file);
+}
+
 static char *timestamp()
 {
     const char *TIME_FORMAT = "%Y-%m-%d %H:%M:%S";
