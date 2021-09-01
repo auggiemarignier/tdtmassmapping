@@ -94,7 +94,8 @@ for ax in axd:
         labelleft=False,
         labelbottom=False,
     )
+cbar_end = np.abs(wavelet_img).max()
 axd = img_to_mosaicaxes(
-    wavelet_img, axd, vmin=wavelet_img.min(), vmax=wavelet_img.max(), cmap="binary_r"
+    wavelet_img, axd, cmap="RdBu", vmin=-cbar_end, vmax=cbar_end,
 )
 plt.show()
