@@ -69,22 +69,39 @@ def build_mosaic_array(levels):
     mosaic[1, 0] = "1b"
     mosaic[1, 1] = "1c"
     for l in range(2, levels + 1):
-        mosaic[: 2 ** l, 2 ** (l - 1) : 2 ** l] = f"{l}a"
-        mosaic[2 ** (l - 1) : 2 ** l, : 2 ** l] = f"{l}b"
+        mosaic[: 2 ** (l - 1), 2 ** (l - 1) : 2 ** l] = f"{l}a"
+        mosaic[2 ** (l - 1) : 2 ** l, : 2 ** (l - 1)] = f"{l}b"
         mosaic[2 ** (l - 1) : 2 ** l, 2 ** (l - 1) : 2 ** l] = f"{l}c"
     return mosaic
 
 
+def img_to_mosaicaxes(img, axd):
+    axd["0"].imshow(np.array([[img[0, 0]]]))
+    axd["1a"].imshow(np.array([[img[0, 1]]]))
+    axd["1b"].imshow(np.array([[img[1, 0]]]))
+    axd["1c"].imshow(np.array([[img[1, 1]]]))
+    for ax in axd:
+        if int(ax[0]) < 2:
+            continue
+        l = int(ax[:-1])
+        if ax[-1] == "a":
+            axd[ax].imshow(img[: 2 ** (l - 1), 2 ** (l - 1) : 2 ** l])
+        elif ax[-1] == "b":
+            axd[ax].imshow(img[2 ** (l - 1) : 2 ** l, : 2 ** (l - 1)])
+        elif ax[-1] == "c":
+            axd[ax].imshow(img[2 ** (l - 1) : 2 ** l, 2 ** (l - 1) : 2 ** l])
+        else:
+            raise KeyError(ax)
+    return axd
+
+
 model, _ = read_model("runs/checkerboard7/restart/final_model.txt")
-mosaic = build_mosaic_array(8)
 indexes = np.nonzero(model)[0]
 ii, ij = index_to_2d(indexes, 256)
 wavelet_img = np.zeros((256, 256))
 wavelet_img[ii, ij] = model[indexes]
-plt.imshow(wavelet_img)
-plt.show()
 
-
+mosaic = build_mosaic_array(4)
 fig = plt.figure(constrained_layout=False, figsize=(10, 10))
 axd = fig.subplot_mosaic(mosaic, gridspec_kw={"wspace": 0, "hspace": 0})
 for ax in axd:
@@ -98,5 +115,5 @@ for ax in axd:
         labelleft=False,
         labelbottom=False,
     )
-identify_axes(axd, 30)
+axd = img_to_mosaicaxes(wavelet_img, axd)
 plt.show()
