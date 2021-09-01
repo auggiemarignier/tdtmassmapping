@@ -1,26 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import cm
-from matplotlib.colors import Normalize
-
-
-# Helper function used for visualization in the following examples
-def identify_axes(ax_dict, fontsize=48):
-    """
-    Helper to identify the Axes in the examples below.
-
-    Draws the label in a large font in the center of the Axes.
-
-    Parameters
-    ----------
-    ax_dict : dict[str, Axes]
-        Mapping between the title / label and the Axes.
-    fontsize : int, optional
-        How big the label should be.
-    """
-    kw = dict(ha="center", va="center", fontsize=fontsize, color="darkgrey")
-    for k, ax in ax_dict.items():
-        ax.text(0.5, 0.5, k, transform=ax.transAxes, **kw)
 
 
 def index_to_2d(index, width):
@@ -75,33 +54,33 @@ def build_mosaic_array(levels):
     return mosaic
 
 
-def img_to_mosaicaxes(img, axd):
-    axd["0"].imshow(np.array([[img[0, 0]]]))
-    axd["1a"].imshow(np.array([[img[0, 1]]]))
-    axd["1b"].imshow(np.array([[img[1, 0]]]))
-    axd["1c"].imshow(np.array([[img[1, 1]]]))
+def img_to_mosaicaxes(img, axd, **kwargs):
+    axd["0"].imshow(np.array([[img[0, 0]]]), **kwargs)
+    axd["1a"].imshow(np.array([[img[0, 1]]]), **kwargs)
+    axd["1b"].imshow(np.array([[img[1, 0]]]), **kwargs)
+    axd["1c"].imshow(np.array([[img[1, 1]]]), **kwargs)
     for ax in axd:
         if int(ax[0]) < 2:
             continue
         l = int(ax[:-1])
         if ax[-1] == "a":
-            axd[ax].imshow(img[: 2 ** (l - 1), 2 ** (l - 1) : 2 ** l])
+            axd[ax].imshow(img[: 2 ** (l - 1), 2 ** (l - 1) : 2 ** l], **kwargs)
         elif ax[-1] == "b":
-            axd[ax].imshow(img[2 ** (l - 1) : 2 ** l, : 2 ** (l - 1)])
+            axd[ax].imshow(img[2 ** (l - 1) : 2 ** l, : 2 ** (l - 1)], **kwargs)
         elif ax[-1] == "c":
-            axd[ax].imshow(img[2 ** (l - 1) : 2 ** l, 2 ** (l - 1) : 2 ** l])
+            axd[ax].imshow(img[2 ** (l - 1) : 2 ** l, 2 ** (l - 1) : 2 ** l], **kwargs)
         else:
             raise KeyError(ax)
     return axd
 
 
-model, _ = read_model("runs/checkerboard7/restart/final_model.txt")
+model, _ = read_model("runs/checkerboard3/restart/restart/restart/final_model.txt")
 indexes = np.nonzero(model)[0]
 ii, ij = index_to_2d(indexes, 256)
 wavelet_img = np.zeros((256, 256))
 wavelet_img[ii, ij] = model[indexes]
 
-mosaic = build_mosaic_array(4)
+mosaic = build_mosaic_array(8)
 fig = plt.figure(constrained_layout=False, figsize=(10, 10))
 axd = fig.subplot_mosaic(mosaic, gridspec_kw={"wspace": 0, "hspace": 0})
 for ax in axd:
@@ -115,5 +94,7 @@ for ax in axd:
         labelleft=False,
         labelbottom=False,
     )
-axd = img_to_mosaicaxes(wavelet_img, axd)
+axd = img_to_mosaicaxes(
+    wavelet_img, axd, vmin=wavelet_img.min(), vmax=wavelet_img.max(), cmap="binary_r"
+)
 plt.show()
