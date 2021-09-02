@@ -44,10 +44,7 @@ def build_mosaic_array(levels):
     assert levels >= 1
     mosaic = np.zeros((2 ** levels, 2 ** levels), dtype="<U2")
     mosaic[0, 0] = "0"
-    mosaic[0, 1] = "1a"
-    mosaic[1, 0] = "1b"
-    mosaic[1, 1] = "1c"
-    for l in range(2, levels + 1):
+    for l in range(1, levels + 1):
         mosaic[: 2 ** (l - 1), 2 ** (l - 1) : 2 ** l] = f"{l}a"
         mosaic[2 ** (l - 1) : 2 ** l, : 2 ** (l - 1)] = f"{l}b"
         mosaic[2 ** (l - 1) : 2 ** l, 2 ** (l - 1) : 2 ** l] = f"{l}c"
@@ -56,11 +53,8 @@ def build_mosaic_array(levels):
 
 def img_to_mosaicaxes(img, axd, **kwargs):
     axd["0"].imshow(np.array([[img[0, 0]]]), **kwargs)
-    axd["1a"].imshow(np.array([[img[0, 1]]]), **kwargs)
-    axd["1b"].imshow(np.array([[img[1, 0]]]), **kwargs)
-    axd["1c"].imshow(np.array([[img[1, 1]]]), **kwargs)
     for ax in axd:
-        if int(ax[0]) < 2:
+        if int(ax[0]) < 1:
             continue
         l = int(ax[:-1])
         if ax[-1] == "a":
