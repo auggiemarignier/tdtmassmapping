@@ -2,8 +2,13 @@
 
 #include <stdio.h>
 #include <vector>
+#include <complex>
+#include <fftw3.h>
+#include <tuple>
 
 #include "hierarchicalmodel.hpp"
+
+typedef std::vector<std::complex<double>> complexvector;
 
 class Observations
 {
@@ -59,4 +64,13 @@ public:
         double &log_normalization) override;
 
     std::vector<double> single_frequency_predictions(std::vector<double> model) override;
+
+private:
+    std::tuple<complexvector, complexvector> init_fft_2d(const uint &imsizey, const uint &imsizex);
+
+    complexvector build_lensing_kernels(const uint &imsizey, const uint &imsizex);
+
+    complexvector lensing_kernel;
+    fftw_plan plan_forward;
+    fftw_plan plan_inverse;
 };
