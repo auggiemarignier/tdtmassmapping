@@ -31,7 +31,8 @@ while os.path.isdir(f"{directory}/restart/"):
         )
         khist[:, 1] += np.loadtxt(f"{directory}/khistogram.txt", usecols=1)
         last_nonzero_k = np.argwhere(khist[:, 1]).max()
-        last = np.loadtxt(f"{directory}/final_model_pix.txt")       
+        last = np.loadtxt(f"{directory}/final_model_pix.txt")
+        khistory = np.concatenate([khistory, np.loadtxt(f"{directory}/khistory.txt")])
 
 mean /= len(restarts) + 1
 std /= len(restarts) + 1
@@ -104,8 +105,8 @@ mosaic = """A
             B"""
 fig = plt.figure(figsize=(10, 5), constrained_layout=True)
 axd = fig.subplot_mosaic(mosaic)
-prop_cycle = plt.rcParams['axes.prop_cycle']
-colours = prop_cycle.by_key()['color']
+prop_cycle = plt.rcParams["axes.prop_cycle"]
+colours = prop_cycle.by_key()["color"]
 
 axd["A"].bar(khist[:last_nonzero_k, 0], khist[:last_nonzero_k, 1])
 axd["A"].set_xlabel("Number of parameters")
@@ -128,7 +129,7 @@ axd["C"] = axd["B"].twinx()
 axd["C"].plot(khistory, color=colours[1])
 axd["C"].set_ylabel("Number of parameters", color=colours[1])
 axd["C"].spines["right"].set_color(colours[1])
-axd["C"].spines['left'].set_visible(False)
+axd["C"].spines["left"].set_visible(False)
 axd["C"].tick_params(axis="y", color=colours[1], labelcolor=colours[1])
 
 plt.show()
