@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
 
 
 def index_to_2d(index, width):
@@ -68,13 +69,14 @@ def img_to_mosaicaxes(img, axd, **kwargs):
     return axd
 
 
-model, _ = read_model("runs/checkerboard3/restart/restart/restart/final_model.txt")
+directory = sys.argv[1]
+model, _ = read_model(f"{directory}/final_model.txt")
 indexes = np.nonzero(model)[0]
 ii, ij = index_to_2d(indexes, 256)
 wavelet_img = np.zeros((256, 256))
 wavelet_img[ii, ij] = model[indexes]
 
-mosaic = build_mosaic_array(8)
+mosaic = build_mosaic_array(4)
 fig = plt.figure(constrained_layout=False, figsize=(10, 10))
 axd = fig.subplot_mosaic(mosaic, gridspec_kw={"wspace": 0, "hspace": 0})
 for ax in axd:
@@ -90,6 +92,6 @@ for ax in axd:
     )
 cbar_end = np.abs(wavelet_img).max()
 axd = img_to_mosaicaxes(
-    wavelet_img, axd, cmap="RdBu", vmin=-cbar_end, vmax=cbar_end,
+    abs(wavelet_img), axd, cmap="inferno", vmin=0, vmax=cbar_end,
 )
 plt.show()
