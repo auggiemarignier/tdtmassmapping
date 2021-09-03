@@ -4,7 +4,7 @@ cmake_policy(SET CMP0048 NEW)
 project(mmtdt
         VERSION 0.0.0
         DESCRIPTION "Mass mapping with transdimensional trees"
-        LANGUAGES CXX)
+        LANGUAGES CXX C)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(PROJECT_LIB lib${PROJECT_NAME})
@@ -36,10 +36,12 @@ add_dependencies(${PROJECT_LIB} ${TDTBASE})
 
 find_package(GSL REQUIRED)
 find_package(GMP REQUIRED)
+find_package(FFTW3 REQUIRED)
 target_link_libraries(${PROJECT_LIB}
                       GSL::gsl
                       ${GMP_LIBRARY}
-                      ${TDTBASE_LIBS})
+                      ${TDTBASE_LIBS}
+                      FFTW3::FFTW3)
 
 include_directories(include ${TDTBASE_INCLUDE}
                             ${GMP_INCLUDE_DIR})
