@@ -707,7 +707,6 @@ static int process(int stepi,
     if ((d->thincounter >= d->skip) && (d->thin <= 1 || ((d->thincounter - d->skip) % d->thin) == 0))
     {
         fprintf(d->fp_out, "%.6f\n", step->header.likelihood);
-        fprintf(d->fp_k, "%i\n", wavetree2d_sub_coeff_count(d->wt));
 
         memset(d->model, 0, sizeof(double) * d->size);
 
@@ -716,6 +715,7 @@ static int process(int stepi,
             fprintf(stderr, "process: failed to set wavetree (sub)\n");
             return -1;
         }
+        fprintf(d->fp_k, "%i\n", wavetree2d_sub_coeff_count(d->wt));
 
         if (wavetree2d_sub_map_to_array(d->wt, d->model, d->size) < 0)
         {
