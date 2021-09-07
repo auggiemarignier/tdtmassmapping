@@ -11,7 +11,6 @@ Proposal::Proposal(GlobalProposal &_global)
       accept(0),
       propose_depth(new int[global.treemaxdepth + 1]),
       accept_depth(new int[global.treemaxdepth + 1]),
-      communicator(MPI_COMM_NULL),
       mpi_size(-1),
       mpi_rank(-1)
 {
@@ -29,7 +28,6 @@ Proposal::Proposal(GlobalProposal &_global, wavetree_perturb_t _name)
       accept(0),
       propose_depth(new int[global.treemaxdepth + 1]),
       accept_depth(new int[global.treemaxdepth + 1]),
-      communicator(MPI_COMM_NULL),
       mpi_size(-1),
       mpi_rank(-1)
 {
@@ -197,14 +195,7 @@ int Proposal::compute_likelihood(int prop_idx,
                                  double &proposed_likelihood,
                                  double &proposed_log_normalization)
 {
-    if (communicator == MPI_COMM_NULL)
-    {
-        proposed_likelihood = global.likelihood(proposed_log_normalization);
-    }
-    else
-    {
-        proposed_likelihood = global.likelihood_mpi(proposed_log_normalization);
-    }
+    proposed_likelihood = global.likelihood(proposed_log_normalization);
     return 0;
 }
 
@@ -232,58 +223,6 @@ std::string Proposal::write_long_stats()
     return s;
 }
 
-void Proposal::initialize_mpi(MPI_Comm _communicator)
-{
-    MPI_Comm_dup(_communicator, &communicator);
-
-    if (MPI_Comm_size(communicator, &mpi_size) != MPI_SUCCESS)
-    {
-        throw ERROR("MPI Failure\n");
-    }
-    if (MPI_Comm_rank(communicator, &mpi_rank) != MPI_SUCCESS)
-    {
-        throw ERROR("MPI Failure\n");
-    }
-}
-
-bool Proposal::primary() const
-{
-    return (communicator == MPI_COMM_NULL || mpi_rank == 0);
-}
-
-int Proposal::communicate_proposal_location_and_value(int &prop_valid,
-                                                      int &prop_idx,
-                                                      int &prop_depth,
-                                                      double &prop_value)
-{
-    if (communicator != MPI_COMM_NULL)
-    {
-        if (MPI_Bcast(&prop_valid, 1, MPI_INT, 0, communicator) != MPI_SUCCESS)
-        {
-            throw ERROR("Failed to broadcast %s valid\n", enum_to_string(name).c_str());
-        }
-
-        if (prop_valid)
-        {
-            if (MPI_Bcast(&prop_idx, 1, MPI_INT, 0, communicator) != MPI_SUCCESS)
-            {
-                throw ERROR("Failed to broadcast %s index\n", enum_to_string(name).c_str());
-            }
-
-            if (MPI_Bcast(&prop_depth, 1, MPI_INT, 0, communicator) != MPI_SUCCESS)
-            {
-                throw ERROR("Failed to broadcast %s depth\n", enum_to_string(name).c_str());
-            }
-
-            if (MPI_Bcast(&prop_value, 1, MPI_DOUBLE, 0, communicator) != MPI_SUCCESS)
-            {
-                throw ERROR("Failed to broadcast %s value\n", enum_to_string(name).c_str());
-            }
-        }
-    }
-    return 0;
-}
-
 int Proposal::compute_reverse_proposal_probability(int prop_idx,
                                                    int prop_depth,
                                                    double prop_value,
@@ -294,33 +233,30 @@ int Proposal::compute_reverse_proposal_probability(int prop_idx,
                                                    double &reverse_prob,
                                                    double &prior_prob)
 {
-    if (primary())
+    if (sub_reverse_proposal(prop_idx,
+                             prop_depth,
+                             prop_value,
+                             ii,
+                             ij,
+                             prop_parent_coeff,
+                             prop_prob,
+                             reverse_prob,
+                             prior_prob) < 0)
     {
-        if (sub_reverse_proposal(prop_idx,
-                                 prop_depth,
-                                 prop_value,
-                                 ii,
-                                 ij,
-                                 prop_parent_coeff,
-                                 prop_prob,
-                                 reverse_prob,
-                                 prior_prob) < 0)
-        {
-            ERROR("failed to reverse Proposal\n");
-            return -1;
-        }
-
-        //
-        // Compute the prior ratio
-        //
-        prior_prob = wavetree_pp_prior_probability2d(global.proposal,
-                                                     ii,
-                                                     ij,
-                                                     prop_depth,
-                                                     global.treemaxdepth,
-                                                     prop_parent_coeff,
-                                                     prop_value);
+        ERROR("failed to reverse Proposal\n");
+        return -1;
     }
+
+    //
+    // Compute the prior ratio
+    //
+    prior_prob = wavetree_pp_prior_probability2d(global.proposal,
+                                                 ii,
+                                                 ij,
+                                                 prop_depth,
+                                                 global.treemaxdepth,
+                                                 prop_parent_coeff,
+                                                 prop_value);
     return 0;
 }
 
@@ -334,39 +270,15 @@ int Proposal::compute_acceptance(double proposed_likelihood,
                                  double prior_prob,
                                  bool &accept_proposal)
 {
-    if (primary())
-    {
-        double u = log(global.random.uniform());
-        double alpha = calculate_alpha(proposed_likelihood,
-                                       proposed_log_normalization,
-                                       reverse_prob,
-                                       choose_prob,
-                                       prop_prob,
-                                       prop_idx,
-                                       ratio,
-                                       prior_prob);
-        accept_proposal = u < alpha;
-    }
-    return 0;
-}
-
-int Proposal::communicate_acceptance(bool &accept_proposal)
-{
-    if (communicator != MPI_COMM_NULL)
-    {
-        int ta;
-        if (mpi_rank == 0)
-        {
-            ta = (int)accept_proposal;
-        }
-        if (MPI_Bcast(&ta, 1, MPI_INT, 0, communicator) != MPI_SUCCESS)
-        {
-            throw ERROR("Failed to broadcast accept proposal\n");
-        }
-        if (mpi_rank != 0)
-        {
-            accept_proposal = (bool)ta;
-        }
-    }
+    double u = log(global.random.uniform());
+    double alpha = calculate_alpha(proposed_likelihood,
+                                   proposed_log_normalization,
+                                   reverse_prob,
+                                   choose_prob,
+                                   prop_prob,
+                                   prop_idx,
+                                   ratio,
+                                   prior_prob);
+    accept_proposal = u < alpha;
     return 0;
 }

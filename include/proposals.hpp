@@ -2,7 +2,6 @@
 
 #include "globalprop.hpp"
 
-#include <mpi.h>
 
 class Proposal
 {
@@ -23,8 +22,6 @@ public:
 
     std::string write_long_stats();
 
-    void initialize_mpi(MPI_Comm communicator);
-
     GlobalProposal &global;
     wavetree_perturb_t name;
     int propose;
@@ -33,7 +30,6 @@ public:
     int *propose_depth;
     int *accept_depth;
 
-    MPI_Comm communicator;
     int mpi_size;
     int mpi_rank;
 
