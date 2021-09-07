@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <math.h>
+#include <functional>
 
 #include "mmobservations.hpp"
 #include "logging.hpp"
@@ -114,4 +115,37 @@ double mmobservations::single_frequency_likelihood(
         log_normalization);
 
     return loglikelihood;
+}
+
+std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> mmobservations::init_fft_2d(const uint &imsizey, const uint &imsizex)
+{
+    fftw_complex *in, *out;
+
+    in = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsizex * imsizey);
+    out = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsizex * imsizey);
+
+    plan_forward = fftw_plan_dft_2d(imsizey, imsizex, in, out, FFTW_FORWARD, FFTW_MEASURE);
+    plan_inverse = fftw_plan_dft_2d(imsizey, imsizex, in, out, FFTW_BACKWARD, FFTW_MEASURE);
+
+    auto forward = [=](fftw_complex *output, const fftw_complex *input)
+    {
+        fftw_execute_dft(plan_forward, const_cast<fftw_complex *>(input), output);
+        for (int i = 0; i < (int)(imsizex * imsizey); i++)
+        {
+            output[i][0] /= std::sqrt(imsizex * imsizey);
+            output[i][1] /= std::sqrt(imsizex * imsizey);
+        }
+    };
+
+    auto backward = [=](fftw_complex *output, const fftw_complex *input)
+    {
+        fftw_execute_dft(plan_inverse, const_cast<fftw_complex *>(input), output);
+        for (int i = 0; i < (int)(imsizex * imsizey); i++)
+        {
+            output[i][0] /= std::sqrt(imsizex * imsizey);
+            output[i][1] /= std::sqrt(imsizex * imsizey);
+        }
+    };
+
+    return std::make_tuple(forward, backward);
 }

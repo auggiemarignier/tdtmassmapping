@@ -5,6 +5,7 @@
 #include <complex>
 #include <fftw3.h>
 #include <tuple>
+#include <cassert>
 
 #include "hierarchicalmodel.hpp"
 
@@ -66,7 +67,7 @@ public:
     std::vector<double> single_frequency_predictions(std::vector<double> model) override;
 
 private:
-    std::tuple<complexvector, complexvector> init_fft_2d(const uint &imsizey, const uint &imsizex);
+    std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> init_fft_2d(const uint &imsizey, const uint &imsizex);
 
     complexvector build_lensing_kernels(const uint &imsizey, const uint &imsizex);
 
