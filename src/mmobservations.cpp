@@ -2,7 +2,6 @@
 #include <iostream>
 #include <fstream>
 #include <math.h>
-#include <functional>
 
 #include "mmobservations.hpp"
 #include "logging.hpp"

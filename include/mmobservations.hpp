@@ -6,10 +6,12 @@
 #include <fftw3.h>
 #include <tuple>
 #include <cassert>
+#include <functional>
 
 #include "hierarchicalmodel.hpp"
 
 typedef std::vector<std::complex<double>> complexvector;
+typedef unsigned int uint;
 
 class Observations
 {
