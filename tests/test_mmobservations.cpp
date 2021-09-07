@@ -3,6 +3,7 @@
 #include <array>
 #include <cstring>
 #include <cmath>
+#include <algorithm>
 
 #include "mmobservations.hpp"
 
@@ -73,10 +74,25 @@ TEST_F(MMObsTest, FFTiFFT)
     fft(output, input);
     ifft(recovered, output);
 
+    std::array<std::complex<double>, imsizex * imsizey> fhat;
     for (uint i = 0; i < imsizex * imsizey; i++)
     {
         ASSERT_FLOAT_EQ(input[i][0], recovered[i][0]) << i;
+        fhat[i] = std::complex<double>(output[i][0], output[i][1]);
     }
+
+    uint index_max = 0;
+    double current_max = std::norm(fhat[0]);
+    for (uint i = 0; i < imsizex * imsizey; i++)
+    {
+        if (current_max < std::norm(fhat[i]))
+        {
+            current_max = std::norm(fhat[i]);
+            index_max = i;
+        }
+    }
+
+    ASSERT_EQ(index_max, (int)freq);
 }
 
 int main(int argc, char **argv)
