@@ -12,7 +12,7 @@ set(PROJECT_LIB lib${PROJECT_NAME})
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
-option(tests "Enable testing" off)
+option(tests "Enable testing" on)
 option(install "Install targets on system" on)
 
 include(ExternalProject)
