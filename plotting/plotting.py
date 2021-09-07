@@ -15,6 +15,7 @@ khist = np.loadtxt(f"{directory}/khistogram.txt")
 last = np.loadtxt(f"{directory}/final_model_pix.txt")
 last_nonzero_k = np.argwhere(khist[:, 1]).max()
 likelihoods = np.loadtxt(f"{directory}/likelihood.txt")
+khistory = np.loadtxt(f"{directory}/khistory.txt")
 
 restarts = []
 while os.path.isdir(f"{directory}/restart/"):
@@ -31,7 +32,7 @@ while os.path.isdir(f"{directory}/restart/"):
         khist[:, 1] += np.loadtxt(f"{directory}/khistogram.txt", usecols=1)
         last_nonzero_k = np.argwhere(khist[:, 1]).max()
         last = np.loadtxt(f"{directory}/final_model_pix.txt")
-        
+        khistory = np.concatenate([khistory, np.loadtxt(f"{directory}/khistory.txt")])
 
 mean /= len(restarts) + 1
 std /= len(restarts) + 1
@@ -45,7 +46,7 @@ stdmax = std.max()
 diffmin = min([diff.min(), diff_last.min()])
 diffmax = max([diff.max(), diff_last.max()])
 
-cmap = cm.RdBu
+cmap = cm.inferno
 diffcmap = cm.binary_r
 stdcmap = cm.turbo
 
@@ -104,12 +105,14 @@ mosaic = """A
             B"""
 fig = plt.figure(figsize=(10, 5), constrained_layout=True)
 axd = fig.subplot_mosaic(mosaic)
+prop_cycle = plt.rcParams["axes.prop_cycle"]
+colours = prop_cycle.by_key()["color"]
 
 axd["A"].bar(khist[:last_nonzero_k, 0], khist[:last_nonzero_k, 1])
 axd["A"].set_xlabel("Number of parameters")
 axd["A"].set_ylabel("Count")
 
-axd["B"].plot(likelihoods)
+axd["B"].plot(likelihoods, color=colours[0])
 for r in restarts:
     axd["B"].axvline(r, c="k", ls="--")
 if len(restarts) > 0:
@@ -118,6 +121,15 @@ if len(restarts) > 0:
     )
 axd["B"].set_yscale("log")
 axd["B"].set_xlabel("Sample number")
-axd["B"].set_ylabel("-log(likelihood)")
+axd["B"].set_ylabel("-log(likelihood)", color=colours[0])
+axd["B"].spines["left"].set_color(colours[0])
+axd["B"].tick_params(axis="y", color=colours[0], labelcolor=colours[0], which="both")
+
+axd["C"] = axd["B"].twinx()
+axd["C"].plot(khistory, color=colours[1])
+axd["C"].set_ylabel("Number of parameters", color=colours[1])
+axd["C"].spines["right"].set_color(colours[1])
+axd["C"].spines["left"].set_visible(False)
+axd["C"].tick_params(axis="y", color=colours[1], labelcolor=colours[1])
 
 plt.show()

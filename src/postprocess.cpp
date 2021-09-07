@@ -49,6 +49,7 @@ struct user_data
     wavetree2d_sub_t *wt;
 
     FILE *fp_out;
+    FILE *fp_k;
 };
 
 static const double CREDIBLE_INTERVAL = 0.95;
@@ -66,7 +67,7 @@ static double head_from_histogram(int *hist, double vmin, double vmax, int bins,
 static double tail_from_histogram(int *hist, double vmin, double vmax, int bins, int drop);
 static double hpd_from_histogram(int *hist, double vmin, double vmax, int bins, double hpd_interval, double &hpd_min, double &hpd_max);
 
-static char short_options[] = "x:y:i:o:D:l:W:t:s:m:M:c:C:g:p:P:Q:b:v:V:S:w:h";
+static char short_options[] = "x:y:i:o:D:l:H:W:t:s:m:M:c:C:g:p:P:Q:b:v:V:S:w:h";
 static struct option long_options[] = {
     {"degree-x", required_argument, 0, 'x'},
     {"degree-y", required_argument, 0, 'y'},
@@ -75,6 +76,8 @@ static struct option long_options[] = {
     {"output", required_argument, 0, 'o'},
     {"stddev", required_argument, 0, 'D'},
     {"likelihood", required_argument, 0, 'l'},
+    {"khistory", required_argument, 0, 'H'},
+
     {"thin", required_argument, 0, 't'},
     {"skip", required_argument, 0, 's'},
 
@@ -112,6 +115,7 @@ int main(int argc, char *argv[])
     const char *output_file;
     const char *stddev_file;
     const char *likelihood_file;
+    const char *khistory_file;
 
     int degree_x;
     int degree_y;
@@ -135,6 +139,7 @@ int main(int argc, char *argv[])
 
     FILE *fp_in;
     FILE *fp_out;
+    FILE *fp_k;
 
     struct user_data data;
     multiset_int_double_t *S_v;
@@ -151,6 +156,7 @@ int main(int argc, char *argv[])
    */
     fp_in = NULL;
     fp_out = NULL;
+    fp_k = NULL;
     degree_x = 8;
     degree_y = 8;
 
@@ -158,6 +164,7 @@ int main(int argc, char *argv[])
     output_file = NULL;
     stddev_file = NULL;
     likelihood_file = NULL;
+    khistory_file = NULL;
 
     mode_file = NULL;
     median_file = NULL;
@@ -213,6 +220,9 @@ int main(int argc, char *argv[])
             break;
         case 'l':
             likelihood_file = optarg;
+            break;
+        case 'H':
+            khistory_file = optarg;
             break;
         case 'o':
             output_file = optarg;
@@ -355,13 +365,22 @@ int main(int argc, char *argv[])
     //
     // Likelihood output
     //
-    fp_out = fopen(likelihood_file, "w");
-    if (fp_out == NULL)
+    data.fp_out = fopen(likelihood_file, "w");
+    if (data.fp_out == NULL)
     {
         fprintf(stderr, "error: failed to open likelihood file\n");
         return -1;
     }
-    data.fp_out = fp_out;
+
+    //
+    // khistory output
+    //
+    data.fp_k = fopen(khistory_file, "w");
+    if (data.fp_k == NULL)
+    {
+        fprintf(stderr, "error: failed to open khistory file\n");
+        return -1;
+    }
 
     /*
    * Process the chain history
@@ -392,7 +411,8 @@ int main(int argc, char *argv[])
         }
     }
     fclose(fp_in);
-    fclose(fp_out);
+    fclose(data.fp_out);
+    fclose(data.fp_k);
 
     /*
    * Mean output
@@ -695,6 +715,7 @@ static int process(int stepi,
             fprintf(stderr, "process: failed to set wavetree (sub)\n");
             return -1;
         }
+        fprintf(d->fp_k, "%i\n", wavetree2d_sub_coeff_count(d->wt));
 
         if (wavetree2d_sub_map_to_array(d->wt, d->model, d->size) < 0)
         {
@@ -927,7 +948,8 @@ static void usage(const char *pname)
             " -i|--input <file>                Input ch file\n"
             " -o|--output <file>               Output mean model file\n"
             " -D|--stddev <file>               Output std dev. file\n"
-            " -l|--lieklihood <file>           OUtput likelihoods file\n"
+            " -l|--likelihood <file>           Output likelihoods file\n"
+            " -H|--khistory<file>              Output khistory file\n"
             "\n"
             " -t|--thin <int>                  Only processing every ith sample\n"
             " -s|--skip <int>                  Skip n samples from beginning\n"

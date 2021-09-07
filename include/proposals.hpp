@@ -2,7 +2,6 @@
 
 #include "globalprop.hpp"
 
-#include <mpi.h>
 
 class Proposal
 {
@@ -17,13 +16,10 @@ public:
 
     virtual int step();
 
-    bool primary() const;
 
     std::string write_short_stats();
 
     std::string write_long_stats();
-
-    void initialize_mpi(MPI_Comm communicator);
 
     GlobalProposal &global;
     wavetree_perturb_t name;
@@ -33,7 +29,6 @@ public:
     int *propose_depth;
     int *accept_depth;
 
-    MPI_Comm communicator;
     int mpi_size;
     int mpi_rank;
 
@@ -50,11 +45,6 @@ private:
                                                    int &prior_errors,
                                                    int &ii,
                                                    int &ij) = 0;
-
-    virtual int communicate_proposal_location_and_value(int &prop_valid,
-                                                        int &prop_idx,
-                                                        int &prop_depth,
-                                                        double &prop_value);
 
     virtual int propose_proposal(int &prop_valid,
                                  int &prop_idx,
@@ -103,8 +93,6 @@ private:
                                    int prop_idx,
                                    double ratio,
                                    double prior_prob) = 0;
-
-    virtual int communicate_acceptance(bool &accept_proposal);
 
     virtual int coefficient_histogram_accept(coefficient_histogram_t *c,
                                              int index,

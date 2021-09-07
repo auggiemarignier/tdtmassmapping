@@ -3,10 +3,9 @@
 #include <vector>
 #include <string>
 #include <set>
+#include <cstring>
 
 #include <gmp.h>
-
-#include <mpi.h>
 
 extern "C"
 {

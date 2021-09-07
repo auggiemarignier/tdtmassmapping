@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
 
 
 def index_to_2d(index, width):
@@ -44,10 +45,7 @@ def build_mosaic_array(levels):
     assert levels >= 1
     mosaic = np.zeros((2 ** levels, 2 ** levels), dtype="<U2")
     mosaic[0, 0] = "0"
-    mosaic[0, 1] = "1a"
-    mosaic[1, 0] = "1b"
-    mosaic[1, 1] = "1c"
-    for l in range(2, levels + 1):
+    for l in range(1, levels + 1):
         mosaic[: 2 ** (l - 1), 2 ** (l - 1) : 2 ** l] = f"{l}a"
         mosaic[2 ** (l - 1) : 2 ** l, : 2 ** (l - 1)] = f"{l}b"
         mosaic[2 ** (l - 1) : 2 ** l, 2 ** (l - 1) : 2 ** l] = f"{l}c"
@@ -56,11 +54,8 @@ def build_mosaic_array(levels):
 
 def img_to_mosaicaxes(img, axd, **kwargs):
     axd["0"].imshow(np.array([[img[0, 0]]]), **kwargs)
-    axd["1a"].imshow(np.array([[img[0, 1]]]), **kwargs)
-    axd["1b"].imshow(np.array([[img[1, 0]]]), **kwargs)
-    axd["1c"].imshow(np.array([[img[1, 1]]]), **kwargs)
     for ax in axd:
-        if int(ax[0]) < 2:
+        if int(ax[0]) < 1:
             continue
         l = int(ax[:-1])
         if ax[-1] == "a":
@@ -74,13 +69,14 @@ def img_to_mosaicaxes(img, axd, **kwargs):
     return axd
 
 
-model, _ = read_model("runs/checkerboard3/restart/restart/restart/final_model.txt")
+directory = sys.argv[1]
+model, _ = read_model(f"{directory}/final_model.txt")
 indexes = np.nonzero(model)[0]
 ii, ij = index_to_2d(indexes, 256)
 wavelet_img = np.zeros((256, 256))
 wavelet_img[ii, ij] = model[indexes]
 
-mosaic = build_mosaic_array(8)
+mosaic = build_mosaic_array(4)
 fig = plt.figure(constrained_layout=False, figsize=(10, 10))
 axd = fig.subplot_mosaic(mosaic, gridspec_kw={"wspace": 0, "hspace": 0})
 for ax in axd:
@@ -96,6 +92,6 @@ for ax in axd:
     )
 cbar_end = np.abs(wavelet_img).max()
 axd = img_to_mosaicaxes(
-    wavelet_img, axd, cmap="RdBu", vmin=-cbar_end, vmax=cbar_end,
+    abs(wavelet_img), axd, cmap="inferno", vmin=0, vmax=cbar_end,
 )
 plt.show()

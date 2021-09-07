@@ -21,7 +21,6 @@ jobs:
       - name: Setup environment
         run: |
           brew install gsl
-          brew install open-mpi
           cmake -E make_directory ${{runner.workspace}}/build
 
       - name: Configure CMake
@@ -29,7 +28,6 @@ jobs:
         run: >-
           cmake $GITHUB_WORKSPACE
           -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-          -DCMAKE_CXX_COMPILER=/usr/local/bin/mpicxx
           -DCMAKE_CXX_FLAGS=-I\ /usr/local/include
 
       - name: Build
