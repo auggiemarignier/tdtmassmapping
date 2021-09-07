@@ -7,8 +7,6 @@
 
 #include <gmp.h>
 
-#include <mpi.h>
-
 extern "C"
 {
 #include "hnk.h"
