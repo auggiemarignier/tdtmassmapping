@@ -1,17 +1,22 @@
 #include "gtest/gtest.h"
 #include <vector>
+#include <array>
+#include <cstring>
+#include <cmath>
 
 #include "mmobservations.hpp"
 
 class MMObsTest : public ::testing::Test
 {
 protected:
-    void SetUp() override {
+    void SetUp() override
+    {
         std::vector<double> obs = {1, 2, 3, 4, 5};
         double sigma = 1.41;
         observations = new mmobservations(obs, sigma);
     }
-    void TearDown() override {
+    void TearDown() override
+    {
         delete observations;
     }
 
@@ -41,7 +46,37 @@ TEST_F(MMObsTest, MMLikelihood)
     std::vector<double> model2 = {0, 2, 3, 4, 5};
     ASSERT_NE(0, observations->single_frequency_likelihood(
                      model2, hmodel, residual, residual_norm, log_normalization));
+}
 
+TEST_F(MMObsTest, FFTiFFT)
+{
+    const uint imsizex = 32;
+    const uint imsizey = 32;
+    auto fft_tuple = observations->init_fft_2d(imsizey, imsizex);
+    auto fft = std::get<0>(fft_tuple);
+    auto ifft = std::get<1>(fft_tuple);
+
+    const double pi = std::acos(-1);
+    const double freq = 2.;
+    const double sps = 1. / 32.;
+
+    std::array<std::complex<double>, imsizex * imsizey> f;
+    for (uint j = 0; j < imsizex * imsizey; j++)
+    {
+        f[j] = std::complex<double>(std::sin(2 * pi * freq * sps * j), 0.);
+    }
+
+    fftw_complex *input = reinterpret_cast<fftw_complex *>(&f);
+    fftw_complex *output = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsizex * imsizey);
+    fftw_complex *recovered = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsizex * imsizey);
+
+    fft(output, input);
+    ifft(recovered, output);
+
+    for (uint i = 0; i < imsizex * imsizey; i++)
+    {
+        ASSERT_FLOAT_EQ(input[i][0], recovered[i][0]) << i;
+    }
 }
 
 int main(int argc, char **argv)
