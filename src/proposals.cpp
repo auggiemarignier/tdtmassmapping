@@ -86,14 +86,6 @@ int Proposal::step()
             return -1;
         }
 
-        if (communicate_proposal_location_and_value(prop_valid,
-                                                    prop_idx,
-                                                    prop_depth,
-                                                    prop_value) < 0)
-        {
-            return -1;
-        }
-
         if (prop_valid)
         {
             propose_depth[prop_depth]++;
@@ -137,11 +129,6 @@ int Proposal::step()
                                    ratio,
                                    prior_prob,
                                    accept_proposal) < 0)
-            {
-                return -1;
-            }
-
-            if (communicate_acceptance(accept_proposal) < 0)
             {
                 return -1;
             }

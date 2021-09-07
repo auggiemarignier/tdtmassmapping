@@ -26,30 +26,27 @@ int DeathProposal::choose_death_location(int k,
                                          double &choose_prob,
                                          int &death_valid)
 {
-    if (primary())
+    //
+    // Get tree structure ratio
+    //
+
+    if (hnk_get_kplus1_ratio(global.hnk,
+                             global.treemaxdepth,
+                             k - 1,
+                             &ratio) < 0)
     {
-        //
-        // Get tree structure ratio
-        //
+        ERROR("failed to get ratio for birth\n");
+        return -1;
+    }
 
-        if (hnk_get_kplus1_ratio(global.hnk,
-                                 global.treemaxdepth,
-                                 k - 1,
-                                 &ratio) < 0)
-        {
-            ERROR("failed to get ratio for birth\n");
-            return -1;
-        }
-
-        if (wavetree2d_sub_choose_death_global(global.wt,
-                                               global.random.uniform(),
-                                               global.treemaxdepth,
-                                               &death_depth,
-                                               &death_idx,
-                                               &choose_prob) < 0)
-        {
-            death_valid = 0;
-        }
+    if (wavetree2d_sub_choose_death_global(global.wt,
+                                           global.random.uniform(),
+                                           global.treemaxdepth,
+                                           &death_depth,
+                                           &death_idx,
+                                           &choose_prob) < 0)
+    {
+        death_valid = 0;
     }
     return 0;
 }
