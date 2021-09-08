@@ -7,6 +7,7 @@
 #include <tuple>
 #include <cassert>
 #include <functional>
+#include <memory>
 
 #include "hierarchicalmodel.hpp"
 
@@ -74,6 +75,6 @@ private:
     complexvector build_lensing_kernels(const uint &imsizey, const uint &imsizex);
 
     complexvector lensing_kernel;
-    fftw_plan plan_forward;
-    fftw_plan plan_inverse;
+    std::shared_ptr<fftw_plan_s> plan_forward;
+    std::shared_ptr<fftw_plan_s> plan_inverse;
 };

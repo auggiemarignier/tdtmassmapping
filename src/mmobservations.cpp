@@ -124,12 +124,14 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
     in = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
     out = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
 
-    plan_forward = fftw_plan_dft_2d(imsizey, imsizex, in, out, FFTW_FORWARD, FFTW_MEASURE);
-    plan_inverse = fftw_plan_dft_2d(imsizey, imsizex, in, out, FFTW_BACKWARD, FFTW_MEASURE);
+    auto del = [](fftw_plan_s *plan)
+    { fftw_destroy_plan(plan); };
+    std::shared_ptr<fftw_plan_s> plan_forward(fftw_plan_dft_2d(imsizey, imsizex, in, out, FFTW_FORWARD, FFTW_MEASURE), del);
+    std::shared_ptr<fftw_plan_s> plan_inverse(fftw_plan_dft_2d(imsizey, imsizex, in, out, FFTW_BACKWARD, FFTW_MEASURE), del);
 
     auto forward = [=](fftw_complex *output, const fftw_complex *input)
     {
-        fftw_execute_dft(plan_forward, const_cast<fftw_complex *>(input), output);
+        fftw_execute_dft(plan_forward.get(), const_cast<fftw_complex *>(input), output);
         for (int i = 0; i < (int)(imsize); i++)
         {
             output[i][0] /= std::sqrt(imsize);
@@ -139,7 +141,7 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
 
     auto backward = [=](fftw_complex *output, const fftw_complex *input)
     {
-        fftw_execute_dft(plan_inverse, const_cast<fftw_complex *>(input), output);
+        fftw_execute_dft(plan_inverse.get(), const_cast<fftw_complex *>(input), output);
         for (int i = 0; i < (int)(imsize); i++)
         {
             output[i][0] /= std::sqrt(imsize);
