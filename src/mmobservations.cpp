@@ -152,12 +152,15 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
     return std::make_tuple(forward, backward);
 }
 
-std::function<void(fftw_complex *, const fftw_complex *)> mmobservations::build_lensing_kernels(const uint &imsizey, const uint &imsizex)
+std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>>mmobservations::build_lensing_kernels(const uint &imsizey, const uint &imsizex)
 {
     const uint imsize = imsizex * imsizey;
     const uint n = std::sqrt(imsize);
     double kx, ky;
+    complexvector lensing_kernel, adjoint_kernel;
+    
     lensing_kernel.reserve(imsize);
+    adjoint_kernel.reserve(imsize);
 
     for (uint i = 0; i < n; i++)
     {
@@ -170,6 +173,7 @@ std::function<void(fftw_complex *, const fftw_complex *)> mmobservations::build_
             double real = (ky * ky - kx * kx) / (kx * kx + ky * ky);
             double imag = (2.0 * kx * ky) / (kx * kx + ky * ky);
             lensing_kernel[i * n + j] = std::complex<double>(real, imag);
+            adjoint_kernel[i * n + j] = std::complex<double>(real, -imag);
         }
     }
 
@@ -182,5 +186,14 @@ std::function<void(fftw_complex *, const fftw_complex *)> mmobservations::build_
         }
     };
 
-    return forward;
+    auto adjoint = [=](fftw_complex *output, const fftw_complex *input)
+    {
+        for (int i = 0; i < (int)imsize; i++)
+        {
+            output[i][0] = lensing_kernel[i].real() * input[i][0];
+            output[i][1] = lensing_kernel[i].imag() * input[i][1];
+        }
+    };
+
+    return std::make_tuple(forward, adjoint);
 }
