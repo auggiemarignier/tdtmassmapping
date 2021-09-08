@@ -53,6 +53,7 @@ TEST_F(MMObsTest, FFTiFFT)
 {
     const uint imsizex = 32;
     const uint imsizey = 32;
+    const uint imsize = imsizex * imsizey;
     auto fft_tuple = observations->init_fft_2d(imsizey, imsizex);
     auto fft = std::get<0>(fft_tuple);
     auto ifft = std::get<1>(fft_tuple);
@@ -61,21 +62,21 @@ TEST_F(MMObsTest, FFTiFFT)
     const double freq = 2.;
     const double sps = 1. / 32.;
 
-    std::array<std::complex<double>, imsizex * imsizey> f;
-    for (uint j = 0; j < imsizex * imsizey; j++)
+    std::array<std::complex<double>, imsize> f;
+    for (uint j = 0; j < imsize; j++)
     {
         f[j] = std::complex<double>(std::sin(2 * pi * freq * sps * j), 0.);
     }
 
     fftw_complex *input = reinterpret_cast<fftw_complex *>(&f);
-    fftw_complex *output = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsizex * imsizey);
-    fftw_complex *recovered = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsizex * imsizey);
+    fftw_complex *output = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    fftw_complex *recovered = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
 
     fft(output, input);
     ifft(recovered, output);
 
-    std::array<std::complex<double>, imsizex * imsizey> fhat;
-    for (uint i = 1; i < imsizex * imsizey; i++)
+    std::array<std::complex<double>, imsize> fhat;
+    for (uint i = 1; i < imsize; i++)
     {
         // May fail at i=0 and imaginary component becuase 0 and 1e-30 are very different in ULP comparison 
         ASSERT_FLOAT_EQ(input[i][0], recovered[i][0]) << i;
@@ -84,7 +85,7 @@ TEST_F(MMObsTest, FFTiFFT)
 
     uint index_max = 0;
     double current_max = std::norm(fhat[0]);
-    for (uint i = 1; i < imsizex * imsizey; i++)
+    for (uint i = 1; i < imsize; i++)
     {
         if (current_max < std::norm(fhat[i]))
         {
