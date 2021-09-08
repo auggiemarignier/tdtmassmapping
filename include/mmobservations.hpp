@@ -71,10 +71,11 @@ public:
 
     std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> init_fft_2d(const uint &imsizey, const uint &imsizex);
 
-private:
-    complexvector build_lensing_kernels(const uint &imsizey, const uint &imsizex);
-
     complexvector lensing_kernel;
+
+private:
+    void build_lensing_kernels(const uint &imsizey, const uint &imsizex);
+
     std::shared_ptr<fftw_plan_s> plan_forward;
     std::shared_ptr<fftw_plan_s> plan_inverse;
 };

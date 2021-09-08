@@ -151,3 +151,25 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
 
     return std::make_tuple(forward, backward);
 }
+
+void mmobservations::build_lensing_kernels(const uint &imsizey, const uint &imsizex)
+{
+    const uint imsize = imsizex * imsizey;
+    const uint n = std::sqrt(imsize);
+    double kx, ky;
+    lensing_kernel.reserve(imsize);
+
+    for (uint i = 0; i < n; i++)
+    {
+        ky = (2 * i - 2 < n) ? (static_cast<double>(i)) : (static_cast<double>(i - n));
+
+        for (uint j = 0; j < n; j++)
+        {
+            kx = (2 * j - 2 < n) ? (static_cast<double>(j)) : (static_cast<double>(j - n));
+
+            double real = (ky * ky - kx * kx) / (kx * kx + ky * ky);
+            double imag = (2.0 * kx * ky) / (kx * kx + ky * ky);
+            lensing_kernel[i * n + j] = std::complex<double>(real, imag);
+        }
+    }
+}
