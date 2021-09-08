@@ -96,6 +96,11 @@ TEST_F(MMObsTest, FFTiFFT)
     ASSERT_EQ(index_max, (int)freq);
 }
 
+TEST_F(MMObsTest, LensingKernel)
+{
+    observations->build_lensing_kernels(32, 32);
+}
+
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
