@@ -84,7 +84,7 @@ TEST_F(MMObsTest, FFTiFFT)
 
     uint index_max = 0;
     double current_max = std::norm(fhat[0]);
-    for (uint i = 0; i < imsizex * imsizey; i++)
+    for (uint i = 1; i < imsizex * imsizey; i++)
     {
         if (current_max < std::norm(fhat[i]))
         {
