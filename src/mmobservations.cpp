@@ -158,6 +158,8 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
     const int n = (int)std::sqrt(imsize);
     double kx, ky;
 
+    complexvector lensing_kernel;
+    complexvector adjoint_kernel;
     lensing_kernel.reserve(imsize);
     adjoint_kernel.reserve(imsize);
 
@@ -173,8 +175,8 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
             {
                 double real = (ky * ky - kx * kx) / (kx * kx + ky * ky);
                 double imag = (2.0 * kx * ky) / (kx * kx + ky * ky);
-                lensing_kernel[i * n + j] = std::complex<double>(real, imag);
-                adjoint_kernel[i * n + j] = std::complex<double>(real, -imag);
+                lensing_kernel.push_back(std::complex<double>(real, imag));
+                adjoint_kernel.push_back(std::complex<double>(real, -imag));
             }
         }
     }
