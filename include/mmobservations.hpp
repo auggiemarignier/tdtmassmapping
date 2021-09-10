@@ -76,4 +76,7 @@ public:
 private:
     std::shared_ptr<fftw_plan_s> plan_forward;
     std::shared_ptr<fftw_plan_s> plan_inverse;
+
+    complexvector lensing_kernel, adjoint_kernel;
+
 };
