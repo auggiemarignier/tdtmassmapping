@@ -175,8 +175,8 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
             {
                 double real = (ky * ky - kx * kx) / (kx * kx + ky * ky);
                 double imag = (2.0 * kx * ky) / (kx * kx + ky * ky);
-                lensing_kernel.push_back(std::complex<double>(real, imag));
-                adjoint_kernel.push_back(std::complex<double>(real, -imag));
+                lensing_kernel.emplace_back(real, imag);
+                adjoint_kernel.emplace_back(real, -imag);
             }
         }
     }
