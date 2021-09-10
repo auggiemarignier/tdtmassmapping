@@ -17,6 +17,10 @@ typedef unsigned int uint;
 class Observations
 {
 public:
+    // Default constructor
+    Observations(){};
+
+#if 0 // Need to decide exactly how/when data gets read
     // Constructor that takes in vectors
     Observations(std::vector<double> _obs, std::vector<double> _sigma);
 
@@ -25,7 +29,7 @@ public:
 
     // Constructor that takes a filename
     Observations(const char *filename);
-
+#endif
     virtual ~Observations(){};
 
     virtual double single_frequency_likelihood(std::vector<double> model,
@@ -48,6 +52,10 @@ public:
 class mmobservations : public Observations
 {
 public:
+    // Default constructor
+    mmobservations(const uint _imsizex, const uint _imsizey);
+
+#if 0  // Need to decide exactly how/when data gets read
     // Constructor that takes in vectors
     mmobservations(std::vector<double> _obs, std::vector<double> _sigma)
         : Observations(_obs, _sigma){};
@@ -59,6 +67,7 @@ public:
     // Constructor that takes a filename
     mmobservations(const char *filename)
         : Observations(filename){};
+#endif
 
     double single_frequency_likelihood(
         std::vector<double> model,
@@ -69,7 +78,18 @@ public:
 
     std::vector<double> single_frequency_predictions(std::vector<double> model) override;
 
+private:
     std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> init_fft_2d(const uint &imsizey, const uint &imsizex);
 
     std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> build_lensing_kernels(const uint &imsizey, const uint &imsizex);
+
+    std::function<void(fftw_complex *, const fftw_complex *)> fft;
+    std::function<void(fftw_complex *, const fftw_complex *)> ifft;
+
+    std::function<void(fftw_complex *, const fftw_complex *)> D;
+    std::function<void(fftw_complex *, const fftw_complex *)> Dadj;
+
+    const uint imsizex;
+    const uint imsizey;
+    const uint imsize;
 };

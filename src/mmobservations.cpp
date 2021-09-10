@@ -6,6 +6,7 @@
 #include "mmobservations.hpp"
 #include "logging.hpp"
 
+#if 0
 Observations::Observations(
     std::vector<double> _obs,
     std::vector<double> _sigma)
@@ -62,6 +63,7 @@ Observations::Observations(const char *filename)
         throw ERROR("File not opened %s", filename);
     }
 }
+#endif
 
 bool Observations::save_residuals(const char *filename,
                                   const double *residuals,
@@ -85,6 +87,21 @@ bool Observations::save_residuals(const char *filename,
     fclose(fp);
     return true;
 }
+
+mmobservations::mmobservations(const uint _imsizex, const uint _imsizey)
+    : Observations(),
+      imsizex(_imsizex),
+      imsizey(_imsizey),
+      imsize(_imsizey * _imsizex)
+{
+    auto fft_tuple = init_fft_2d(imsizey, imsizex);
+    auto fft = std::get<0>(fft_tuple);
+    auto ifft = std::get<1>(fft_tuple);
+
+    auto operator_tuple = build_lensing_kernels(imsizex, imsizey);
+    auto D = std::get<0>(operator_tuple);
+    auto D_adj = std::get<1>(operator_tuple);
+};
 
 std::vector<double> mmobservations::single_frequency_predictions(
     std::vector<double> model)
