@@ -6,6 +6,7 @@
 #include <algorithm>
 
 #include "mmobservations.hpp"
+#include "rng.hpp"
 
 class MMObsTest : public ::testing::Test
 {
@@ -98,7 +99,34 @@ TEST_F(MMObsTest, FFTiFFT)
 
 TEST_F(MMObsTest, LensingKernel)
 {
-    observations->build_lensing_kernels(32, 32);
+    const uint imsizex = 32;
+    const uint imsizey = 32;
+    const uint imsize = imsizex * imsizey;
+    auto operator_tuple = observations->build_lensing_kernels(imsizex, imsizey);
+    auto D = std::get<0>(operator_tuple);
+    auto D_adj = std::get<1>(operator_tuple);
+
+    Rng random(1);
+
+    std::array<std::complex<double>, imsize> f;
+    for (uint j = 0; j < imsize; j++)
+    {
+        f[j] = std::complex<double>(random.uniform(), random.uniform());
+    }
+
+    fftw_complex *input = reinterpret_cast<fftw_complex *>(&f);
+    fftw_complex *output = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    fftw_complex *recovered = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+
+    D(output, input);
+    D_adj(recovered, output);
+
+    for (uint i = 0; i < imsize; i++)
+    {
+        ASSERT_FLOAT_EQ(input[i][0], recovered[i][0]) << i;
+        ASSERT_FLOAT_EQ(input[i][1], recovered[i][1]) << i;
+        
+    }
 }
 
 int main(int argc, char **argv)
