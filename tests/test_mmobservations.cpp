@@ -25,30 +25,6 @@ protected:
     mmobservations *observations;
 };
 
-TEST_F(MMObsTest, MMPredsIdentity)
-{
-    std::vector<double> model = {1, 2, 3, 4, 5};
-    ASSERT_EQ(model, observations->single_frequency_predictions(model));
-    ASSERT_EQ(observations->n_obs, 5);
-}
-
-TEST_F(MMObsTest, MMLikelihood)
-{
-    std::vector<double> model = {1, 2, 3, 4, 5};
-    independentgaussianhierarchicalmodel *hmodel = nullptr;
-    hmodel = new independentgaussianhierarchicalmodel();
-    hmodel->setparameter(0, 1.0);
-    double log_normalization = 0.0;
-    double residual[5];
-    double residual_norm[5];
-
-    ASSERT_EQ(0, observations->single_frequency_likelihood(
-                     model, hmodel, residual, residual_norm, log_normalization));
-
-    std::vector<double> model2 = {0, 2, 3, 4, 5};
-    ASSERT_NE(0, observations->single_frequency_likelihood(
-                     model2, hmodel, residual, residual_norm, log_normalization));
-}
 
 TEST_F(MMObsTest, FFTiFFT)
 {
@@ -125,7 +101,6 @@ TEST_F(MMObsTest, LensingKernel)
     {
         ASSERT_FLOAT_EQ(input[i][0], recovered[i][0]) << i;
         ASSERT_FLOAT_EQ(input[i][1], recovered[i][1]) << i;
-        
     }
 }
 
