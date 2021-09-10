@@ -178,6 +178,11 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
                 lensing_kernel.emplace_back(real, imag);
                 adjoint_kernel.emplace_back(real, -imag);
             }
+            else
+            {
+                lensing_kernel.emplace_back(0, 0);
+                adjoint_kernel.emplace_back(0, 0);
+            }
         }
     }
 
