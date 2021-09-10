@@ -13,9 +13,10 @@ class MMObsTest : public ::testing::Test
 protected:
     void SetUp() override
     {
-        std::vector<double> obs = {1, 2, 3, 4, 5};
-        double sigma = 1.41;
-        observations = new mmobservations(obs, sigma);
+        const uint imsizex = 32;
+        const uint imsizey = 32;
+        observations = new mmobservations(imsizex, imsizey);
+        random = new Rng(1);
     }
     void TearDown() override
     {
@@ -23,18 +24,12 @@ protected:
     }
 
     mmobservations *observations;
+    Rng *random;
+    static constexpr uint imsize = 32 * 32;
 };
-
 
 TEST_F(MMObsTest, FFTiFFT)
 {
-    const uint imsizex = 32;
-    const uint imsizey = 32;
-    const uint imsize = imsizex * imsizey;
-    auto fft_tuple = observations->init_fft_2d(imsizey, imsizex);
-    auto fft = std::get<0>(fft_tuple);
-    auto ifft = std::get<1>(fft_tuple);
-
     const double pi = std::acos(-1);
     const double freq = 2.;
     const double sps = 1. / 32.;
@@ -49,8 +44,8 @@ TEST_F(MMObsTest, FFTiFFT)
     fftw_complex *output = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
     fftw_complex *recovered = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
 
-    fft(output, input);
-    ifft(recovered, output);
+    observations->fft(output, input);
+    observations->ifft(recovered, output);
 
     std::array<std::complex<double>, imsize> fhat;
     for (uint i = 1; i < imsize; i++)
@@ -60,7 +55,7 @@ TEST_F(MMObsTest, FFTiFFT)
         fhat[i] = std::complex<double>(output[i][0], output[i][1]);
     }
 
-    uint index_max = 0;
+    int index_max = 0;
     double current_max = std::norm(fhat[0]);
     for (uint i = 1; i < imsize; i++)
     {
@@ -75,27 +70,18 @@ TEST_F(MMObsTest, FFTiFFT)
 
 TEST_F(MMObsTest, LensingKernel)
 {
-    const uint imsizex = 32;
-    const uint imsizey = 32;
-    const uint imsize = imsizex * imsizey;
-    auto operator_tuple = observations->build_lensing_kernels(imsizex, imsizey);
-    auto D = std::get<0>(operator_tuple);
-    auto D_adj = std::get<1>(operator_tuple);
-
-    Rng random(1);
-
     std::array<std::complex<double>, imsize> f;
     for (uint j = 0; j < imsize; j++)
     {
-        f[j] = std::complex<double>(random.uniform(), random.uniform());
+        f[j] = std::complex<double>(random->uniform(), random->uniform());
     }
 
     fftw_complex *input = reinterpret_cast<fftw_complex *>(&f);
     fftw_complex *output = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
     fftw_complex *recovered = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
 
-    D(output, input);
-    D_adj(recovered, output);
+    observations->D(output, input);
+    observations->Dadj(recovered, output);
 
     for (uint i = 0; i < imsize; i++)
     {

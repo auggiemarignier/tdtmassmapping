@@ -78,16 +78,16 @@ public:
 
     std::vector<double> single_frequency_predictions(std::vector<double> model) override;
 
-private:
-    std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> init_fft_2d(const uint &imsizey, const uint &imsizex);
-
-    std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> build_lensing_kernels(const uint &imsizey, const uint &imsizex);
-
     std::function<void(fftw_complex *, const fftw_complex *)> fft;
     std::function<void(fftw_complex *, const fftw_complex *)> ifft;
 
     std::function<void(fftw_complex *, const fftw_complex *)> D;
     std::function<void(fftw_complex *, const fftw_complex *)> Dadj;
+
+private:
+    std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> init_fft_2d();
+
+    std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> build_lensing_kernels();
 
     const uint imsizex;
     const uint imsizey;

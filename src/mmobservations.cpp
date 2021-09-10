@@ -94,13 +94,13 @@ mmobservations::mmobservations(const uint _imsizex, const uint _imsizey)
       imsizey(_imsizey),
       imsize(_imsizey * _imsizex)
 {
-    auto fft_tuple = init_fft_2d(imsizey, imsizex);
-    auto fft = std::get<0>(fft_tuple);
-    auto ifft = std::get<1>(fft_tuple);
+    auto fft_tuple = init_fft_2d();
+    fft = std::get<0>(fft_tuple);
+    ifft = std::get<1>(fft_tuple);
 
-    auto operator_tuple = build_lensing_kernels(imsizex, imsizey);
-    auto D = std::get<0>(operator_tuple);
-    auto D_adj = std::get<1>(operator_tuple);
+    auto operator_tuple = build_lensing_kernels();
+    D = std::get<0>(operator_tuple);
+    Dadj = std::get<1>(operator_tuple);
 };
 
 std::vector<double> mmobservations::single_frequency_predictions(
@@ -133,11 +133,9 @@ double mmobservations::single_frequency_likelihood(
     return loglikelihood;
 }
 
-std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> mmobservations::init_fft_2d(const uint &imsizey, const uint &imsizex)
+std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> mmobservations::init_fft_2d()
 {
-    uint imsize = imsizex * imsizey;
     fftw_complex *in, *out;
-
     in = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
     out = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
 
@@ -169,9 +167,8 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
     return std::make_tuple(forward, backward);
 }
 
-std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> mmobservations::build_lensing_kernels(const uint &imsizey, const uint &imsizex)
+std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> mmobservations::build_lensing_kernels()
 {
-    const uint imsize = imsizex * imsizey;
     const int n = (int)std::sqrt(imsize);
     double kx, ky;
 
