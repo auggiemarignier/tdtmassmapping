@@ -205,8 +205,13 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
     {
         for (int i = 0; i < (int)imsize; i++)
         {
-            output[i][0] = lensing_kernel[i].real() * input[i][0];
-            output[i][1] = lensing_kernel[i].imag() * input[i][1];
+            double lkr = lensing_kernel[i].real();
+            double lki = lensing_kernel[i].imag();
+            double inr = input[i][0];
+            double ini = input[i][1];
+
+            output[i][0] = lkr * inr - lki * ini;
+            output[i][1] = lkr * ini + lki * inr;
         }
     };
 
@@ -214,8 +219,14 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
     {
         for (int i = 0; i < (int)imsize; i++)
         {
-            output[i][0] = input[i][0] / lensing_kernel[i].real();
-            output[i][1] = input[i][1] / lensing_kernel[i].imag();
+            double lkr = lensing_kernel[i].real();
+            double lki = lensing_kernel[i].imag();
+            double norm = lkr * lkr + lki * lki;
+            double inr = input[i][0];
+            double ini = input[i][1];
+
+            output[i][0] = (inr * lkr + ini * lki) / norm;
+            output[i][1] = (ini * lkr - inr * lki) / norm;
         }
     };
 
@@ -223,8 +234,13 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
     {
         for (int i = 0; i < (int)imsize; i++)
         {
-            output[i][0] = adjoint_kernel[i].real() * input[i][0];
-            output[i][1] = adjoint_kernel[i].imag() * input[i][1];
+            double lkr = lensing_kernel[i].real();
+            double lki = lensing_kernel[i].imag();
+            double inr = input[i][0];
+            double ini = input[i][1];
+
+            output[i][0] = lkr * inr - lki * ini;
+            output[i][1] = -1 * (lkr * ini + lki * inr);
         }
     };
 
