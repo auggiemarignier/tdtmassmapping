@@ -81,7 +81,7 @@ TEST_F(MMObsTest, LensingKernel)
     fftw_complex *recovered = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
 
     observations->D(output, input);
-    observations->Dadj(recovered, output);
+    observations->Dinv(recovered, output);
 
     for (uint i = 0; i < imsize; i++)
     {

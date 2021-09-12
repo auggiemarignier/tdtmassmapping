@@ -83,13 +83,16 @@ public:
 
     std::function<void(fftw_complex *, const fftw_complex *)> D;
     std::function<void(fftw_complex *, const fftw_complex *)> Dadj;
+    std::function<void(fftw_complex *, const fftw_complex *)> Dinv;
+
     void kaiser_squires(fftw_complex *output, const fftw_complex *input);
+    void kaiser_squires_inv(fftw_complex *output, const fftw_complex *input);
     void kaiser_squires_adj(fftw_complex *output, const fftw_complex *input);
 
 private:
     std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> init_fft_2d();
 
-    std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> build_lensing_kernels();
+    std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>,std::function<void(fftw_complex *, const fftw_complex *)>> build_lensing_kernels();
 
 
     const uint imsizex;

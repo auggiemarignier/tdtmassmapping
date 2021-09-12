@@ -100,7 +100,8 @@ mmobservations::mmobservations(const uint _imsizex, const uint _imsizey)
 
     auto operator_tuple = build_lensing_kernels();
     D = std::get<0>(operator_tuple);
-    Dadj = std::get<1>(operator_tuple);
+    Dinv = std::get<1>(operator_tuple);
+    Dadj = std::get<2>(operator_tuple);
 };
 
 std::vector<double> mmobservations::single_frequency_predictions(
@@ -167,7 +168,7 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
     return std::make_tuple(forward, backward);
 }
 
-std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> mmobservations::build_lensing_kernels()
+std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>,std::function<void(fftw_complex *, const fftw_complex *)>> mmobservations::build_lensing_kernels()
 {
     const int n = (int)std::sqrt(imsize);
     double kx, ky;
@@ -209,6 +210,15 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
         }
     };
 
+    auto inverse = [=](fftw_complex *output, const fftw_complex *input)
+    {
+        for (int i = 0; i < (int)imsize; i++)
+        {
+            output[i][0] = input[i][0] / lensing_kernel[i].real();
+            output[i][1] = input[i][1] / lensing_kernel[i].imag();
+        }
+    };
+
     auto adjoint = [=](fftw_complex *output, const fftw_complex *input)
     {
         for (int i = 0; i < (int)imsize; i++)
@@ -218,7 +228,7 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
         }
     };
 
-    return std::make_tuple(forward, adjoint);
+    return std::make_tuple(forward, inverse, adjoint);
 }
 
 void mmobservations::kaiser_squires(fftw_complex *output, const fftw_complex *input)
@@ -230,11 +240,20 @@ void mmobservations::kaiser_squires(fftw_complex *output, const fftw_complex *in
     ifft(output, temp2);
 }
 
+void mmobservations::kaiser_squires_inv(fftw_complex *output, const fftw_complex *input)
+{
+    fftw_complex *temp = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    fftw_complex *temp2 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    fft(temp, input);
+    Dinv(temp2, temp);
+    ifft(output, temp2);
+}
+
 void mmobservations::kaiser_squires_adj(fftw_complex *output, const fftw_complex *input)
 {
     fftw_complex *temp = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
     fftw_complex *temp2 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
-    ifft(temp, input);
+    fft(temp, input);
     Dadj(temp2, temp);
-    fft(output, temp2);
+    ifft(output, temp2);
 }
