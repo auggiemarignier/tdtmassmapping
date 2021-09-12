@@ -55,7 +55,7 @@ public:
     // Default constructor
     mmobservations(const uint _imsizex, const uint _imsizey);
 
-#if 0  // Need to decide exactly how/when data gets read
+#if 0 // Need to decide exactly how/when data gets read
     // Constructor that takes in vectors
     mmobservations(std::vector<double> _obs, std::vector<double> _sigma)
         : Observations(_obs, _sigma){};
@@ -83,11 +83,14 @@ public:
 
     std::function<void(fftw_complex *, const fftw_complex *)> D;
     std::function<void(fftw_complex *, const fftw_complex *)> Dadj;
+    void kaiser_squires(fftw_complex *output, const fftw_complex *input);
+    void kaiser_squires_adj(fftw_complex *output, const fftw_complex *input);
 
 private:
     std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> init_fft_2d();
 
     std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> build_lensing_kernels();
+
 
     const uint imsizex;
     const uint imsizey;

@@ -220,3 +220,21 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
 
     return std::make_tuple(forward, adjoint);
 }
+
+void mmobservations::kaiser_squires(fftw_complex *output, const fftw_complex *input)
+{
+    fftw_complex *temp = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    fftw_complex *temp2 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    fft(temp, input);
+    D(temp2, temp);
+    ifft(output, temp2);
+}
+
+void mmobservations::kaiser_squires_adj(fftw_complex *output, const fftw_complex *input)
+{
+    fftw_complex *temp = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    fftw_complex *temp2 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    ifft(temp, input);
+    Dadj(temp2, temp);
+    fft(output, temp2);
+}

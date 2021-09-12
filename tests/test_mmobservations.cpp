@@ -50,7 +50,7 @@ TEST_F(MMObsTest, FFTiFFT)
     std::array<std::complex<double>, imsize> fhat;
     for (uint i = 1; i < imsize; i++)
     {
-        // May fail at i=0 and imaginary component becuase 0 and 1e-30 are very different in ULP comparison 
+        // May fail at i=0 and imaginary component becuase 0 and 1e-30 are very different in ULP comparison
         ASSERT_FLOAT_EQ(input[i][0], recovered[i][0]) << i;
         fhat[i] = std::complex<double>(output[i][0], output[i][1]);
     }
@@ -82,6 +82,28 @@ TEST_F(MMObsTest, LensingKernel)
 
     observations->D(output, input);
     observations->Dadj(recovered, output);
+
+    for (uint i = 0; i < imsize; i++)
+    {
+        ASSERT_FLOAT_EQ(input[i][0], recovered[i][0]) << i;
+        ASSERT_FLOAT_EQ(input[i][1], recovered[i][1]) << i;
+    }
+}
+
+TEST_F(MMObsTest, KaiserSquires)
+{
+    std::array<std::complex<double>, imsize> f;
+    for (uint j = 0; j < imsize; j++)
+    {
+        f[j] = std::complex<double>(random->uniform(), random->uniform());
+    }
+
+    fftw_complex *input = reinterpret_cast<fftw_complex *>(&f);
+    fftw_complex *output = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    fftw_complex *recovered = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+
+    observations->kaiser_squires(output, input);
+    observations->kaiser_squires_adj(recovered, output);
 
     for (uint i = 0; i < imsize; i++)
     {
