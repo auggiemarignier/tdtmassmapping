@@ -168,7 +168,7 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
     return std::make_tuple(forward, backward);
 }
 
-std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>,std::function<void(fftw_complex *, const fftw_complex *)>> mmobservations::build_lensing_kernels()
+std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> mmobservations::build_lensing_kernels()
 {
     const int n = (int)std::sqrt(imsize);
     double kx, ky;
@@ -210,8 +210,8 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
             double inr = input[i][0];
             double ini = input[i][1];
 
-            output[i][0] = lkr * inr - lki * ini;
-            output[i][1] = lkr * ini + lki * inr;
+            output[i][0] = (i == 0) ? 0 : lkr * inr - lki * ini;
+            output[i][1] = (i == 0) ? 0 : lkr * ini + lki * inr;
         }
     };
 
@@ -225,8 +225,8 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
             double inr = input[i][0];
             double ini = input[i][1];
 
-            output[i][0] = (inr * lkr + ini * lki) / norm;
-            output[i][1] = (ini * lkr - inr * lki) / norm;
+            output[i][0] = (i == 0) ? 0 : (inr * lkr + ini * lki) / norm;
+            output[i][1] = (i == 0) ? 0 : (ini * lkr - inr * lki) / norm;
         }
     };
 
@@ -239,8 +239,8 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
             double inr = input[i][0];
             double ini = input[i][1];
 
-            output[i][0] = lkr * inr - lki * ini;
-            output[i][1] = -1 * (lkr * ini + lki * inr);
+            output[i][0] = (i == 0) ? 0 : lkr * inr - lki * ini;
+            output[i][1] = (i == 0) ? 0 : -1 * (lkr * ini + lki * inr);
         }
     };
 

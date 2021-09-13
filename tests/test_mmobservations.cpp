@@ -83,8 +83,9 @@ TEST_F(MMObsTest, LensingKernel)
     observations->D(output, input);
     observations->Dinv(recovered, output);
 
-    for (uint i = 0; i < imsize; i++)
+    for (uint i = 1; i < imsize; i++)
     {
+        // i = 0 can't be recovered due to mass sheet degeneracy
         ASSERT_FLOAT_EQ(input[i][0], recovered[i][0]) << i;
         ASSERT_FLOAT_EQ(input[i][1], recovered[i][1]) << i;
     }
@@ -103,10 +104,11 @@ TEST_F(MMObsTest, KaiserSquires)
     fftw_complex *recovered = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
 
     observations->kaiser_squires(output, input);
-    observations->kaiser_squires_adj(recovered, output);
+    observations->kaiser_squires_inv(recovered, output);
 
-    for (uint i = 0; i < imsize; i++)
+    for (uint i = 1; i < imsize; i++)
     {
+        // i = 0 can't be recovered due to mass sheet degeneracy
         ASSERT_FLOAT_EQ(input[i][0], recovered[i][0]) << i;
         ASSERT_FLOAT_EQ(input[i][1], recovered[i][1]) << i;
     }
