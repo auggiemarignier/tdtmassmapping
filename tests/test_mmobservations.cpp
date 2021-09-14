@@ -196,6 +196,47 @@ TEST_F(MMObsTest, KaiserSquiresAdj)
     ASSERT_FLOAT_EQ(g1dotg2, k1dotk2p);
 }
 
+TEST_F(MMObsTest, FFTAdj)
+{
+    std::array<std::complex<double>, imsize> k1;
+    std::array<std::complex<double>, imsize> k2;
+    for (uint j = 0; j < imsize; j++)
+    {
+        k1[j] = std::complex<double>(random->uniform(), random->uniform());
+        k2[j] = std::complex<double>(random->uniform(), random->uniform());
+    }
+
+    fftw_complex *kappa1 = reinterpret_cast<fftw_complex *>(&k1);
+    fftw_complex *kappa2 = reinterpret_cast<fftw_complex *>(&k2);
+    fftw_complex *gamma1 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    fftw_complex *gamma2 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    fftw_complex *kappa2prime = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+
+    observations->fft(gamma1, kappa1);
+    observations->fft(gamma2, kappa2);
+    observations->ifft(kappa2prime, gamma2);
+
+    std::array<std::complex<double>, imsize> g1;
+    std::array<std::complex<double>, imsize> g2;
+    std::array<std::complex<double>, imsize> k2p;
+    for (uint j = 0; j < imsize; j++)
+    {
+        g1[j] = std::complex<double>(gamma1[j][0], gamma1[j][1]);
+        g2[j] = std::complex<double>(gamma2[j][0], gamma2[j][1]);
+        k2p[j] = std::complex<double>(kappa2prime[j][0], kappa2prime[j][1]);
+    }
+
+    double g1dotg2 = 0;
+    double k1dotk2p = 0;
+    for (uint j = 0; j < imsize; j++)
+    {
+        g1dotg2 += std::abs(g1[j] * g2[j]);
+        k1dotk2p += std::abs(k1[j] * k2p[j]);
+    }
+
+    ASSERT_FLOAT_EQ(g1dotg2, k1dotk2p);
+}
+
 int main(int argc, char **argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
