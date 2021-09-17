@@ -143,11 +143,14 @@ TEST_F(MMObsTest, KaiserSquiresInv)
     observations->kaiser_squires(output, input);
     observations->kaiser_squires_inv(recovered, output);
 
+    // Mass sheet degeneracy says we can only recover kappa up to a constant
+    // Check input - recovered == constant
+    double const_real = input[0][0] - recovered[0][0];
+    double const_imag = input[0][1] - recovered[0][1];
     for (uint i = 1; i < imsize; i++)
     {
-        // i = 0 can't be recovered due to mass sheet degeneracy
-        ASSERT_FLOAT_EQ(input[i][0], recovered[i][0]) << i;
-        ASSERT_FLOAT_EQ(input[i][1], recovered[i][1]) << i;
+        ASSERT_NEAR(input[i][0] - recovered[i][0] - const_real, 0., 1e-12) << i;
+        ASSERT_NEAR(input[i][1] - recovered[i][1] - const_imag, 0., 1e-12) << i;
     }
 }
 
