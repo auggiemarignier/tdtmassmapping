@@ -128,15 +128,16 @@ TEST_F(MMObsTest, LensingKernelAdj)
         g1[j] = std::complex<double>(gamma1[j][0], gamma1[j][1]);
     }
 
-    double g1dotg2 = 0;
-    double k1dotk2 = 0;
+    std::complex<double> g1dotg2 = 0;
+    std::complex<double> k1dotk2 = 0;
     for (uint j = 0; j < imsize; j++)
     {
-        g1dotg2 += std::abs(g1[j] * g2[j]);
-        k1dotk2 += std::abs(k1[j] * k2[j]);
+        g1dotg2 += g1[j] * std::conj(g2[j]);
+        k1dotk2 += k1[j] * std::conj(k2[j]);
     }
 
-    ASSERT_FLOAT_EQ(g1dotg2, k1dotk2);
+    ASSERT_FLOAT_EQ(g1dotg2.real(), k1dotk2.real());
+    ASSERT_FLOAT_EQ(g1dotg2.imag(), k1dotk2.imag());
 }
 
 TEST_F(MMObsTest, KaiserSquiresInv)
@@ -167,7 +168,6 @@ TEST_F(MMObsTest, KaiserSquiresInv)
 
 TEST_F(MMObsTest, KaiserSquiresAdj)
 {
-{
     std::array<std::complex<double>, imsize> k1;
     std::array<std::complex<double>, imsize> g2;
     for (uint j = 0; j < imsize; j++)
@@ -192,16 +192,16 @@ TEST_F(MMObsTest, KaiserSquiresAdj)
         g1[j] = std::complex<double>(gamma1[j][0], gamma1[j][1]);
     }
 
-    double g1dotg2 = 0;
-    double k1dotk2 = 0;
+    std::complex<double> g1dotg2 = 0;
+    std::complex<double> k1dotk2 = 0;
     for (uint j = 0; j < imsize; j++)
     {
-        g1dotg2 += std::abs(g1[j] * g2[j]);
-        k1dotk2 += std::abs(k1[j] * k2[j]);
+        g1dotg2 += g1[j] * std::conj(g2[j]);
+        k1dotk2 += k1[j] * std::conj(k2[j]);
     }
 
-    ASSERT_FLOAT_EQ(g1dotg2, k1dotk2);
-}
+    ASSERT_FLOAT_EQ(g1dotg2.real(), k1dotk2.real());
+    ASSERT_FLOAT_EQ(g1dotg2.imag(), k1dotk2.imag());
 }
 
 TEST_F(MMObsTest, FFTAdj)
@@ -230,15 +230,16 @@ TEST_F(MMObsTest, FFTAdj)
         g1[j] = std::complex<double>(gamma1[j][0], gamma1[j][1]);
     }
 
-    double g1dotg2 = 0;
-    double k1dotk2 = 0;
+    std::complex<double> g1dotg2 = 0;
+    std::complex<double> k1dotk2 = 0;
     for (uint j = 0; j < imsize; j++)
     {
-        g1dotg2 += std::abs(g1[j] * g2[j]);
-        k1dotk2 += std::abs(k1[j] * k2[j]);
+        g1dotg2 += g1[j] * std::conj(g2[j]);
+        k1dotk2 += k1[j] * std::conj(k2[j]);
     }
 
-    ASSERT_FLOAT_EQ(g1dotg2, k1dotk2);
+    ASSERT_FLOAT_EQ(g1dotg2.real(), k1dotk2.real());
+    ASSERT_FLOAT_EQ(g1dotg2.imag(), k1dotk2.imag());
 }
 
 int main(int argc, char **argv)
