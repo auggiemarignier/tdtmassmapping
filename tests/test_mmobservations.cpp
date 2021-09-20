@@ -47,6 +47,7 @@ TEST_F(MMObsTest, FFTiFFT)
     observations->fft(output, input);
     observations->ifft(recovered, output);
 
+    // forward-backward recovery test
     std::array<std::complex<double>, imsize> fhat;
     for (uint i = 0; i < imsize; i++)
     {
@@ -54,6 +55,7 @@ TEST_F(MMObsTest, FFTiFFT)
         fhat[i] = std::complex<double>(output[i][0], output[i][1]);
     }
 
+    // check spectrum peak is where it is expected
     int index_max = 0;
     double current_max = std::norm(fhat[0]);
     for (uint i = 1; i < imsize; i++)
@@ -65,6 +67,16 @@ TEST_F(MMObsTest, FFTiFFT)
         }
     }
     ASSERT_EQ(index_max, (int)freq);
+
+    // Parseval's Theorem to check unitary normalisation
+    double space_power = 0.;
+    double freq_power = 0.;
+    for (uint i = 0; i < imsize; i ++)
+    {
+        space_power += std::norm(f[i]);
+        freq_power += std::norm(fhat[i]);
+    }
+    ASSERT_NEAR(space_power, freq_power, 1e-12);
 }
 
 TEST_F(MMObsTest, LensingKernelInv)
