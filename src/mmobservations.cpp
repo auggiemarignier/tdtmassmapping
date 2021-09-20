@@ -178,13 +178,16 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
     lensing_kernel.reserve(imsize);
     adjoint_kernel.reserve(imsize);
 
+    FILE *fp = fopen("/Users/auggiemarignier/Documents/PhD/TDT/massmapping/outputs/D.txt", "w");
+    FILE *fp_adj = fopen("/Users/auggiemarignier/Documents/PhD/TDT/massmapping/outputs/Dadj.txt", "w");
+    int loopcounter = 0;
     for (int i = 0; i < n; i++)
     {
-        ky = (2 * i - 2 < n) ? (static_cast<double>(i)) : (static_cast<double>(i - n));
+        ky = (2 * i < n) ? (static_cast<double>(i)) : (static_cast<double>(i - n));
 
         for (int j = 0; j < n; j++)
         {
-            kx = (2 * j - 2 < n) ? (static_cast<double>(j)) : (static_cast<double>(j - n));
+            kx = (2 * j < n) ? (static_cast<double>(j)) : (static_cast<double>(j - n));
 
             if ((kx != 0.0) || (ky != 0.0))
             {
@@ -198,8 +201,15 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
                 lensing_kernel.emplace_back(0, 0);
                 adjoint_kernel.emplace_back(0, 0);
             }
+
+            fprintf(fp, "%f %f\n", lensing_kernel[loopcounter].real(), lensing_kernel[loopcounter].imag());
+            fprintf(fp_adj, "%f %f\n", adjoint_kernel[loopcounter].real(), adjoint_kernel[loopcounter].imag());
+            loopcounter++;
         }
     }
+
+    fclose(fp);
+    fclose(fp_adj);
 
     auto forward = [=](fftw_complex *output, const fftw_complex *input)
     {
