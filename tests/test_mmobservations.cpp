@@ -48,10 +48,9 @@ TEST_F(MMObsTest, FFTiFFT)
     observations->ifft(recovered, output);
 
     std::array<std::complex<double>, imsize> fhat;
-    for (uint i = 1; i < imsize; i++)
+    for (uint i = 0; i < imsize; i++)
     {
-        // May fail at i=0 and imaginary component becuase 0 and 1e-30 are very different in ULP comparison
-        ASSERT_FLOAT_EQ(input[i][0], recovered[i][0]) << i;
+        ASSERT_NEAR(input[i][0], recovered[i][0], 1e-12) << i;
         fhat[i] = std::complex<double>(output[i][0], output[i][1]);
     }
 
@@ -86,8 +85,8 @@ TEST_F(MMObsTest, LensingKernelInv)
     for (uint i = 1; i < imsize; i++)
     {
         // i = 0 can't be recovered due to mass sheet degeneracy
-        ASSERT_FLOAT_EQ(input[i][0], recovered[i][0]) << i;
-        ASSERT_FLOAT_EQ(input[i][1], recovered[i][1]) << i;
+        ASSERT_NEAR(input[i][0], recovered[i][0], 1e-12) << i;
+        ASSERT_NEAR(input[i][1], recovered[i][1], 1e-12) << i;
     }
 }
 
