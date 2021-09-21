@@ -220,8 +220,8 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
             double inr = input[i][0];
             double ini = input[i][1];
 
-            output[i][0] = (i == 0) ? 0 : lkr * inr - lki * ini;
-            output[i][1] = (i == 0) ? 0 : lkr * ini + lki * inr;
+            output[i][0] = lkr * inr - lki * ini;
+            output[i][1] = lkr * ini + lki * inr;
         }
     };
 
@@ -249,8 +249,8 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
             double inr = input[i][0];
             double ini = input[i][1];
 
-            output[i][0] = (i == 0) ? 0 : lkr * inr - lki * ini;
-            output[i][1] = (i == 0) ? 0 : -1 * (lkr * ini + lki * inr);
+            output[i][0] = lkr * inr - lki * ini;
+            output[i][1] = -1 * (lkr * ini + lki * inr);
         }
     };
 
