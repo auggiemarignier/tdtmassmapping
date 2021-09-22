@@ -244,13 +244,13 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
     {
         for (int i = 0; i < (int)imsize; i++)
         {
-            double lkr = lensing_kernel[i].real();
-            double lki = lensing_kernel[i].imag();
+            double lkr = adjoint_kernel[i].real();
+            double lki = adjoint_kernel[i].imag();
             double inr = input[i][0];
             double ini = input[i][1];
 
             output[i][0] = lkr * inr - lki * ini;
-            output[i][1] = -1 * (lkr * ini + lki * inr);
+            output[i][1] = lkr * ini + lki * inr;
         }
     };
 
