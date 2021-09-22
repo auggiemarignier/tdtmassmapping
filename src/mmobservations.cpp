@@ -119,16 +119,12 @@ double mmobservations::single_frequency_likelihood(
 {
     complexvector predictions = single_frequency_predictions(model);
 
-    for (size_t i = 0; i < obs.size(); i++)
+    double loglikelihood = 0.0;
+    for (size_t i = 0; i < imsize; i++)
     {
         residuals[i] = obs[i] - predictions[i];
-    }
-
-    double loglikelihood = 0.0;
-    for (size_t i = 0; i < n_obs; i++)
-    {
         residuals_normed[i] = residuals[i] / sigma[i];
-        loglikelihood += residuals_normed[i] * residuals_normed[i] * 0.5;
+        loglikelihood += std::abs(residuals_normed[i] * residuals_normed[i]) * 0.5;
         log_normalization += log(sigma[i]);
     }
 
@@ -283,7 +279,7 @@ void mmobservations::set_observed_data(complexvector &_obs)
         ERROR("Input data has size %i.  Expected size %i.", _obs.size(), imsize);
 }
 
-void mmobservations::set_sigmas(complexvector &_sigmas)
+void mmobservations::set_sigmas(std::vector<double> &_sigmas)
 {
     if (_sigmas.size() == imsize)
         sigma = _sigmas;
