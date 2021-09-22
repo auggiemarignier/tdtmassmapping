@@ -49,7 +49,7 @@ public:
     size_t n_obs;
 };
 
-class mmobservations
+class mmobservations : Observations
 {
 public:
     // Default constructor

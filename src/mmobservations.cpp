@@ -89,7 +89,8 @@ bool Observations::save_residuals(const char *filename,
 }
 
 mmobservations::mmobservations(const uint _imsizex, const uint _imsizey)
-    : imsizex(_imsizex),
+    : Observations(),
+      imsizex(_imsizex),
       imsizey(_imsizey),
       imsize(_imsizey * _imsizex)
 {
