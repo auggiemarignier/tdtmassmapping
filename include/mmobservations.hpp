@@ -22,29 +22,28 @@ public:
 
 #if 0 // Need to decide exactly how/when data gets read
     // Constructor that takes in vectors
-    Observations(std::vector<double> _obs, std::vector<double> _sigma);
+    Observations(complexvector _obs, complexvector _sigma);
 
     // Constructor that takes a vector of obs and the stddev
-    Observations(std::vector<double> _obs, double _sigma);
+    Observations(complexvector _obs, double _sigma);
 
     // Constructor that takes a filename
     Observations(const char *filename);
 #endif
     virtual ~Observations(){};
 
-    virtual double single_frequency_likelihood(std::vector<double> model,
-                                               const hierarchicalmodel *hmodel,
-                                               double *residuals,
-                                               double *residuals_normed,
+    virtual double single_frequency_likelihood(complexvector model,
+                                               std::complex<double> *residuals,
+                                               std::complex<double> *residuals_normed,
                                                double &log_normalization) = 0;
 
-    virtual std::vector<double> single_frequency_predictions(std::vector<double> model) = 0;
+    virtual complexvector single_frequency_predictions(complexvector model) = 0;
 
     virtual bool save_residuals(const char *filename,
                                 const double *residuals,
                                 const double *residuals_normed);
 
-    std::vector<double> obs;
+    complexvector obs;
     std::vector<double> sigma;
     size_t n_obs;
 };
@@ -57,11 +56,11 @@ public:
 
 #if 0 // Need to decide exactly how/when data gets read
     // Constructor that takes in vectors
-    mmobservations(std::vector<double> _obs, std::vector<double> _sigma)
+    mmobservations(complexvector _obs, complexvector _sigma)
         : Observations(_obs, _sigma){};
 
     // Constructor that takes a vector of obs and the stddev
-    mmobservations(std::vector<double> _obs, double _sigma)
+    mmobservations(complexvector _obs, double _sigma)
         : Observations(_obs, _sigma){};
 
     // Constructor that takes a filename
@@ -73,9 +72,9 @@ public:
         complexvector model,
         std::complex<double> *residuals,
         std::complex<double> *residuals_normed,
-        double &log_normalization);
+        double &log_normalization) override;
 
-    complexvector single_frequency_predictions(complexvector model);
+    complexvector single_frequency_predictions(complexvector model) override;
 
     void kaiser_squires(fftw_complex *output, const fftw_complex *input);
     void kaiser_squires_inv(fftw_complex *output, const fftw_complex *input);

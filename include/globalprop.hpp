@@ -97,13 +97,13 @@ public:
     int mean_residual_n;
     int residual_size;
 
-    double *residual;
-    double *mean_residual;
-    double *last_valid_residual;
+    std::complex<double> *residual;
+    std::complex<double> *mean_residual;
+    std::complex<double> *last_valid_residual;
 
-    double *residual_normed;
-    double *mean_residual_normed;
-    double *last_valid_residual_normed;
+    std::complex<double> *residual_normed;
+    std::complex<double> *mean_residual_normed;
+    std::complex<double> *last_valid_residual_normed;
 
     bool residuals_valid;
 

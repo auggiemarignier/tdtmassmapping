@@ -120,12 +120,12 @@ GlobalProposal::GlobalProposal(Observations *_observations,
     INFO("Data: %d total points\n", ntotal);
 
     residual_size = ntotal;
-    residual = new double[residual_size];
-    mean_residual = new double[residual_size];
-    last_valid_residual = new double[residual_size];
-    residual_normed = new double[residual_size];
-    mean_residual_normed = new double[residual_size];
-    last_valid_residual_normed = new double[residual_size];
+    residual = new std::complex<double>[residual_size];
+    mean_residual = new std::complex<double>[residual_size];
+    last_valid_residual = new std::complex<double>[residual_size];
+    residual_normed = new std::complex<double>[residual_size];
+    mean_residual_normed = new std::complex<double>[residual_size];
+    last_valid_residual_normed = new std::complex<double>[residual_size];
 
     residual_hist = new int[residual_size * residual_hist_bins];
 
@@ -260,9 +260,8 @@ GlobalProposal::image_likelihood(const double *image_model,
                                  double &log_normalization)
 {
     log_normalization = 0.0;
-    std::vector<double> image_model_v(image_model, image_model + size);
+    complexvector image_model_v(image_model, image_model + size);
     return observations->single_frequency_likelihood(image_model_v,
-                                                     hierarchical,
                                                      residual,
                                                      residual_normed,
                                                      log_normalization);
@@ -296,9 +295,8 @@ GlobalProposal::likelihood(double &log_normalization)
     }
 
     log_normalization = 0.0;
-    std::vector<double> model_v(model, model + size);
+    complexvector model_v(model, model + size);
     return observations->single_frequency_likelihood(model_v,
-                                                     hierarchical,
                                                      residual,
                                                      residual_normed,
                                                      log_normalization);
@@ -373,7 +371,7 @@ void GlobalProposal::update_residual_mean()
     for (int i = 0; i < residual_size; i++)
     {
 
-        double delta = last_valid_residual[i] - mean_residual[i];
+        std::complex<double> delta = last_valid_residual[i] - mean_residual[i];
         mean_residual[i] += delta / (double)(mean_residual_n);
 
         delta = last_valid_residual_normed[i] - mean_residual_normed[i];
