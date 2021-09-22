@@ -84,7 +84,7 @@ TEST_F(MMObsTest, LensingKernelInv)
     std::array<std::complex<double>, imsize> f;
     for (uint j = 0; j < imsize; j++)
     {
-        f[j] = std::complex<double>(random->uniform(), random->uniform());
+        f[j] = std::complex<double>(random->normal(1.), random->normal(1.));
     }
 
     fftw_complex *input = reinterpret_cast<fftw_complex *>(&f);
@@ -108,8 +108,8 @@ TEST_F(MMObsTest, LensingKernelAdj)
     std::array<std::complex<double>, imsize> g2;
     for (uint j = 0; j < imsize; j++)
     {
-        k1[j] = std::complex<double>(random->uniform(), random->uniform());
-        g2[j] = std::complex<double>(random->uniform(), random->uniform());
+        k1[j] = std::complex<double>(random->normal(1.), random->normal(1.));
+        g2[j] = std::complex<double>(random->normal(1.), random->normal(1.));
     }
 
     fftw_complex *kappa1 = reinterpret_cast<fftw_complex *>(&k1);
@@ -145,7 +145,7 @@ TEST_F(MMObsTest, KaiserSquiresInv)
     std::array<std::complex<double>, imsize> f;
     for (uint j = 0; j < imsize; j++)
     {
-        f[j] = std::complex<double>(random->uniform(), random->uniform());
+        f[j] = std::complex<double>(random->normal(1.), random->normal(1.));
     }
 
     fftw_complex *input = reinterpret_cast<fftw_complex *>(&f);
@@ -172,8 +172,8 @@ TEST_F(MMObsTest, KaiserSquiresAdj)
     std::array<std::complex<double>, imsize> g2;
     for (uint j = 0; j < imsize; j++)
     {
-        k1[j] = std::complex<double>(random->uniform(), random->uniform());
-        g2[j] = std::complex<double>(random->uniform(), random->uniform());
+        k1[j] = std::complex<double>(random->normal(1.), random->normal(1.));
+        g2[j] = std::complex<double>(random->normal(1.), random->normal(1.));
     }
 
     fftw_complex *kappa1 = reinterpret_cast<fftw_complex *>(&k1);
@@ -210,8 +210,8 @@ TEST_F(MMObsTest, FFTAdj)
     std::array<std::complex<double>, imsize> g2;
     for (uint j = 0; j < imsize; j++)
     {
-        k1[j] = std::complex<double>(random->uniform(), random->uniform());
-        g2[j] = std::complex<double>(random->uniform(), random->uniform());
+        k1[j] = std::complex<double>(random->normal(1.), random->normal(1.));
+        g2[j] = std::complex<double>(random->normal(1.), random->normal(1.));
     }
 
     fftw_complex *kappa1 = reinterpret_cast<fftw_complex *>(&k1);
