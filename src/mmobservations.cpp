@@ -89,8 +89,7 @@ bool Observations::save_residuals(const char *filename,
 }
 
 mmobservations::mmobservations(const uint _imsizex, const uint _imsizey)
-    : Observations(),
-      imsizex(_imsizex),
+    : imsizex(_imsizex),
       imsizey(_imsizey),
       imsize(_imsizey * _imsizex)
 {
@@ -104,32 +103,33 @@ mmobservations::mmobservations(const uint _imsizex, const uint _imsizey)
     Dadj = std::get<2>(operator_tuple);
 };
 
-std::vector<double> mmobservations::single_frequency_predictions(
-    std::vector<double> model)
+complexvector mmobservations::single_frequency_predictions(
+    complexvector model)
 {
-    std::vector<double> predictions = model;
+    complexvector predictions = model;
     return predictions;
 }
 
 double mmobservations::single_frequency_likelihood(
-    std::vector<double> model,
-    const hierarchicalmodel *hmodel,
-    double *residuals,
-    double *residuals_normed,
+    complexvector model,
+    std::complex<double> *residuals,
+    std::complex<double> *residuals_normed,
     double &log_normalization)
 {
-    std::vector<double> predictions = single_frequency_predictions(model);
+    complexvector predictions = single_frequency_predictions(model);
 
     for (size_t i = 0; i < obs.size(); i++)
     {
         residuals[i] = obs[i] - predictions[i];
     }
-    double loglikelihood = hmodel->nll(
-        residuals,
-        &sigma[0],
-        n_obs,
-        residuals_normed,
-        log_normalization);
+
+    double loglikelihood = 0.0;
+    for (size_t i = 0; i < n_obs; i++)
+    {
+        residuals_normed[i] = residuals[i] / sigma[i];
+        loglikelihood += residuals_normed[i] * residuals_normed[i] * 0.5;
+        log_normalization += log(sigma[i]);
+    }
 
     return loglikelihood;
 }

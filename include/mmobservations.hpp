@@ -49,7 +49,7 @@ public:
     size_t n_obs;
 };
 
-class mmobservations : public Observations
+class mmobservations
 {
 public:
     // Default constructor
@@ -70,13 +70,12 @@ public:
 #endif
 
     double single_frequency_likelihood(
-        std::vector<double> model,
-        const hierarchicalmodel *hmodel,
-        double *residuals,
-        double *residuals_normed,
-        double &log_normalization) override;
+        complexvector model,
+        std::complex<double> *residuals,
+        std::complex<double> *residuals_normed,
+        double &log_normalization);
 
-    std::vector<double> single_frequency_predictions(std::vector<double> model) override;
+    complexvector single_frequency_predictions(complexvector model);
 
     void kaiser_squires(fftw_complex *output, const fftw_complex *input);
     void kaiser_squires_inv(fftw_complex *output, const fftw_complex *input);
@@ -97,4 +96,8 @@ private:
     const uint imsizex;
     const uint imsizey;
     const uint imsize;
+
+    complexvector obs;
+    complexvector sigma;
+    size_t n_obs;
 };
