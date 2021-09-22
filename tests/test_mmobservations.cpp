@@ -28,6 +28,20 @@ protected:
     static constexpr uint imsize = 32 * 32;
 };
 
+TEST_F(MMObsTest, MMLikelihood)
+{
+    complexvector f;
+    f.reserve(imsize);
+    for (uint j = 0; j < imsize; j++)
+    {
+        f.emplace_back(random->normal(1.), random->normal(1.));
+    }
+    observations->set_observed_data(f);
+    double log_normalization = 0.0;
+
+    ASSERT_EQ(0, observations->single_frequency_likelihood(f, log_normalization));
+}
+
 TEST_F(MMObsTest, KaiserSquiresInv)
 {
     std::array<std::complex<double>, imsize> f;
