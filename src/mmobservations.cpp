@@ -90,18 +90,15 @@ complexvector mmobservations::single_frequency_predictions(
 
 double mmobservations::single_frequency_likelihood(
     complexvector model,
-    std::complex<double> *residuals,
-    std::complex<double> *residuals_normed,
     double &log_normalization)
 {
     complexvector predictions = single_frequency_predictions(model);
-
     double loglikelihood = 0.0;
     for (size_t i = 0; i < imsize; i++)
     {
-        residuals[i] = obs[i] - predictions[i];
-        residuals_normed[i] = residuals[i] / sigma[i];
-        loglikelihood += std::abs(residuals_normed[i] * residuals_normed[i]) * 0.5;
+        std::complex<double> res = obs[i] - predictions[i];
+        std::complex<double> res_normed = res / sigma[i];
+        loglikelihood += std::norm(res_normed) * 0.5;
         log_normalization += log(sigma[i]);
     }
 

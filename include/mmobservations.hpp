@@ -33,8 +33,6 @@ public:
     virtual ~Observations(){};
 
     virtual double single_frequency_likelihood(complexvector model,
-                                               std::complex<double> *residuals,
-                                               std::complex<double> *residuals_normed,
                                                double &log_normalization) = 0;
 
     virtual complexvector single_frequency_predictions(complexvector model) = 0;
@@ -66,8 +64,6 @@ public:
 
     double single_frequency_likelihood(
         complexvector model,
-        std::complex<double> *residuals,
-        std::complex<double> *residuals_normed,
         double &log_normalization) override;
 
     complexvector single_frequency_predictions(complexvector model) override;

@@ -230,8 +230,6 @@ GlobalProposal::image_likelihood(const double *image_model,
     log_normalization = 0.0;
     complexvector image_model_v(image_model, image_model + size);
     return observations->single_frequency_likelihood(image_model_v,
-                                                     residual,
-                                                     residual_normed,
                                                      log_normalization);
 }
 
@@ -265,8 +263,6 @@ GlobalProposal::likelihood(double &log_normalization)
     log_normalization = 0.0;
     complexvector model_v(model, model + size);
     return observations->single_frequency_likelihood(model_v,
-                                                     residual,
-                                                     residual_normed,
                                                      log_normalization);
 }
 
