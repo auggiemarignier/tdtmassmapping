@@ -78,13 +78,6 @@ public:
 
     std::vector<double> single_frequency_predictions(std::vector<double> model) override;
 
-    std::function<void(fftw_complex *, const fftw_complex *)> fft;
-    std::function<void(fftw_complex *, const fftw_complex *)> ifft;
-
-    std::function<void(fftw_complex *, const fftw_complex *)> D;
-    std::function<void(fftw_complex *, const fftw_complex *)> Dadj;
-    std::function<void(fftw_complex *, const fftw_complex *)> Dinv;
-
     void kaiser_squires(fftw_complex *output, const fftw_complex *input);
     void kaiser_squires_inv(fftw_complex *output, const fftw_complex *input);
     void kaiser_squires_adj(fftw_complex *output, const fftw_complex *input);
@@ -92,8 +85,14 @@ public:
 private:
     std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> init_fft_2d();
 
+    std::function<void(fftw_complex *, const fftw_complex *)> fft;
+    std::function<void(fftw_complex *, const fftw_complex *)> ifft;
+
     std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>,std::function<void(fftw_complex *, const fftw_complex *)>> build_lensing_kernels();
 
+    std::function<void(fftw_complex *, const fftw_complex *)> D;
+    std::function<void(fftw_complex *, const fftw_complex *)> Dadj;
+    std::function<void(fftw_complex *, const fftw_complex *)> Dinv;
 
     const uint imsizex;
     const uint imsizey;
