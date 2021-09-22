@@ -65,7 +65,6 @@ public:
     const double *get_mean_residuals() const;
     const double *get_mean_normed_residuals() const;
     bool save_residuals(const char *filename);
-    bool save_residual_histogram(const char *filename) const;
     bool save_residual_covariance(const char *filename) const;
 
     static generic_lift_inverse1d_step_t wavelet_inverse_function_from_id(int id);

@@ -379,13 +379,6 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    filename = mkfilename(output_prefix, "residuals_hist.txt");
-    if (!global.save_residual_histogram(filename.c_str()))
-    {
-        ERROR("Failed to save residual histogram");
-        return -1;
-    }
-
     filename = mkfilename(output_prefix, "residuals_cov.txt");
     if (!global.save_residual_covariance(filename.c_str()))
     {

@@ -376,12 +376,6 @@ void GlobalProposal::update_residual_mean()
 
         delta = last_valid_residual_normed[i] - mean_residual_normed[i];
         mean_residual_normed[i] += delta / (double)(mean_residual_n);
-
-        int hi = (int)((last_valid_residual_normed[i] - residual_hist_min) / (residual_hist_max - residual_hist_min) * (double)residual_hist_bins);
-        if (hi >= 0 && hi < residual_hist_bins)
-        {
-            residual_hist[i * residual_hist_bins + hi]++;
-        }
     }
 }
 
