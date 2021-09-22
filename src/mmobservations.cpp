@@ -65,29 +65,6 @@ Observations::Observations(const char *filename)
 }
 #endif
 
-bool Observations::save_residuals(const char *filename,
-                                  const double *residuals,
-                                  const double *residuals_normed)
-{
-    const double *res = residuals;
-    const double *resn = residuals_normed;
-    FILE *fp = fopen(filename, "w");
-    if (fp == NULL)
-    {
-        return false;
-    }
-
-    for (size_t i = 0; i < n_obs; i++)
-    {
-        fprintf(fp, "%15.9f %15.9f\n", *res, *resn);
-        res++;
-        resn++;
-    }
-
-    fclose(fp);
-    return true;
-}
-
 mmobservations::mmobservations(const uint _imsizex, const uint _imsizey)
     : Observations(),
       imsizex(_imsizex),

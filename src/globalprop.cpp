@@ -53,18 +53,6 @@ GlobalProposal::GlobalProposal(Observations *_observations,
       observations(_observations),
       model(nullptr),
       workspace(nullptr),
-      mean_residual_n(0),
-      residual(nullptr),
-      mean_residual(nullptr),
-      last_valid_residual(nullptr),
-      residual_normed(nullptr),
-      mean_residual_normed(nullptr),
-      last_valid_residual_normed(nullptr),
-      residuals_valid(false),
-      residual_hist_bins(100),
-      residual_hist_min(-5.0),
-      residual_hist_max(5.0),
-      residual_hist(nullptr),
       width(-1),
       height(-1),
       size(-1),
@@ -118,18 +106,6 @@ GlobalProposal::GlobalProposal(Observations *_observations,
 
     int ntotal = observations->n_obs;
     INFO("Data: %d total points\n", ntotal);
-
-    residual_size = ntotal;
-    residual = new std::complex<double>[residual_size];
-    mean_residual = new std::complex<double>[residual_size];
-    last_valid_residual = new std::complex<double>[residual_size];
-    residual_normed = new std::complex<double>[residual_size];
-    mean_residual_normed = new std::complex<double>[residual_size];
-    last_valid_residual_normed = new std::complex<double>[residual_size];
-
-    residual_hist = new int[residual_size * residual_hist_bins];
-
-    reset_residuals();
 
     if (initial_model == NULL)
     {
@@ -241,14 +217,6 @@ GlobalProposal::~GlobalProposal()
     delete[] model;
     delete[] workspace;
 
-    delete[] residual;
-    delete[] mean_residual;
-    delete[] last_valid_residual;
-    delete[] residual_normed;
-    delete[] mean_residual_normed;
-    delete[] last_valid_residual_normed;
-    delete[] residual_hist;
-
     coefficient_histogram_destroy(coeff_hist);
     hnk_destroy(hnk);
     wavetree2d_sub_destroy(wt);
@@ -302,214 +270,12 @@ GlobalProposal::likelihood(double &log_normalization)
                                                      log_normalization);
 }
 
-void GlobalProposal::reset_residuals()
-{
-    mean_residual_n = 0;
-    for (int i = 0; i < residual_size; i++)
-    {
-        residual[i] = 0.0;
-        mean_residual[i] = 0.0;
-        last_valid_residual[i] = 0.0;
-
-        residual_normed[i] = 0.0;
-        mean_residual_normed[i] = 0.0;
-        last_valid_residual_normed[i] = 0.0;
-
-        for (int j = 0; j < residual_hist_bins; j++)
-        {
-            residual_hist[i * residual_hist_bins + j] = 0;
-        }
-    }
-
-    cov_n = 0;
-
-    for (int i = 0; i < (int)cov_count.size(); i++)
-    {
-        int N = cov_count[i];
-
-        for (int j = 0; j < N; j++)
-        {
-            cov_delta[i][j] = 0.0;
-            cov_mu[i][j] = 0.0;
-        }
-
-        N = N * N;
-        for (int j = 0; j < N; j++)
-        {
-            cov_sigma[i][j] = 0.0;
-        }
-    }
-}
-
-void GlobalProposal::invalidate_residuals()
-{
-    residuals_valid = false;
-}
-
 void GlobalProposal::accept()
 {
-    residuals_valid = true;
-    for (int i = 0; i < residual_size; i++)
-    {
-        last_valid_residual[i] = residual[i];
-        last_valid_residual_normed[i] = residual_normed[i];
-    }
-
-    update_residual_mean();
-    update_residual_covariance();
 }
 
 void GlobalProposal::reject()
 {
-    update_residual_mean();
-}
-
-void GlobalProposal::update_residual_mean()
-{
-    mean_residual_n++;
-
-    for (int i = 0; i < residual_size; i++)
-    {
-
-        std::complex<double> delta = last_valid_residual[i] - mean_residual[i];
-        mean_residual[i] += delta / (double)(mean_residual_n);
-
-        delta = last_valid_residual_normed[i] - mean_residual_normed[i];
-        mean_residual_normed[i] += delta / (double)(mean_residual_n);
-    }
-}
-
-void GlobalProposal::update_residual_covariance()
-{
-    double *p = last_valid_residual;
-
-    for (int k = 0; k < residual_size; k++)
-    {
-
-        cov_n++;
-
-        for (int i = 0; i < (int)cov_count.size(); i++)
-        {
-
-            int N = cov_count[i];
-
-            for (int j = 0; j < N; j++)
-            {
-                cov_delta[i][j] = (p[j] - cov_mu[i][j]) / (double)(cov_n);
-                cov_mu[i][j] += cov_delta[i][j];
-            }
-
-            for (int j = 0; j < N; j++)
-            {
-                for (int l = j; l < N; l++)
-                {
-
-                    cov_sigma[i][j * N + l] +=
-                        (double)(cov_n - 1) * cov_delta[i][j] * cov_delta[i][l] -
-                        cov_sigma[i][j * N + l] / (double)(cov_n);
-                }
-            }
-
-            p += N;
-        }
-    }
-}
-
-int GlobalProposal::get_residual_size() const
-{
-    return residual_size;
-}
-
-const double *
-GlobalProposal::get_mean_residuals() const
-{
-    return mean_residual;
-}
-
-const double *
-GlobalProposal::get_mean_normed_residuals() const
-{
-    return mean_residual_normed;
-}
-
-bool GlobalProposal::save_residuals(const char *filename)
-{
-    if (observations != nullptr)
-    {
-        return observations->save_residuals(filename, mean_residual, mean_residual_normed);
-    }
-    else
-    {
-        return true;
-    }
-}
-
-bool GlobalProposal::save_residual_histogram(const char *filename) const
-{
-    if (observations != nullptr)
-    {
-        FILE *fp = fopen(filename, "w");
-        if (fp == NULL)
-        {
-            ERROR("Failed to create file");
-            return false;
-        }
-
-        fprintf(fp, "%d %d %f %f\n", residual_size, residual_hist_bins, residual_hist_min, residual_hist_max);
-        for (int i = 0; i < residual_size; i++)
-        {
-            for (int j = 0; j < residual_hist_bins; j++)
-            {
-                fprintf(fp, "%d ", residual_hist[i * residual_hist_bins + j]);
-            }
-            fprintf(fp, "\n");
-        }
-
-        fclose(fp);
-    }
-
-    return true;
-}
-
-bool GlobalProposal::save_residual_covariance(const char *filename) const
-{
-    if (observations != nullptr)
-    {
-        FILE *fp = fopen(filename, "w");
-        if (fp == NULL)
-        {
-            ERROR("Failed to create file\n");
-            return false;
-        }
-
-        fprintf(fp, "%d\n", (int)cov_count.size());
-
-        for (int i = 0; i < (int)cov_count.size(); i++)
-        {
-
-            int N = cov_count[i];
-
-            fprintf(fp, "%d\n", N);
-            for (int j = 0; j < N; j++)
-            {
-                fprintf(fp, "%.9g ", cov_mu[i][j]);
-            }
-            fprintf(fp, "\n");
-
-            for (int j = 0; j < N; j++)
-            {
-                for (int k = 0; k < N; k++)
-                {
-                    fprintf(fp, "%.9g ", cov_sigma[i][j * N + k]);
-                }
-                fprintf(fp, "\n");
-            }
-        }
-
-        fclose(fp);
-    }
-
-    return true;
 }
 
 generic_lift_inverse1d_step_t

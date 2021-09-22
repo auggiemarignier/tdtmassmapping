@@ -39,10 +39,6 @@ public:
 
     virtual complexvector single_frequency_predictions(complexvector model) = 0;
 
-    virtual bool save_residuals(const char *filename,
-                                const double *residuals,
-                                const double *residuals_normed);
-
     complexvector obs;
     std::vector<double> sigma;
     size_t n_obs;

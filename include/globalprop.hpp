@@ -54,18 +54,9 @@ public:
                             double &log_normalization);
     double likelihood(double &log_normalization);
     double likelihood_mpi(double &log_normalization) { return 1.0; } //TODO: implement this
-    void reset_residuals();
-    void invalidate_residuals();
     void accept();
     void reject();
-    void update_residual_mean();
-    void update_residual_covariance();
-    int get_residual_size() const;
     void set_max_depth(int md);
-    const double *get_mean_residuals() const;
-    const double *get_mean_normed_residuals() const;
-    bool save_residuals(const char *filename);
-    bool save_residual_covariance(const char *filename) const;
 
     static generic_lift_inverse1d_step_t wavelet_inverse_function_from_id(int id);
     static generic_lift_forward1d_step_t wavelet_forward_function_from_id(int id);
@@ -92,24 +83,6 @@ public:
     double *workspace;
 
     double lambda;
-
-    int mean_residual_n;
-    int residual_size;
-
-    std::complex<double> *residual;
-    std::complex<double> *mean_residual;
-    std::complex<double> *last_valid_residual;
-
-    std::complex<double> *residual_normed;
-    std::complex<double> *mean_residual_normed;
-    std::complex<double> *last_valid_residual_normed;
-
-    bool residuals_valid;
-
-    int residual_hist_bins;
-    double residual_hist_min;
-    double residual_hist_max;
-    int *residual_hist;
 
     int width;
     int height;
