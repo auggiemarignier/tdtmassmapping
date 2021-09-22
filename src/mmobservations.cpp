@@ -284,3 +284,19 @@ void mmobservations::kaiser_squires_adj(fftw_complex *output, const fftw_complex
     Dadj(temp2, temp);
     ifft(output, temp2);
 }
+
+void mmobservations::set_observed_data(complexvector &_obs)
+{
+    if (_obs.size() == imsize)
+        obs = _obs;
+    else
+        ERROR("Input data has size %i.  Expected size %i.", _obs.size(), imsize);
+}
+
+void mmobservations::set_sigmas(complexvector &_sigmas)
+{
+    if (_sigmas.size() == imsize)
+        sigma = _sigmas;
+    else
+        ERROR("Input data has size %i.  Expected size %i.", _sigmas.size(), imsize);
+}

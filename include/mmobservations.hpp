@@ -81,6 +81,9 @@ public:
     void kaiser_squires_inv(fftw_complex *output, const fftw_complex *input);
     void kaiser_squires_adj(fftw_complex *output, const fftw_complex *input);
 
+    void set_observed_data(complexvector &_obs);
+    void set_sigmas(complexvector &_simgas);
+
 private:
     std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> init_fft_2d();
 
@@ -99,5 +102,4 @@ private:
 
     complexvector obs;
     complexvector sigma;
-    size_t n_obs;
 };
