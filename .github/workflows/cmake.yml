@@ -34,7 +34,7 @@ jobs:
         working-directory: ${{runner.workspace}}/build
         run: cmake --build . --config $BUILD_TYPE
 
-      - uses: DamianReeves/write-file-action@v1.0
+      - name: Build dummy prior file for tests
         run: |
           echo laplace >> ${{runner.workspace}}/build/tutorial_prior.txt
           echo 0.2 >> ${{runner.workspace}}/build/tutorial_prior.txt
