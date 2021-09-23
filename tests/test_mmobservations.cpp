@@ -49,13 +49,13 @@ TEST_F(MMObsTest, MMLikelihood)
 
 TEST_F(MMObsTest, KaiserSquiresInv)
 {
-    std::array<std::complex<double>, imsize> f;
+    fftw_complex *input = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
     for (uint j = 0; j < imsize; j++)
     {
-        f[j] = std::complex<double>(random->normal(1.), random->normal(1.));
+        input[j][0] = random->normal(1.);
+        input[j][1] = random->normal(1.);
     }
 
-    fftw_complex *input = reinterpret_cast<fftw_complex *>(&f);
     fftw_complex *output = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
     fftw_complex *recovered = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
 
@@ -83,8 +83,16 @@ TEST_F(MMObsTest, KaiserSquiresAdj)
         g2[j] = std::complex<double>(random->normal(1.), random->normal(1.));
     }
 
-    fftw_complex *kappa1 = reinterpret_cast<fftw_complex *>(&k1);
-    fftw_complex *gamma2 = reinterpret_cast<fftw_complex *>(&g2);
+    fftw_complex *kappa1 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    fftw_complex *gamma2 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    for (uint j = 0; j < imsize; j++)
+    {
+        kappa1[j][0] = k1[j].real();
+        kappa1[j][1] = k1[j].imag();
+        gamma2[j][0] = g2[j].real();
+        gamma2[j][1] = g2[j].imag();
+    }
+
     fftw_complex *kappa2 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
     fftw_complex *gamma1 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
 
