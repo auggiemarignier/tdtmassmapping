@@ -34,7 +34,7 @@ jobs:
         working-directory: ${{runner.workspace}}/build
         run: cmake --build . --config $BUILD_TYPE
 
-      - uses: DamianReeves/write-file-action
+      - uses: DamianReeves/write-file-action@v1.0
         with:
           path: ${{runner.workspace}}/build/tutorial_prior.txt
           contents: |
