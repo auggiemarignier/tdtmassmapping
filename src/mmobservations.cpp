@@ -84,10 +84,8 @@ double Observations::single_frequency_likelihood(
 
 void Observations::set_observed_data(complexvector &_obs)
 {
-    if (_obs.size() == n_obs)
-        obs = _obs;
-    else
-        ERROR("Input data has size %i.  Expected size %i.", _obs.size(), n_obs);
+    obs = _obs;
+    n_obs = _obs.size();
 }
 
 void Observations::set_sigmas(std::vector<double> &_sigmas)
@@ -114,8 +112,7 @@ mmobservations::mmobservations(const uint _imsizex, const uint _imsizey)
     : Observations(),
       imsizex(_imsizex),
       imsizey(_imsizey),
-      imsize(_imsizey * _imsizex),
-      n_obs(_imsizey * _imsizex)
+      imsize(_imsizey * _imsizex)
 {
     auto fft_tuple = init_fft_2d();
     fft = std::get<0>(fft_tuple);
