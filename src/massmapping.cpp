@@ -167,15 +167,12 @@ int main(int argc, char *argv[])
     Logger::open_log(logfile);
     INFO("Reading in kappa map");
     std::ifstream file(input_kappa);
-    std::vector<double> kappa;
+    complexvector kappa;
     double element;
-    double mean = 0;
-    double var = 0;
-    double stddev = 0;
     if (file.is_open())
     {
         while (file >> element)
-            kappa.emplace_back(element);
+            kappa.emplace_back(element, 0);
 
         if (1 << degreex * 1 << degreey != kappa.size())
             throw ERROR("Incorrect image size");
@@ -188,8 +185,10 @@ int main(int argc, char *argv[])
     }
 
     mmobservations observations(1 << degreex, 1 << degreey);
-    observations.set_observed_data(kappa);
-    observations.set_sigmas((std::vector<double>)stddev);
+    complexvector gamma = observations.single_frequency_predictions(kappa);
+    observations.set_observed_data(gamma);
+    std::vector<double> sigma(1.);
+    observations.set_sigmas(sigma);
 
     GlobalProposal global(&observations,
                           initial_model,

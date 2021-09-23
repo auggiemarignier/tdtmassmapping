@@ -34,9 +34,10 @@ TEST_F(MMObsTest, MMLikelihood)
     f.reserve(imsize);
     for (uint j = 0; j < imsize; j++)
     {
-        f.emplace_back(random->normal(1.), random->normal(1.));
+        f.emplace_back(random->normal(1.), 0);
     }
-    observations->set_observed_data(f);
+    complexvector predictions = observations->single_frequency_predictions(f);
+    observations->set_observed_data(predictions);
 
     std::vector<double> sig = {1.};
     observations->set_sigmas(sig);
