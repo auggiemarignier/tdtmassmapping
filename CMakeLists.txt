@@ -55,8 +55,6 @@ if(tests)
                         INSTALL_COMMAND "")
     FetchContent_MakeAvailable(googletest)
     add_subdirectory(tests)
-    configure_file(data/Bolshoi_7_clean_256.txt ${CMAKE_CURRENT_BINARY_DIR}/Bolshoi_7_clean_256.txt)
-    configure_file(data/tutorial_prior.txt ${CMAKE_CURRENT_BINARY_DIR}/tutorial_prior.txt)
 endif()
 
 add_executable(${PROJECT_NAME} src/massmapping.cpp)
