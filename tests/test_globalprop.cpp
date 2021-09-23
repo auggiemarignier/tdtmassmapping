@@ -10,9 +10,11 @@ protected:
     GlobalProposal *global;
     void SetUp() override
     {
-        std::vector<double> obs = {1, 2, 3, 4, 5};
-        double sigma = 1.41;
+        complexvector obs = {(1,0), (2,0), (3,0), (4,0), (5,0)};
+        std::vector<double> sigma = {1.41};
         observations = new Identity();
+        observations->set_observed_data(obs);
+        observations->set_sigmas(sigma);
 
         global = new GlobalProposal(observations,
                                     NULL,
@@ -34,5 +36,5 @@ TEST_F(GlobalPropTest, GlobalLikelihood)
 {
     // wavetree model at initialisation is 0 everywhere
     double likelihood = global->likelihood(global->current_log_normalization);
-    ASSERT_FLOAT_EQ(likelihood, 13.8323);
+    ASSERT_FLOAT_EQ(likelihood, 0);
 }

@@ -12,9 +12,11 @@ protected:
     BirthProposal *birth;
     void SetUp() override
     {
-        std::vector<double> obs = {0, 1, 2, 3};
-        double sigma = 1.41;
+        complexvector obs = {(1,0), (2,0), (3,0), (4,0), (5,0)};
+        std::vector<double> sigma = {1.41};
         observations = new Identity();
+        observations->set_observed_data(obs);
+        observations->set_sigmas(sigma);
 
         global = new GlobalProposal(observations,
                                     NULL,
@@ -46,9 +48,11 @@ protected:
     BirthProposal *birth;
     void SetUp() override
     {
-        std::vector<double> obs = {0, 1, 2, 3};
-        double sigma = 1.41;
+        complexvector obs = {(1,0), (2,0), (3,0), (4,0), (5,0)};
+        std::vector<double> sigma = {1.41};
         observations = new Identity();
+        observations->set_observed_data(obs);
+        observations->set_sigmas(sigma);
 
         global = new GlobalProposal(observations,
                                     NULL,
@@ -83,9 +87,11 @@ protected:
     ValueProposal *value;
     void SetUp() override
     {
-        std::vector<double> obs = {0, 1, 2, 3};
-        double sigma = 1.41;
+        complexvector obs = {(1,0), (2,0), (3,0), (4,0), (5,0)};
+        std::vector<double> sigma = {1.41};
         observations = new Identity();
+        observations->set_observed_data(obs);
+        observations->set_sigmas(sigma);
 
         global = new GlobalProposal(observations,
                                     NULL,
