@@ -50,6 +50,7 @@ public:
         va_start(args, fmt);
         Logger::Get().write_log_imp(level, sourcefile, function, lineno, fmt, args);
         va_end(args);
+        return nullptr;
     }
 
     static void open_log(const char *filename)
@@ -66,7 +67,6 @@ public:
     {
         Logger::Get().flush_imp();
     }
-
 
 private:
     Logger(){};
