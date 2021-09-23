@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <gsl/gsl_rng.h>
 #include <getopt.h>
 
@@ -37,7 +38,7 @@ static void usage(const char *pname);
 int main(int argc, char *argv[])
 {
     // Defaults
-    char *input_obs = nullptr;
+    char *input_kappa = nullptr;
     char *initial_model = nullptr;
     char *prior_file = nullptr;
     char *output_prefix = nullptr;
@@ -69,7 +70,7 @@ int main(int argc, char *argv[])
         switch (c)
         {
         case 'i':
-            input_obs = optarg;
+            input_kappa = optarg;
             break;
         case 'I':
             initial_model = optarg;
@@ -146,7 +147,7 @@ int main(int argc, char *argv[])
     }
 
     // Check files
-    if (input_obs == NULL)
+    if (input_kappa == NULL)
     {
         fprintf(stderr, "Please provide an input file\n");
         return -1;
@@ -164,8 +165,31 @@ int main(int argc, char *argv[])
 
     // Setup
     Logger::open_log(logfile);
+    INFO("Reading in kappa map");
+    std::ifstream file(input_kappa);
+    std::vector<double> kappa;
+    double element;
+    double mean = 0;
+    double var = 0;
+    double stddev = 0;
+    if (file.is_open())
+    {
+        while (file >> element)
+            kappa.emplace_back(element);
 
-    mmobservations observations(input_obs);
+        if (1 << degreex * 1 << degreey != kappa.size())
+            throw ERROR("Incorrect image size");
+
+        file.close();
+    }
+    else
+    {
+        throw ERROR("File not opened %s", input_kappa);
+    }
+
+    mmobservations observations(1 << degreex, 1 << degreey);
+    observations.set_observed_data(kappa);
+    observations.set_sigmas((std::vector<double>)stddev);
 
     GlobalProposal global(&observations,
                           initial_model,
