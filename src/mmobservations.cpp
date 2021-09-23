@@ -81,15 +81,25 @@ mmobservations::mmobservations(const uint _imsizex, const uint _imsizey)
     Dadj = std::get<2>(operator_tuple);
 };
 
-complexvector mmobservations::single_frequency_predictions(
-    complexvector model)
+complexvector mmobservations::single_frequency_predictions(complexvector &model)
 {
-    complexvector predictions = model;
+    fftw_complex *kappa = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    fftw_complex *gamma = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    for (uint i = 0; i < imsize; i++)
+    {
+        kappa[i][0] = model[i].real();
+        kappa[i][1] = model[i].imag();
+    }
+    kaiser_squires(gamma, kappa);
+    complexvector predictions;
+    predictions.reserve(imsize);
+    for (uint i = 0; i < imsize; i++)
+        predictions.emplace_back(gamma[i][0], gamma[i][1]);
     return predictions;
 }
 
 double mmobservations::single_frequency_likelihood(
-    complexvector model,
+    complexvector &model,
     double &log_normalization)
 {
     complexvector predictions = single_frequency_predictions(model);
