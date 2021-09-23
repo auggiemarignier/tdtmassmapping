@@ -257,6 +257,12 @@ void mmobservations::set_sigmas(std::vector<double> &_sigmas)
 {
     if (_sigmas.size() == imsize)
         sigma = _sigmas;
+    else if (_sigmas.size() == 1)
+    {
+        sigma.reserve(imsize);
+        for (uint i = 0; i < imsize; i++)
+            sigma.emplace_back(_sigmas[0]);
+    }
     else
         ERROR("Input data has size %i.  Expected size %i.", _sigmas.size(), imsize);
 }

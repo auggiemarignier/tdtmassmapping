@@ -37,6 +37,10 @@ TEST_F(MMObsTest, MMLikelihood)
         f.emplace_back(random->normal(1.), random->normal(1.));
     }
     observations->set_observed_data(f);
+
+    std::vector<double> sig = {1.};
+    observations->set_sigmas(sig);
+
     double log_normalization = 0.0;
 
     ASSERT_EQ(0, observations->single_frequency_likelihood(f, log_normalization));
