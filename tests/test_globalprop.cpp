@@ -10,7 +10,11 @@ protected:
     GlobalProposal *global;
     void SetUp() override
     {
-        complexvector obs = {(1,0), (2,0), (3,0), (4,0), (5,0)};
+        complexvector obs = {std::complex<double>(1., 0.),
+                             std::complex<double>(2., 0.),
+                             std::complex<double>(3., 0.),
+                             std::complex<double>(4., 0.),
+                             std::complex<double>(5., 0.)};
         std::vector<double> sigma = {1.41};
         observations = new Identity();
         observations->set_observed_data(obs);
