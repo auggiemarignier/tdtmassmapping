@@ -34,6 +34,24 @@ jobs:
         working-directory: ${{runner.workspace}}/build
         run: cmake --build . --config $BUILD_TYPE
 
+      - uses: DamianReeves/write-file-action
+        with:
+          path: ${{runner.workspace}}/build/tutorial_prior.txt
+          contents: |
+            laplace
+            0.2
+            priorbirth
+            depthgaussianperturb
+            7
+            0.020
+            0.020
+            0.025
+            0.035
+            0.050
+            0.050
+            0.050
+          write-mode: append
+
       - name: Test
         working-directory: ${{runner.workspace}}/build
         run: ctest -C $BUILD_TYPE -T test --output-on-failure
