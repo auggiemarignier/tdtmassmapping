@@ -20,7 +20,7 @@ jobs:
 
       - name: Setup environment
         run: |
-          brew install gsl
+          brew install gsl fftw
           cmake -E make_directory ${{runner.workspace}}/build
 
       - name: Configure CMake
