@@ -4,7 +4,7 @@ cmake_policy(SET CMP0048 NEW)
 project(mmtdt
         VERSION 0.0.0
         DESCRIPTION "Mass mapping with transdimensional trees"
-        LANGUAGES CXX)
+        LANGUAGES CXX C)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(PROJECT_LIB lib${PROJECT_NAME})
@@ -12,7 +12,7 @@ set(PROJECT_LIB lib${PROJECT_NAME})
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
-option(tests "Enable testing" off)
+option(tests "Enable testing" on)
 option(install "Install targets on system" on)
 
 include(ExternalProject)
@@ -36,10 +36,12 @@ add_dependencies(${PROJECT_LIB} ${TDTBASE})
 
 find_package(GSL REQUIRED)
 find_package(GMP REQUIRED)
+find_package(FFTW3 REQUIRED)
 target_link_libraries(${PROJECT_LIB}
                       GSL::gsl
                       ${GMP_LIBRARY}
-                      ${TDTBASE_LIBS})
+                      ${TDTBASE_LIBS}
+                      FFTW3::FFTW3)
 
 include_directories(include ${TDTBASE_INCLUDE}
                             ${GMP_INCLUDE_DIR})
@@ -49,12 +51,10 @@ if(tests)
     include(CTest)
     FetchContent_Declare(googletest
                         GIT_REPOSITORY https://github.com/google/googletest.git
-                        GIT_TAG master
+                        GIT_TAG release-1.11.0
                         INSTALL_COMMAND "")
     FetchContent_MakeAvailable(googletest)
     add_subdirectory(tests)
-    configure_file(data/Bolshoi_7_clean_256.txt ${CMAKE_CURRENT_BINARY_DIR}/Bolshoi_7_clean_256.txt)
-    configure_file(data/tutorial_prior.txt ${CMAKE_CURRENT_BINARY_DIR}/tutorial_prior.txt)
 endif()
 
 add_executable(${PROJECT_NAME} src/massmapping.cpp)

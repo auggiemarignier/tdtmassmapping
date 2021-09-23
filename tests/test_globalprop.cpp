@@ -6,13 +6,19 @@
 class GlobalPropTest : public ::testing::Test
 {
 protected:
-    mmobservations *observations;
+    Identity *observations;
     GlobalProposal *global;
     void SetUp() override
     {
-        std::vector<double> obs = {1, 2, 3, 4, 5};
-        double sigma = 1.41;
-        observations = new mmobservations(obs, sigma);
+        complexvector obs = {std::complex<double>(1., 0.),
+                             std::complex<double>(2., 0.),
+                             std::complex<double>(3., 0.),
+                             std::complex<double>(4., 0.),
+                             std::complex<double>(5., 0.)};
+        std::vector<double> sigma = {1.41};
+        observations = new Identity();
+        observations->set_observed_data(obs);
+        observations->set_sigmas(sigma);
 
         global = new GlobalProposal(observations,
                                     NULL,
@@ -35,24 +41,4 @@ TEST_F(GlobalPropTest, GlobalLikelihood)
     // wavetree model at initialisation is 0 everywhere
     double likelihood = global->likelihood(global->current_log_normalization);
     ASSERT_FLOAT_EQ(likelihood, 13.8323);
-}
-
-TEST_F(GlobalPropTest, GlobalAccept)
-{
-    ASSERT_EQ(global->mean_residual_n, 0);
-    for (int i = 0; i < global->residual_size; i++)
-    {
-        ASSERT_EQ(global->mean_residual[i], 0);
-        ASSERT_EQ(global->last_valid_residual[i], 0);
-    }
-
-    double likelihood = global->likelihood(global->current_log_normalization);
-    global->accept();
-
-    ASSERT_EQ(global->mean_residual_n, 1);
-    for (int i = 0; i < global->residual_size; i++)
-    {
-        ASSERT_EQ(global->mean_residual[i], global->observations->obs[i]);
-        ASSERT_EQ(global->last_valid_residual[i], global->observations->obs[i]);
-    }
 }

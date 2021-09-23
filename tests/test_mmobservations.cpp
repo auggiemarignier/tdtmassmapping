@@ -1,47 +1,122 @@
 #include "gtest/gtest.h"
 #include <vector>
+#include <array>
+#include <cstring>
+#include <cmath>
+#include <algorithm>
 
 #include "mmobservations.hpp"
+#include "rng.hpp"
 
 class MMObsTest : public ::testing::Test
 {
 protected:
-    void SetUp() override {
-        std::vector<double> obs = {1, 2, 3, 4, 5};
-        double sigma = 1.41;
-        observations = new mmobservations(obs, sigma);
+    void SetUp() override
+    {
+        const uint imsizex = 32;
+        const uint imsizey = 32;
+        observations = new mmobservations(imsizex, imsizey);
+        random = new Rng(1);
     }
-    void TearDown() override {
+    void TearDown() override
+    {
         delete observations;
     }
 
     mmobservations *observations;
+    Rng *random;
+    static constexpr uint imsize = 32 * 32;
 };
-
-TEST_F(MMObsTest, MMPredsIdentity)
-{
-    std::vector<double> model = {1, 2, 3, 4, 5};
-    ASSERT_EQ(model, observations->single_frequency_predictions(model));
-    ASSERT_EQ(observations->n_obs, 5);
-}
 
 TEST_F(MMObsTest, MMLikelihood)
 {
-    std::vector<double> model = {1, 2, 3, 4, 5};
-    independentgaussianhierarchicalmodel *hmodel = nullptr;
-    hmodel = new independentgaussianhierarchicalmodel();
-    hmodel->setparameter(0, 1.0);
+    complexvector f;
+    f.reserve(imsize);
+    for (uint j = 0; j < imsize; j++)
+    {
+        f.emplace_back(random->normal(1.), 0);
+    }
+    complexvector predictions = observations->single_frequency_predictions(f);
+    observations->set_observed_data(predictions);
+
+    std::vector<double> sig = {1.};
+    observations->set_sigmas(sig);
+
     double log_normalization = 0.0;
-    double residual[5];
-    double residual_norm[5];
 
-    ASSERT_EQ(0, observations->single_frequency_likelihood(
-                     model, hmodel, residual, residual_norm, log_normalization));
+    ASSERT_EQ(0, observations->single_frequency_likelihood(f, log_normalization));
+}
 
-    std::vector<double> model2 = {0, 2, 3, 4, 5};
-    ASSERT_NE(0, observations->single_frequency_likelihood(
-                     model2, hmodel, residual, residual_norm, log_normalization));
+TEST_F(MMObsTest, KaiserSquiresInv)
+{
+    fftw_complex *input = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    for (uint j = 0; j < imsize; j++)
+    {
+        input[j][0] = random->normal(1.);
+        input[j][1] = random->normal(1.);
+    }
 
+    fftw_complex *output = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    fftw_complex *recovered = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+
+    observations->kaiser_squires(output, input);
+    observations->kaiser_squires_inv(recovered, output);
+
+    // Mass sheet degeneracy says we can only recover kappa up to a constant
+    // Check input - recovered == constant
+    double const_real = input[0][0] - recovered[0][0];
+    double const_imag = input[0][1] - recovered[0][1];
+    for (uint i = 1; i < imsize; i++)
+    {
+        ASSERT_NEAR(input[i][0] - recovered[i][0] - const_real, 0., 1e-12) << i;
+        ASSERT_NEAR(input[i][1] - recovered[i][1] - const_imag, 0., 1e-12) << i;
+    }
+}
+
+TEST_F(MMObsTest, KaiserSquiresAdj)
+{
+    std::array<std::complex<double>, imsize> k1;
+    std::array<std::complex<double>, imsize> g2;
+    for (uint j = 0; j < imsize; j++)
+    {
+        k1[j] = std::complex<double>(random->normal(1.), random->normal(1.));
+        g2[j] = std::complex<double>(random->normal(1.), random->normal(1.));
+    }
+
+    fftw_complex *kappa1 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    fftw_complex *gamma2 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    for (uint j = 0; j < imsize; j++)
+    {
+        kappa1[j][0] = k1[j].real();
+        kappa1[j][1] = k1[j].imag();
+        gamma2[j][0] = g2[j].real();
+        gamma2[j][1] = g2[j].imag();
+    }
+
+    fftw_complex *kappa2 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    fftw_complex *gamma1 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+
+    observations->kaiser_squires(gamma1, kappa1);
+    observations->kaiser_squires_adj(kappa2, gamma2);
+
+    std::array<std::complex<double>, imsize> k2;
+    std::array<std::complex<double>, imsize> g1;
+    for (uint j = 0; j < imsize; j++)
+    {
+        k2[j] = std::complex<double>(kappa2[j][0], kappa2[j][1]);
+        g1[j] = std::complex<double>(gamma1[j][0], gamma1[j][1]);
+    }
+
+    std::complex<double> g1dotg2 = 0;
+    std::complex<double> k1dotk2 = 0;
+    for (uint j = 0; j < imsize; j++)
+    {
+        g1dotg2 += g1[j] * std::conj(g2[j]);
+        k1dotk2 += k1[j] * std::conj(k2[j]);
+    }
+
+    ASSERT_FLOAT_EQ(g1dotg2.real(), k1dotk2.real());
+    ASSERT_FLOAT_EQ(g1dotg2.imag(), k1dotk2.imag());
 }
 
 int main(int argc, char **argv)

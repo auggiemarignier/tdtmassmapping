@@ -6,6 +6,7 @@
 #include "mmobservations.hpp"
 #include "logging.hpp"
 
+#if 0
 Observations::Observations(
     std::vector<double> _obs,
     std::vector<double> _sigma)
@@ -62,56 +63,220 @@ Observations::Observations(const char *filename)
         throw ERROR("File not opened %s", filename);
     }
 }
+#endif
 
-bool Observations::save_residuals(const char *filename,
-                                  const double *residuals,
-                                  const double *residuals_normed)
+double Observations::single_frequency_likelihood(
+    complexvector &model,
+    double &log_normalization)
 {
-    const double *res = residuals;
-    const double *resn = residuals_normed;
-    FILE *fp = fopen(filename, "w");
-    if (fp == NULL)
-    {
-        return false;
-    }
-
+    complexvector predictions = single_frequency_predictions(model);
+    double loglikelihood = 0.0;
     for (size_t i = 0; i < n_obs; i++)
     {
-        fprintf(fp, "%15.9f %15.9f\n", *res, *resn);
-        res++;
-        resn++;
+        std::complex<double> res = obs[i] - predictions[i];
+        std::complex<double> res_normed = res / sigma[i];
+        loglikelihood += std::norm(res_normed) * 0.5;
+        log_normalization += log(sigma[i]);
     }
 
-    fclose(fp);
-    return true;
+    return loglikelihood;
 }
 
-std::vector<double> mmobservations::single_frequency_predictions(
-    std::vector<double> model)
+void Observations::set_observed_data(complexvector &_obs)
 {
-    std::vector<double> predictions = model;
+    obs = _obs;
+    n_obs = _obs.size();
+}
+
+void Observations::set_sigmas(std::vector<double> &_sigmas)
+{
+    if (_sigmas.size() == n_obs)
+        sigma = _sigmas;
+    else if (_sigmas.size() == 1)
+    {
+        sigma.reserve(n_obs);
+        for (uint i = 0; i < n_obs; i++)
+            sigma.emplace_back(_sigmas[0]);
+    }
+    else
+        ERROR("Input data has size %i.  Expected size %i.", _sigmas.size(), n_obs);
+}
+
+complexvector Identity::single_frequency_predictions(complexvector &model)
+{
+    complexvector predictions = model;
     return predictions;
 }
 
-double mmobservations::single_frequency_likelihood(
-    std::vector<double> model,
-    const hierarchicalmodel *hmodel,
-    double *residuals,
-    double *residuals_normed,
-    double &log_normalization)
+mmobservations::mmobservations(const uint _imsizex, const uint _imsizey)
+    : Observations(),
+      imsizex(_imsizex),
+      imsizey(_imsizey),
+      imsize(_imsizey * _imsizex)
 {
-    std::vector<double> predictions = single_frequency_predictions(model);
+    auto fft_tuple = init_fft_2d();
+    fft = std::get<0>(fft_tuple);
+    ifft = std::get<1>(fft_tuple);
 
-    for (size_t i = 0; i < obs.size(); i++)
+    auto operator_tuple = build_lensing_kernels();
+    D = std::get<0>(operator_tuple);
+    Dinv = std::get<1>(operator_tuple);
+    Dadj = std::get<2>(operator_tuple);
+};
+
+complexvector mmobservations::single_frequency_predictions(complexvector &model)
+{
+    fftw_complex *kappa = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    fftw_complex *gamma = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    for (uint i = 0; i < imsize; i++)
     {
-        residuals[i] = obs[i] - predictions[i];
+        kappa[i][0] = model[i].real();
+        kappa[i][1] = model[i].imag();
     }
-    double loglikelihood = hmodel->nll(
-        residuals,
-        &sigma[0],
-        n_obs,
-        residuals_normed,
-        log_normalization);
+    kaiser_squires(gamma, kappa);
+    complexvector predictions;
+    predictions.reserve(imsize);
+    for (uint i = 0; i < imsize; i++)
+        predictions.emplace_back(gamma[i][0], gamma[i][1]);
+    return predictions;
+}
 
-    return loglikelihood;
+std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> mmobservations::init_fft_2d()
+{
+    fftw_complex *in, *out;
+    in = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    out = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+
+    auto del = [](fftw_plan_s *plan)
+    { fftw_destroy_plan(plan); };
+    std::shared_ptr<fftw_plan_s> plan_forward(fftw_plan_dft_2d(imsizey, imsizex, in, out, FFTW_FORWARD, FFTW_MEASURE), del);
+    std::shared_ptr<fftw_plan_s> plan_inverse(fftw_plan_dft_2d(imsizey, imsizex, in, out, FFTW_BACKWARD, FFTW_MEASURE), del);
+
+    auto forward = [=](fftw_complex *output, const fftw_complex *input)
+    {
+        fftw_execute_dft(plan_forward.get(), const_cast<fftw_complex *>(input), output);
+        for (int i = 0; i < (int)(imsize); i++)
+        {
+            output[i][0] /= std::sqrt(imsize);
+            output[i][1] /= std::sqrt(imsize);
+        }
+    };
+
+    auto backward = [=](fftw_complex *output, const fftw_complex *input)
+    {
+        fftw_execute_dft(plan_inverse.get(), const_cast<fftw_complex *>(input), output);
+        for (int i = 0; i < (int)(imsize); i++)
+        {
+            output[i][0] /= std::sqrt(imsize);
+            output[i][1] /= std::sqrt(imsize);
+        }
+    };
+
+    return std::make_tuple(forward, backward);
+}
+
+std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> mmobservations::build_lensing_kernels()
+{
+    const int n = (int)std::sqrt(imsize);
+    double kx, ky;
+
+    complexvector lensing_kernel;
+    complexvector adjoint_kernel;
+    lensing_kernel.reserve(imsize);
+    adjoint_kernel.reserve(imsize);
+
+    for (int i = 0; i < n; i++)
+    {
+        ky = (2 * i < n) ? (static_cast<double>(i)) : (static_cast<double>(i - n));
+
+        for (int j = 0; j < n; j++)
+        {
+            kx = (2 * j < n) ? (static_cast<double>(j)) : (static_cast<double>(j - n));
+
+            if ((kx != 0.0) || (ky != 0.0))
+            {
+                double real = (ky * ky - kx * kx) / (kx * kx + ky * ky);
+                double imag = (2.0 * kx * ky) / (kx * kx + ky * ky);
+                lensing_kernel.emplace_back(real, imag);
+                adjoint_kernel.emplace_back(real, -imag);
+            }
+            else
+            {
+                lensing_kernel.emplace_back(0, 0);
+                adjoint_kernel.emplace_back(0, 0);
+            }
+        }
+    }
+
+    auto forward = [=](fftw_complex *output, const fftw_complex *input)
+    {
+        for (int i = 0; i < (int)imsize; i++)
+        {
+            double lkr = lensing_kernel[i].real();
+            double lki = lensing_kernel[i].imag();
+            double inr = input[i][0];
+            double ini = input[i][1];
+
+            output[i][0] = lkr * inr - lki * ini;
+            output[i][1] = lkr * ini + lki * inr;
+        }
+    };
+
+    auto inverse = [=](fftw_complex *output, const fftw_complex *input)
+    {
+        for (int i = 0; i < (int)imsize; i++)
+        {
+            double lkr = lensing_kernel[i].real();
+            double lki = lensing_kernel[i].imag();
+            double norm = lkr * lkr + lki * lki;
+            double inr = input[i][0];
+            double ini = input[i][1];
+
+            output[i][0] = (i == 0) ? 0 : (inr * lkr + ini * lki) / norm;
+            output[i][1] = (i == 0) ? 0 : (ini * lkr - inr * lki) / norm;
+        }
+    };
+
+    auto adjoint = [=](fftw_complex *output, const fftw_complex *input)
+    {
+        for (int i = 0; i < (int)imsize; i++)
+        {
+            double lkr = adjoint_kernel[i].real();
+            double lki = adjoint_kernel[i].imag();
+            double inr = input[i][0];
+            double ini = input[i][1];
+
+            output[i][0] = lkr * inr - lki * ini;
+            output[i][1] = lkr * ini + lki * inr;
+        }
+    };
+
+    return std::make_tuple(forward, inverse, adjoint);
+}
+
+void mmobservations::kaiser_squires(fftw_complex *output, const fftw_complex *input)
+{
+    fftw_complex *temp = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    fftw_complex *temp2 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    fft(temp, input);
+    D(temp2, temp);
+    ifft(output, temp2);
+}
+
+void mmobservations::kaiser_squires_inv(fftw_complex *output, const fftw_complex *input)
+{
+    fftw_complex *temp = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    fftw_complex *temp2 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    fft(temp, input);
+    Dinv(temp2, temp);
+    ifft(output, temp2);
+}
+
+void mmobservations::kaiser_squires_adj(fftw_complex *output, const fftw_complex *input)
+{
+    fftw_complex *temp = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    fftw_complex *temp2 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    fft(temp, input);
+    Dadj(temp2, temp);
+    ifft(output, temp2);
 }

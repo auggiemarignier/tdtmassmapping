@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <gsl/gsl_rng.h>
 #include <getopt.h>
 
@@ -37,7 +38,7 @@ static void usage(const char *pname);
 int main(int argc, char *argv[])
 {
     // Defaults
-    char *input_obs = nullptr;
+    char *input_kappa = nullptr;
     char *initial_model = nullptr;
     char *prior_file = nullptr;
     char *output_prefix = nullptr;
@@ -69,7 +70,7 @@ int main(int argc, char *argv[])
         switch (c)
         {
         case 'i':
-            input_obs = optarg;
+            input_kappa = optarg;
             break;
         case 'I':
             initial_model = optarg;
@@ -146,7 +147,7 @@ int main(int argc, char *argv[])
     }
 
     // Check files
-    if (input_obs == NULL)
+    if (input_kappa == NULL)
     {
         fprintf(stderr, "Please provide an input file\n");
         return -1;
@@ -164,8 +165,30 @@ int main(int argc, char *argv[])
 
     // Setup
     Logger::open_log(logfile);
+    INFO("Reading in kappa map");
+    std::ifstream file(input_kappa);
+    complexvector kappa;
+    double element;
+    if (file.is_open())
+    {
+        while (file >> element)
+            kappa.emplace_back(element, 0);
 
-    mmobservations observations(input_obs);
+        if (1 << degreex * 1 << degreey != kappa.size())
+            throw ERROR("Incorrect image size");
+
+        file.close();
+    }
+    else
+    {
+        throw ERROR("File not opened %s", input_kappa);
+    }
+
+    mmobservations observations(1 << degreex, 1 << degreey);
+    complexvector gamma = observations.single_frequency_predictions(kappa);
+    observations.set_observed_data(gamma);
+    std::vector<double> sigma(1.);
+    observations.set_sigmas(sigma);
 
     GlobalProposal global(&observations,
                           initial_model,
@@ -371,27 +394,6 @@ int main(int argc, char *argv[])
         fprintf(fp, "\n");
     }
     fclose(fp);
-
-    filename = mkfilename(output_prefix, "residuals.txt");
-    if (!global.save_residuals(filename.c_str()))
-    {
-        ERROR("Failed to create residuals file");
-        return -1;
-    }
-
-    filename = mkfilename(output_prefix, "residuals_hist.txt");
-    if (!global.save_residual_histogram(filename.c_str()))
-    {
-        ERROR("Failed to save residual histogram");
-        return -1;
-    }
-
-    filename = mkfilename(output_prefix, "residuals_cov.txt");
-    if (!global.save_residual_covariance(filename.c_str()))
-    {
-        ERROR("Failed to save residual covariance");
-        return -1;
-    }
 
     INFO("DONE");
     return 0;

@@ -57,6 +57,7 @@ void *Logger::write_log_imp(logger_level_t level, const char *sourcefile, const 
 
     vfprintf(log_file, fmt, args);
     fprintf(log_file, "\n");
+    return nullptr;
 }
 
 void Logger::close_log_imp()

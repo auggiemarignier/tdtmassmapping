@@ -20,7 +20,7 @@ jobs:
 
       - name: Setup environment
         run: |
-          brew install gsl
+          brew install gsl fftw
           cmake -E make_directory ${{runner.workspace}}/build
 
       - name: Configure CMake
@@ -33,6 +33,21 @@ jobs:
       - name: Build
         working-directory: ${{runner.workspace}}/build
         run: cmake --build . --config $BUILD_TYPE
+
+      - name: Build dummy prior file for tests
+        run: |
+          echo laplace >> ${{runner.workspace}}/build/tests/tutorial_prior.txt
+          echo 0.2 >> ${{runner.workspace}}/build/tests/tutorial_prior.txt
+          echo priorbirth >> ${{runner.workspace}}/build/tests/tutorial_prior.txt
+          echo depthgaussianperturb >> ${{runner.workspace}}/build/tests/tutorial_prior.txt
+          echo 7 >> ${{runner.workspace}}/build/tests/tutorial_prior.txt
+          echo 0.020 >> ${{runner.workspace}}/build/tests/tutorial_prior.txt
+          echo 0.020 >> ${{runner.workspace}}/build/tests/tutorial_prior.txt
+          echo 0.025 >> ${{runner.workspace}}/build/tests/tutorial_prior.txt
+          echo 0.035 >> ${{runner.workspace}}/build/tests/tutorial_prior.txt
+          echo 0.050 >> ${{runner.workspace}}/build/tests/tutorial_prior.txt
+          echo 0.050 >> ${{runner.workspace}}/build/tests/tutorial_prior.txt
+          echo 0.050 >> ${{runner.workspace}}/build/tests/tutorial_prior.txt
 
       - name: Test
         working-directory: ${{runner.workspace}}/build

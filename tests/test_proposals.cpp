@@ -7,14 +7,20 @@
 class BirthTest : public ::testing::Test
 {
 protected:
-    mmobservations *observations;
+    Identity *observations;
     GlobalProposal *global;
     BirthProposal *birth;
     void SetUp() override
     {
-        std::vector<double> obs = {0, 1, 2, 3};
-        double sigma = 1.41;
-        observations = new mmobservations(obs, sigma);
+        complexvector obs = {std::complex<double>(1., 0.),
+                             std::complex<double>(2., 0.),
+                             std::complex<double>(3., 0.),
+                             std::complex<double>(4., 0.),
+                             std::complex<double>(5., 0.)};
+        std::vector<double> sigma = {1.41};
+        observations = new Identity();
+        observations->set_observed_data(obs);
+        observations->set_sigmas(sigma);
 
         global = new GlobalProposal(observations,
                                     NULL,
@@ -35,21 +41,26 @@ TEST_F(BirthTest, BirthStep)
     int step_taken = birth->step();
     ASSERT_EQ(birth->propose, 1);
     ASSERT_TRUE(step_taken == 0 || step_taken == 1);
-    ASSERT_EQ(global->mean_residual_n, 1);
 }
 
 class DeathTest : public ::testing::Test
 {
 protected:
-    mmobservations *observations;
+    Identity *observations;
     GlobalProposal *global;
     DeathProposal *death;
     BirthProposal *birth;
     void SetUp() override
     {
-        std::vector<double> obs = {0, 1, 2, 3};
-        double sigma = 1.41;
-        observations = new mmobservations(obs, sigma);
+        complexvector obs = {std::complex<double>(1., 0.),
+                             std::complex<double>(2., 0.),
+                             std::complex<double>(3., 0.),
+                             std::complex<double>(4., 0.),
+                             std::complex<double>(5., 0.)};
+        std::vector<double> sigma = {1.41};
+        observations = new Identity();
+        observations->set_observed_data(obs);
+        observations->set_sigmas(sigma);
 
         global = new GlobalProposal(observations,
                                     NULL,
@@ -74,20 +85,25 @@ TEST_F(DeathTest, DeathStep)
     int step_taken = death->step();
     ASSERT_EQ(death->propose, 1);
     ASSERT_TRUE(step_taken == 0 || step_taken == 1);
-    ASSERT_EQ(global->mean_residual_n, 2);
 }
 
 class ValueTest : public ::testing::Test
 {
 protected:
-    mmobservations *observations;
+    Identity *observations;
     GlobalProposal *global;
     ValueProposal *value;
     void SetUp() override
     {
-        std::vector<double> obs = {0, 1, 2, 3};
-        double sigma = 1.41;
-        observations = new mmobservations(obs, sigma);
+        complexvector obs = {std::complex<double>(1., 0.),
+                             std::complex<double>(2., 0.),
+                             std::complex<double>(3., 0.),
+                             std::complex<double>(4., 0.),
+                             std::complex<double>(5., 0.)};
+        std::vector<double> sigma = {1.41};
+        observations = new Identity();
+        observations->set_observed_data(obs);
+        observations->set_sigmas(sigma);
 
         global = new GlobalProposal(observations,
                                     NULL,
@@ -108,5 +124,4 @@ TEST_F(ValueTest, ValueStep)
     int step_taken = value->step();
     ASSERT_EQ(value->propose, 1);
     ASSERT_TRUE(step_taken == 0 || step_taken == 1);
-    ASSERT_EQ(global->mean_residual_n, 1);
 }

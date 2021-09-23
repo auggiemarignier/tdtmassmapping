@@ -175,7 +175,11 @@ int Proposal::step()
                 return 0;
             }
         }
+        else
+            return 0;
     }
+    else
+        return 0;
 }
 
 int Proposal::compute_likelihood(int prop_idx,
