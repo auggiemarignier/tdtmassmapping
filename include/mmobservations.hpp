@@ -32,10 +32,10 @@ public:
 #endif
     virtual ~Observations(){};
 
-    virtual double single_frequency_likelihood(complexvector model,
+    virtual double single_frequency_likelihood(complexvector &model,
                                                double &log_normalization) = 0;
 
-    virtual complexvector single_frequency_predictions(complexvector model) = 0;
+    virtual complexvector single_frequency_predictions(complexvector &model) = 0;
 
     complexvector obs;
     std::vector<double> sigma;
@@ -63,10 +63,10 @@ public:
 #endif
 
     double single_frequency_likelihood(
-        complexvector model,
+        complexvector &model,
         double &log_normalization) override;
 
-    complexvector single_frequency_predictions(complexvector model) override;
+    complexvector single_frequency_predictions(complexvector &model) override;
 
     void kaiser_squires(fftw_complex *output, const fftw_complex *input);
     void kaiser_squires_inv(fftw_complex *output, const fftw_complex *input);
