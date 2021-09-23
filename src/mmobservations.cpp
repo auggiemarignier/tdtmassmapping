@@ -65,6 +65,23 @@ Observations::Observations(const char *filename)
 }
 #endif
 
+double Observations::single_frequency_likelihood(
+    complexvector &model,
+    double &log_normalization)
+{
+    complexvector predictions = single_frequency_predictions(model);
+    double loglikelihood = 0.0;
+    for (size_t i = 0; i < n_obs; i++)
+    {
+        std::complex<double> res = obs[i] - predictions[i];
+        std::complex<double> res_normed = res / sigma[i];
+        loglikelihood += std::norm(res_normed) * 0.5;
+        log_normalization += log(sigma[i]);
+    }
+
+    return loglikelihood;
+}
+
 complexvector Identity::single_frequency_predictions(complexvector &model)
 {
     complexvector predictions = model;
@@ -75,7 +92,8 @@ mmobservations::mmobservations(const uint _imsizex, const uint _imsizey)
     : Observations(),
       imsizex(_imsizex),
       imsizey(_imsizey),
-      imsize(_imsizey * _imsizex)
+      imsize(_imsizey * _imsizex),
+      n_obs(_imsizey * _imsizex)
 {
     auto fft_tuple = init_fft_2d();
     fft = std::get<0>(fft_tuple);
@@ -102,23 +120,6 @@ complexvector mmobservations::single_frequency_predictions(complexvector &model)
     for (uint i = 0; i < imsize; i++)
         predictions.emplace_back(gamma[i][0], gamma[i][1]);
     return predictions;
-}
-
-double mmobservations::single_frequency_likelihood(
-    complexvector &model,
-    double &log_normalization)
-{
-    complexvector predictions = single_frequency_predictions(model);
-    double loglikelihood = 0.0;
-    for (size_t i = 0; i < imsize; i++)
-    {
-        std::complex<double> res = obs[i] - predictions[i];
-        std::complex<double> res_normed = res / sigma[i];
-        loglikelihood += std::norm(res_normed) * 0.5;
-        log_normalization += log(sigma[i]);
-    }
-
-    return loglikelihood;
 }
 
 std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> mmobservations::init_fft_2d()

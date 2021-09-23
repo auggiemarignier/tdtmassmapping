@@ -33,7 +33,7 @@ public:
     virtual ~Observations(){};
 
     virtual double single_frequency_likelihood(complexvector &model,
-                                               double &log_normalization) = 0;
+                                               double &log_normalization);
 
     virtual complexvector single_frequency_predictions(complexvector &model) = 0;
 
@@ -45,8 +45,6 @@ public:
 class Identity : public Observations
 {
 public:
-    double single_frequency_likelihood(complexvector &model,
-                                       double &log_normalization) override;
     complexvector single_frequency_predictions(complexvector &model) override;
 };
 
@@ -69,10 +67,6 @@ public:
     mmobservations(const char *filename)
         : Observations(filename){};
 #endif
-
-    double single_frequency_likelihood(
-        complexvector &model,
-        double &log_normalization) override;
 
     complexvector single_frequency_predictions(complexvector &model) override;
 
@@ -101,4 +95,5 @@ private:
 
     complexvector obs;
     std::vector<double> sigma;
+    size_t n_obs;
 };
