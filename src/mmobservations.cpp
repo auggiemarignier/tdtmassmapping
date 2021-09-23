@@ -82,6 +82,28 @@ double Observations::single_frequency_likelihood(
     return loglikelihood;
 }
 
+void Observations::set_observed_data(complexvector &_obs)
+{
+    if (_obs.size() == n_obs)
+        obs = _obs;
+    else
+        ERROR("Input data has size %i.  Expected size %i.", _obs.size(), n_obs);
+}
+
+void Observations::set_sigmas(std::vector<double> &_sigmas)
+{
+    if (_sigmas.size() == n_obs)
+        sigma = _sigmas;
+    else if (_sigmas.size() == 1)
+    {
+        sigma.reserve(n_obs);
+        for (uint i = 0; i < n_obs; i++)
+            sigma.emplace_back(_sigmas[0]);
+    }
+    else
+        ERROR("Input data has size %i.  Expected size %i.", _sigmas.size(), n_obs);
+}
+
 complexvector Identity::single_frequency_predictions(complexvector &model)
 {
     complexvector predictions = model;
@@ -260,26 +282,4 @@ void mmobservations::kaiser_squires_adj(fftw_complex *output, const fftw_complex
     fft(temp, input);
     Dadj(temp2, temp);
     ifft(output, temp2);
-}
-
-void mmobservations::set_observed_data(complexvector &_obs)
-{
-    if (_obs.size() == imsize)
-        obs = _obs;
-    else
-        ERROR("Input data has size %i.  Expected size %i.", _obs.size(), imsize);
-}
-
-void mmobservations::set_sigmas(std::vector<double> &_sigmas)
-{
-    if (_sigmas.size() == imsize)
-        sigma = _sigmas;
-    else if (_sigmas.size() == 1)
-    {
-        sigma.reserve(imsize);
-        for (uint i = 0; i < imsize; i++)
-            sigma.emplace_back(_sigmas[0]);
-    }
-    else
-        ERROR("Input data has size %i.  Expected size %i.", _sigmas.size(), imsize);
 }

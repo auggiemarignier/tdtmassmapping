@@ -37,8 +37,8 @@ public:
 
     virtual complexvector single_frequency_predictions(complexvector &model) = 0;
 
-    virtual void set_observed_data(complexvector &_obs) = 0;
-    virtual void set_sigmas(std::vector<double> &_simgas) = 0;
+    virtual void set_observed_data(complexvector &_obs);
+    virtual void set_sigmas(std::vector<double> &_simgas);
 
     complexvector obs;
     std::vector<double> sigma;
@@ -49,8 +49,6 @@ class Identity : public Observations
 {
 public:
     complexvector single_frequency_predictions(complexvector &model) override;
-    void set_observed_data(complexvector &_obs) override;
-    void set_sigmas(std::vector<double> &_simgas) override;
 };
 
 class mmobservations : public Observations
@@ -78,9 +76,6 @@ public:
     void kaiser_squires(fftw_complex *output, const fftw_complex *input);
     void kaiser_squires_inv(fftw_complex *output, const fftw_complex *input);
     void kaiser_squires_adj(fftw_complex *output, const fftw_complex *input);
-
-    void set_observed_data(complexvector &_obs) override;
-    void set_sigmas(std::vector<double> &_simgas) override;
 
 private:
     std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> init_fft_2d();
