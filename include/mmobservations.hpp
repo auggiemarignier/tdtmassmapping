@@ -42,6 +42,14 @@ public:
     size_t n_obs;
 };
 
+class Identity : public Observations
+{
+public:
+    double single_frequency_likelihood(complexvector &model,
+                                       double &log_normalization) override;
+    complexvector single_frequency_predictions(complexvector &model) override;
+};
+
 class mmobservations : public Observations
 {
 public:
@@ -81,7 +89,7 @@ private:
     std::function<void(fftw_complex *, const fftw_complex *)> fft;
     std::function<void(fftw_complex *, const fftw_complex *)> ifft;
 
-    std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>,std::function<void(fftw_complex *, const fftw_complex *)>> build_lensing_kernels();
+    std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> build_lensing_kernels();
 
     std::function<void(fftw_complex *, const fftw_complex *)> D;
     std::function<void(fftw_complex *, const fftw_complex *)> Dadj;

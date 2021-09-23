@@ -65,6 +65,12 @@ Observations::Observations(const char *filename)
 }
 #endif
 
+complexvector Identity::single_frequency_predictions(complexvector &model)
+{
+    complexvector predictions = model;
+    return predictions;
+}
+
 mmobservations::mmobservations(const uint _imsizex, const uint _imsizey)
     : Observations(),
       imsizex(_imsizex),
