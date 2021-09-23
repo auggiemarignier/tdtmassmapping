@@ -40,5 +40,5 @@ TEST_F(GlobalPropTest, GlobalLikelihood)
 {
     // wavetree model at initialisation is 0 everywhere
     double likelihood = global->likelihood(global->current_log_normalization);
-    ASSERT_FLOAT_EQ(likelihood, 0);
+    ASSERT_FLOAT_EQ(likelihood, 13.8323);
 }
