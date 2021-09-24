@@ -31,7 +31,7 @@ set(SOURCES src/mmobservations.cpp
             src/utils.cpp)
 
 add_library(${PROJECT_LIB} STATIC ${SOURCES})
-set_target_properties(${PROJECT_LIB} PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
+set_target_properties(${PROJECT_LIB} PROPERTIES OUTPUT_NAME ${PROJECT_NAME} ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 add_dependencies(${PROJECT_LIB} ${TDTBASE})
 
 find_package(GSL REQUIRED)
@@ -57,6 +57,7 @@ if(tests)
     add_subdirectory(tests)
 endif()
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 add_executable(${PROJECT_NAME} src/massmapping.cpp)
 target_link_libraries(${PROJECT_NAME} ${PROJECT_LIB})
 

@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
 
 set(LIBS gtest_main ${PROJECT_LIB})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin)
 
 add_executable(test_proposals test_proposals.cpp)
 add_executable(test_mmobservations test_mmobservations.cpp)
