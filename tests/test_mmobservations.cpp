@@ -71,6 +71,10 @@ TEST_F(MMObsTest, KaiserSquiresInv)
         ASSERT_NEAR(input[i][0] - recovered[i][0] - const_real, 0., 1e-12) << i;
         ASSERT_NEAR(input[i][1] - recovered[i][1] - const_imag, 0., 1e-12) << i;
     }
+
+    fftw_free(input);
+    fftw_free(output);
+    fftw_free(recovered);
 }
 
 TEST_F(MMObsTest, KaiserSquiresAdj)
@@ -117,6 +121,11 @@ TEST_F(MMObsTest, KaiserSquiresAdj)
 
     ASSERT_FLOAT_EQ(g1dotg2.real(), k1dotk2.real());
     ASSERT_FLOAT_EQ(g1dotg2.imag(), k1dotk2.imag());
+
+    fftw_free(kappa1);
+    fftw_free(kappa2);
+    fftw_free(gamma1);
+    fftw_free(gamma2);
 }
 
 int main(int argc, char **argv)

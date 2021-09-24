@@ -139,6 +139,8 @@ complexvector mmobservations::single_frequency_predictions(complexvector &model)
     for (uint i = 0; i < imsize; i++)
         predictions.emplace_back(gamma[i][0], gamma[i][1]);
     return predictions;
+    fftw_free(kappa);
+    fftw_free(gamma);
 }
 
 std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> mmobservations::init_fft_2d()
@@ -172,6 +174,8 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
         }
     };
 
+    fftw_free(in);
+    fftw_free(out);
     return std::make_tuple(forward, backward);
 }
 
@@ -261,6 +265,8 @@ void mmobservations::kaiser_squires(fftw_complex *output, const fftw_complex *in
     fft(temp, input);
     D(temp2, temp);
     ifft(output, temp2);
+    fftw_free(temp);
+    fftw_free(temp2);
 }
 
 void mmobservations::kaiser_squires_inv(fftw_complex *output, const fftw_complex *input)
@@ -270,6 +276,8 @@ void mmobservations::kaiser_squires_inv(fftw_complex *output, const fftw_complex
     fft(temp, input);
     Dinv(temp2, temp);
     ifft(output, temp2);
+    fftw_free(temp);
+    fftw_free(temp2);
 }
 
 void mmobservations::kaiser_squires_adj(fftw_complex *output, const fftw_complex *input)
@@ -279,4 +287,6 @@ void mmobservations::kaiser_squires_adj(fftw_complex *output, const fftw_complex
     fft(temp, input);
     Dadj(temp2, temp);
     ifft(output, temp2);
+    fftw_free(temp);
+    fftw_free(temp2);
 }
