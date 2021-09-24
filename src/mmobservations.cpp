@@ -143,39 +143,52 @@ complexvector mmobservations::single_frequency_predictions(complexvector &model)
     fftw_free(gamma);
 }
 
-std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> mmobservations::init_fft_2d()
+std::tuple<std::function<void(complexvector &, const complexvector &)>, std::function<void(complexvector &, const complexvector &)>> mmobservations::init_fft_2d()
 {
-    fftw_complex *in, *out;
-    in = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
-    out = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    complexvector in(imsize);
+    complexvector out(imsize);
 
     auto del = [](fftw_plan_s *plan)
     { fftw_destroy_plan(plan); };
-    std::shared_ptr<fftw_plan_s> plan_forward(fftw_plan_dft_2d(imsizey, imsizex, in, out, FFTW_FORWARD, FFTW_MEASURE), del);
-    std::shared_ptr<fftw_plan_s> plan_inverse(fftw_plan_dft_2d(imsizey, imsizex, in, out, FFTW_BACKWARD, FFTW_MEASURE), del);
+    std::shared_ptr<fftw_plan_s> plan_forward(
+        fftw_plan_dft_2d(
+            imsizey,
+            imsizex,
+            reinterpret_cast<fftw_complex *>(&in[0]),
+            reinterpret_cast<fftw_complex *>(&out[0]),
+            FFTW_FORWARD,
+            FFTW_MEASURE),
+        del);
+    std::shared_ptr<fftw_plan_s> plan_inverse(
+        fftw_plan_dft_2d(
+            imsizey,
+            imsizex,
+            reinterpret_cast<fftw_complex *>(&in[0]),
+            reinterpret_cast<fftw_complex *>(&out[0]),
+            FFTW_BACKWARD,
+            FFTW_MEASURE),
+        del);
 
-    auto forward = [=](fftw_complex *output, const fftw_complex *input)
+    auto forward = [=](complexvector &output, const complexvector &input)
     {
-        fftw_execute_dft(plan_forward.get(), const_cast<fftw_complex *>(input), output);
+        fftw_execute_dft(
+            plan_forward.get(),
+            const_cast<fftw_complex *>(reinterpret_cast<const fftw_complex *>(&input[0])),
+            reinterpret_cast<fftw_complex *>(&output[0]));
         for (int i = 0; i < (int)(imsize); i++)
-        {
-            output[i][0] /= std::sqrt(imsize);
-            output[i][1] /= std::sqrt(imsize);
-        }
+            output[i] /= std::sqrt(imsize);
     };
 
-    auto backward = [=](fftw_complex *output, const fftw_complex *input)
+    auto backward = [=](complexvector &output, const complexvector &input)
     {
-        fftw_execute_dft(plan_inverse.get(), const_cast<fftw_complex *>(input), output);
+        fftw_execute_dft(
+            plan_inverse.get(),
+            const_cast<fftw_complex *>(reinterpret_cast<const fftw_complex *>(&input[0])),
+            reinterpret_cast<fftw_complex *>(&output[0]));
         for (int i = 0; i < (int)(imsize); i++)
-        {
-            output[i][0] /= std::sqrt(imsize);
-            output[i][1] /= std::sqrt(imsize);
-        }
+            output[i] /= std::sqrt(imsize);
     };
 
-    fftw_free(in);
-    fftw_free(out);
     return std::make_tuple(forward, backward);
 }
 
