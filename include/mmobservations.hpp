@@ -92,8 +92,4 @@ private:
     const uint imsizex;
     const uint imsizey;
     const uint imsize;
-
-    complexvector obs;
-    std::vector<double> sigma;
-    size_t n_obs;
 };
