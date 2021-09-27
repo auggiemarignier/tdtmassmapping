@@ -64,9 +64,6 @@ target_link_libraries(${PROJECT_NAME} ${PROJECT_LIB})
 add_executable(${PROJECT_NAME}_pp src/postprocess.cpp)
 target_link_libraries(${PROJECT_NAME}_pp ${PROJECT_LIB})
 
-add_executable(leak src/leak.cpp)
-target_link_libraries(leak ${PROJECT_LIB})
-
 if(install)
     install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_pp RUNTIME)
     install(TARGETS ${PROJECT_LIB} LIBRARY)
