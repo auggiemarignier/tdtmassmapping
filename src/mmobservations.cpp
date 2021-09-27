@@ -200,13 +200,13 @@ std::tuple<std::function<void(complexvector &, const complexvector &)>, std::fun
             {
                 double real = (ky * ky - kx * kx) / (kx * kx + ky * ky);
                 double imag = (2.0 * kx * ky) / (kx * kx + ky * ky);
-                lensing_kernel.emplace_back(real, imag);
-                adjoint_kernel.emplace_back(real, -imag);
+                lensing_kernel[i * n + j] = std::complex<double>(real, imag);
+                adjoint_kernel[i * n + j] = std::complex<double>(real, -imag);
             }
             else
             {
-                lensing_kernel.emplace_back(0, 0);
-                adjoint_kernel.emplace_back(0, 0);
+                lensing_kernel[i * n + j] = std::complex<double>(0, 0);
+                adjoint_kernel[i * n + j] = std::complex<double>(0, 0);
             }
         }
     }
@@ -214,19 +214,20 @@ std::tuple<std::function<void(complexvector &, const complexvector &)>, std::fun
     auto forward = [=](complexvector &output, const complexvector &input)
     {
         for (int i = 0; i < (int)imsize; i++)
-            output.emplace_back(lensing_kernel[i] * input[i]);
+            output[i] = lensing_kernel[i] * input[i];
     };
 
     auto inverse = [=](complexvector &output, const complexvector &input)
     {
-        for (int i = 0; i < (int)imsize; i++)
-            output.emplace_back(input[i] / lensing_kernel[i]);
+        output[0] = std::complex<double>(0., 0.);
+        for (int i = 1; i < (int)imsize; i++)
+            output[i] = input[i] / lensing_kernel[i];
     };
 
     auto adjoint = [=](complexvector &output, const complexvector &input)
     {
         for (int i = 0; i < (int)imsize; i++)
-            output.emplace_back(adjoint_kernel[i] * input[i]);
+            output[i] = adjoint_kernel[i] * input[i];
     };
 
     return std::make_tuple(forward, inverse, adjoint);
