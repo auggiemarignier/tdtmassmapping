@@ -192,15 +192,13 @@ std::tuple<std::function<void(complexvector &, const complexvector &)>, std::fun
     return std::make_tuple(forward, backward);
 }
 
-std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> mmobservations::build_lensing_kernels()
+std::tuple<std::function<void(complexvector &, const complexvector &)>, std::function<void(complexvector &, const complexvector &)>, std::function<void(complexvector &, const complexvector &)>> mmobservations::build_lensing_kernels()
 {
     const int n = (int)std::sqrt(imsize);
     double kx, ky;
 
-    complexvector lensing_kernel;
-    complexvector adjoint_kernel;
-    lensing_kernel.reserve(imsize);
-    adjoint_kernel.reserve(imsize);
+    complexvector lensing_kernel(imsize);
+    complexvector adjoint_kernel(imsize);
 
     for (int i = 0; i < n; i++)
     {
@@ -225,47 +223,22 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
         }
     }
 
-    auto forward = [=](fftw_complex *output, const fftw_complex *input)
+    auto forward = [=](complexvector &output, const complexvector &input)
     {
         for (int i = 0; i < (int)imsize; i++)
-        {
-            double lkr = lensing_kernel[i].real();
-            double lki = lensing_kernel[i].imag();
-            double inr = input[i][0];
-            double ini = input[i][1];
-
-            output[i][0] = lkr * inr - lki * ini;
-            output[i][1] = lkr * ini + lki * inr;
-        }
+            output.emplace_back(lensing_kernel[i] * input[i]);
     };
 
-    auto inverse = [=](fftw_complex *output, const fftw_complex *input)
+    auto inverse = [=](complexvector &output, const complexvector &input)
     {
         for (int i = 0; i < (int)imsize; i++)
-        {
-            double lkr = lensing_kernel[i].real();
-            double lki = lensing_kernel[i].imag();
-            double norm = lkr * lkr + lki * lki;
-            double inr = input[i][0];
-            double ini = input[i][1];
-
-            output[i][0] = (i == 0) ? 0 : (inr * lkr + ini * lki) / norm;
-            output[i][1] = (i == 0) ? 0 : (ini * lkr - inr * lki) / norm;
-        }
+            output.emplace_back(input[i] / lensing_kernel[i]);
     };
 
-    auto adjoint = [=](fftw_complex *output, const fftw_complex *input)
+    auto adjoint = [=](complexvector &output, const complexvector &input)
     {
         for (int i = 0; i < (int)imsize; i++)
-        {
-            double lkr = adjoint_kernel[i].real();
-            double lki = adjoint_kernel[i].imag();
-            double inr = input[i][0];
-            double ini = input[i][1];
-
-            output[i][0] = lkr * inr - lki * ini;
-            output[i][1] = lkr * ini + lki * inr;
-        }
+            output.emplace_back(adjoint_kernel[i] * input[i]);
     };
 
     return std::make_tuple(forward, inverse, adjoint);
