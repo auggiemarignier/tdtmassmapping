@@ -244,35 +244,29 @@ std::tuple<std::function<void(complexvector &, const complexvector &)>, std::fun
     return std::make_tuple(forward, inverse, adjoint);
 }
 
-void mmobservations::kaiser_squires(fftw_complex *output, const fftw_complex *input)
+void mmobservations::kaiser_squires(complexvector &output, const complexvector &input)
 {
-    fftw_complex *temp = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
-    fftw_complex *temp2 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    complexvector temp(imsize);
+    complexvector temp2(imsize);
     fft(temp, input);
     D(temp2, temp);
     ifft(output, temp2);
-    fftw_free(temp);
-    fftw_free(temp2);
 }
 
-void mmobservations::kaiser_squires_inv(fftw_complex *output, const fftw_complex *input)
+void mmobservations::kaiser_squires_inv(complexvector &output, const complexvector &input)
 {
-    fftw_complex *temp = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
-    fftw_complex *temp2 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    complexvector temp(imsize);
+    complexvector temp2(imsize);
     fft(temp, input);
     Dinv(temp2, temp);
     ifft(output, temp2);
-    fftw_free(temp);
-    fftw_free(temp2);
 }
 
-void mmobservations::kaiser_squires_adj(fftw_complex *output, const fftw_complex *input)
+void mmobservations::kaiser_squires_adj(complexvector &output, const complexvector &input)
 {
-    fftw_complex *temp = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
-    fftw_complex *temp2 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    complexvector temp(imsize);
+    complexvector temp2(imsize);
     fft(temp, input);
     Dadj(temp2, temp);
     ifft(output, temp2);
-    fftw_free(temp);
-    fftw_free(temp2);
 }
