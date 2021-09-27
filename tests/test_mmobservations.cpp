@@ -30,13 +30,13 @@ protected:
 
 TEST_F(MMObsTest, MMLikelihood)
 {
-    complexvector f;
-    f.reserve(imsize);
+    complexvector f(imsize);;
     for (uint j = 0; j < imsize; j++)
-    {
-        f.emplace_back(random->normal(1.), 0);
-    }
+        f[j] = std::complex<double>(random->normal(1.), 0);
+
     complexvector predictions = observations->single_frequency_predictions(f);
+    for (int i = 1; i < imsize; i++)
+        ASSERT_NE(std::complex<double>(0,0), predictions[i]);
     observations->set_observed_data(predictions);
 
     std::vector<double> sig = {1.};
@@ -53,7 +53,7 @@ TEST_F(MMObsTest, KaiserSquiresInv)
     complexvector output(imsize);
     complexvector recovered(imsize);
     for (uint j = 0; j < imsize; j++)
-        input.emplace_back(random->normal(1.), random->normal(1.));
+        input[j] = std::complex<double>(random->normal(1.), random->normal(1.));
 
     observations->kaiser_squires(output, input);
     observations->kaiser_squires_inv(recovered, output);
