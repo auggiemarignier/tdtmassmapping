@@ -49,67 +49,40 @@ TEST_F(MMObsTest, MMLikelihood)
 
 TEST_F(MMObsTest, KaiserSquiresInv)
 {
-    fftw_complex *input = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    complexvector input(imsize);
+    complexvector output(imsize);
+    complexvector recovered(imsize);
     for (uint j = 0; j < imsize; j++)
-    {
-        input[j][0] = random->normal(1.);
-        input[j][1] = random->normal(1.);
-    }
-
-    fftw_complex *output = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
-    fftw_complex *recovered = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+        input.emplace_back(random->normal(1.), random->normal(1.));
 
     observations->kaiser_squires(output, input);
     observations->kaiser_squires_inv(recovered, output);
 
     // Mass sheet degeneracy says we can only recover kappa up to a constant
     // Check input - recovered == constant
-    double const_real = input[0][0] - recovered[0][0];
-    double const_imag = input[0][1] - recovered[0][1];
+    std::complex<double> const_diff = input[0] - recovered[0];
     for (uint i = 1; i < imsize; i++)
     {
-        ASSERT_NEAR(input[i][0] - recovered[i][0] - const_real, 0., 1e-12) << i;
-        ASSERT_NEAR(input[i][1] - recovered[i][1] - const_imag, 0., 1e-12) << i;
+        std::complex<double> diff = input[i] - recovered[i];
+        ASSERT_NEAR(diff.real() - const_diff.real(), 0., 1e-12) << i;
+        ASSERT_NEAR(diff.imag() - const_diff.imag(), 0., 1e-12) << i;
     }
-
-    fftw_free(input);
-    fftw_free(output);
-    fftw_free(recovered);
 }
 
 TEST_F(MMObsTest, KaiserSquiresAdj)
 {
-    std::array<std::complex<double>, imsize> k1;
-    std::array<std::complex<double>, imsize> g2;
+    complexvector k1(imsize);
+    complexvector k2(imsize);
+    complexvector g1(imsize);
+    complexvector g2(imsize);
     for (uint j = 0; j < imsize; j++)
     {
         k1[j] = std::complex<double>(random->normal(1.), random->normal(1.));
         g2[j] = std::complex<double>(random->normal(1.), random->normal(1.));
     }
 
-    fftw_complex *kappa1 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
-    fftw_complex *gamma2 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
-    for (uint j = 0; j < imsize; j++)
-    {
-        kappa1[j][0] = k1[j].real();
-        kappa1[j][1] = k1[j].imag();
-        gamma2[j][0] = g2[j].real();
-        gamma2[j][1] = g2[j].imag();
-    }
-
-    fftw_complex *kappa2 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
-    fftw_complex *gamma1 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
-
-    observations->kaiser_squires(gamma1, kappa1);
-    observations->kaiser_squires_adj(kappa2, gamma2);
-
-    std::array<std::complex<double>, imsize> k2;
-    std::array<std::complex<double>, imsize> g1;
-    for (uint j = 0; j < imsize; j++)
-    {
-        k2[j] = std::complex<double>(kappa2[j][0], kappa2[j][1]);
-        g1[j] = std::complex<double>(gamma1[j][0], gamma1[j][1]);
-    }
+    observations->kaiser_squires(g1, k1);
+    observations->kaiser_squires_adj(k2, g2);
 
     std::complex<double> g1dotg2 = 0;
     std::complex<double> k1dotk2 = 0;
@@ -121,11 +94,6 @@ TEST_F(MMObsTest, KaiserSquiresAdj)
 
     ASSERT_FLOAT_EQ(g1dotg2.real(), k1dotk2.real());
     ASSERT_FLOAT_EQ(g1dotg2.imag(), k1dotk2.imag());
-
-    fftw_free(kappa1);
-    fftw_free(kappa2);
-    fftw_free(gamma1);
-    fftw_free(gamma2);
 }
 
 int main(int argc, char **argv)

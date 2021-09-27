@@ -124,70 +124,69 @@ mmobservations::mmobservations(const uint _imsizex, const uint _imsizey)
     Dadj = std::get<2>(operator_tuple);
 };
 
-complexvector mmobservations::single_frequency_predictions(complexvector &model)
+complexvector mmobservations::single_frequency_predictions(complexvector &kappa)
 {
-    fftw_complex *kappa = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
-    fftw_complex *gamma = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
-    for (uint i = 0; i < imsize; i++)
-    {
-        kappa[i][0] = model[i].real();
-        kappa[i][1] = model[i].imag();
-    }
+    complexvector gamma(imsize);
     kaiser_squires(gamma, kappa);
-    complexvector predictions;
-    predictions.reserve(imsize);
-    for (uint i = 0; i < imsize; i++)
-        predictions.emplace_back(gamma[i][0], gamma[i][1]);
-    return predictions;
-    fftw_free(kappa);
-    fftw_free(gamma);
+    return gamma;
 }
 
-std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> mmobservations::init_fft_2d()
+std::tuple<std::function<void(complexvector &, const complexvector &)>, std::function<void(complexvector &, const complexvector &)>> mmobservations::init_fft_2d()
 {
-    fftw_complex *in, *out;
-    in = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
-    out = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    complexvector in(imsize);
+    complexvector out(imsize);
 
     auto del = [](fftw_plan_s *plan)
     { fftw_destroy_plan(plan); };
-    std::shared_ptr<fftw_plan_s> plan_forward(fftw_plan_dft_2d(imsizey, imsizex, in, out, FFTW_FORWARD, FFTW_MEASURE), del);
-    std::shared_ptr<fftw_plan_s> plan_inverse(fftw_plan_dft_2d(imsizey, imsizex, in, out, FFTW_BACKWARD, FFTW_MEASURE), del);
+    std::shared_ptr<fftw_plan_s> plan_forward(
+        fftw_plan_dft_2d(
+            imsizey,
+            imsizex,
+            reinterpret_cast<fftw_complex *>(&in[0]),
+            reinterpret_cast<fftw_complex *>(&out[0]),
+            FFTW_FORWARD,
+            FFTW_MEASURE),
+        del);
+    std::shared_ptr<fftw_plan_s> plan_inverse(
+        fftw_plan_dft_2d(
+            imsizey,
+            imsizex,
+            reinterpret_cast<fftw_complex *>(&in[0]),
+            reinterpret_cast<fftw_complex *>(&out[0]),
+            FFTW_BACKWARD,
+            FFTW_MEASURE),
+        del);
 
-    auto forward = [=](fftw_complex *output, const fftw_complex *input)
+    auto forward = [=](complexvector &output, const complexvector &input)
     {
-        fftw_execute_dft(plan_forward.get(), const_cast<fftw_complex *>(input), output);
+        fftw_execute_dft(
+            plan_forward.get(),
+            const_cast<fftw_complex *>(reinterpret_cast<const fftw_complex *>(&input[0])),
+            reinterpret_cast<fftw_complex *>(&output[0]));
         for (int i = 0; i < (int)(imsize); i++)
-        {
-            output[i][0] /= std::sqrt(imsize);
-            output[i][1] /= std::sqrt(imsize);
-        }
+            output[i] /= std::sqrt(imsize);
     };
 
-    auto backward = [=](fftw_complex *output, const fftw_complex *input)
+    auto backward = [=](complexvector &output, const complexvector &input)
     {
-        fftw_execute_dft(plan_inverse.get(), const_cast<fftw_complex *>(input), output);
+        fftw_execute_dft(
+            plan_inverse.get(),
+            const_cast<fftw_complex *>(reinterpret_cast<const fftw_complex *>(&input[0])),
+            reinterpret_cast<fftw_complex *>(&output[0]));
         for (int i = 0; i < (int)(imsize); i++)
-        {
-            output[i][0] /= std::sqrt(imsize);
-            output[i][1] /= std::sqrt(imsize);
-        }
+            output[i] /= std::sqrt(imsize);
     };
 
-    fftw_free(in);
-    fftw_free(out);
     return std::make_tuple(forward, backward);
 }
 
-std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> mmobservations::build_lensing_kernels()
+std::tuple<std::function<void(complexvector &, const complexvector &)>, std::function<void(complexvector &, const complexvector &)>, std::function<void(complexvector &, const complexvector &)>> mmobservations::build_lensing_kernels()
 {
     const int n = (int)std::sqrt(imsize);
     double kx, ky;
 
-    complexvector lensing_kernel;
-    complexvector adjoint_kernel;
-    lensing_kernel.reserve(imsize);
-    adjoint_kernel.reserve(imsize);
+    complexvector lensing_kernel(imsize);
+    complexvector adjoint_kernel(imsize);
 
     for (int i = 0; i < n; i++)
     {
@@ -212,81 +211,50 @@ std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::funct
         }
     }
 
-    auto forward = [=](fftw_complex *output, const fftw_complex *input)
+    auto forward = [=](complexvector &output, const complexvector &input)
     {
         for (int i = 0; i < (int)imsize; i++)
-        {
-            double lkr = lensing_kernel[i].real();
-            double lki = lensing_kernel[i].imag();
-            double inr = input[i][0];
-            double ini = input[i][1];
-
-            output[i][0] = lkr * inr - lki * ini;
-            output[i][1] = lkr * ini + lki * inr;
-        }
+            output.emplace_back(lensing_kernel[i] * input[i]);
     };
 
-    auto inverse = [=](fftw_complex *output, const fftw_complex *input)
+    auto inverse = [=](complexvector &output, const complexvector &input)
     {
         for (int i = 0; i < (int)imsize; i++)
-        {
-            double lkr = lensing_kernel[i].real();
-            double lki = lensing_kernel[i].imag();
-            double norm = lkr * lkr + lki * lki;
-            double inr = input[i][0];
-            double ini = input[i][1];
-
-            output[i][0] = (i == 0) ? 0 : (inr * lkr + ini * lki) / norm;
-            output[i][1] = (i == 0) ? 0 : (ini * lkr - inr * lki) / norm;
-        }
+            output.emplace_back(input[i] / lensing_kernel[i]);
     };
 
-    auto adjoint = [=](fftw_complex *output, const fftw_complex *input)
+    auto adjoint = [=](complexvector &output, const complexvector &input)
     {
         for (int i = 0; i < (int)imsize; i++)
-        {
-            double lkr = adjoint_kernel[i].real();
-            double lki = adjoint_kernel[i].imag();
-            double inr = input[i][0];
-            double ini = input[i][1];
-
-            output[i][0] = lkr * inr - lki * ini;
-            output[i][1] = lkr * ini + lki * inr;
-        }
+            output.emplace_back(adjoint_kernel[i] * input[i]);
     };
 
     return std::make_tuple(forward, inverse, adjoint);
 }
 
-void mmobservations::kaiser_squires(fftw_complex *output, const fftw_complex *input)
+void mmobservations::kaiser_squires(complexvector &output, const complexvector &input)
 {
-    fftw_complex *temp = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
-    fftw_complex *temp2 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    complexvector temp(imsize);
+    complexvector temp2(imsize);
     fft(temp, input);
     D(temp2, temp);
     ifft(output, temp2);
-    fftw_free(temp);
-    fftw_free(temp2);
 }
 
-void mmobservations::kaiser_squires_inv(fftw_complex *output, const fftw_complex *input)
+void mmobservations::kaiser_squires_inv(complexvector &output, const complexvector &input)
 {
-    fftw_complex *temp = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
-    fftw_complex *temp2 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    complexvector temp(imsize);
+    complexvector temp2(imsize);
     fft(temp, input);
     Dinv(temp2, temp);
     ifft(output, temp2);
-    fftw_free(temp);
-    fftw_free(temp2);
 }
 
-void mmobservations::kaiser_squires_adj(fftw_complex *output, const fftw_complex *input)
+void mmobservations::kaiser_squires_adj(complexvector &output, const complexvector &input)
 {
-    fftw_complex *temp = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
-    fftw_complex *temp2 = (fftw_complex *)fftw_malloc(sizeof(fftw_complex) * imsize);
+    complexvector temp(imsize);
+    complexvector temp2(imsize);
     fft(temp, input);
     Dadj(temp2, temp);
     ifft(output, temp2);
-    fftw_free(temp);
-    fftw_free(temp2);
 }

@@ -73,21 +73,21 @@ public:
 
     complexvector single_frequency_predictions(complexvector &model) override;
 
-    void kaiser_squires(fftw_complex *output, const fftw_complex *input);
-    void kaiser_squires_inv(fftw_complex *output, const fftw_complex *input);
-    void kaiser_squires_adj(fftw_complex *output, const fftw_complex *input);
+    void kaiser_squires(complexvector &output, const complexvector &input);
+    void kaiser_squires_inv(complexvector &output, const complexvector &input);
+    void kaiser_squires_adj(complexvector &output, const complexvector &input);
 
 private:
-    std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> init_fft_2d();
+    std::tuple<std::function<void(complexvector &, const complexvector &)>, std::function<void(complexvector &, const complexvector &)>> init_fft_2d();
 
-    std::function<void(fftw_complex *, const fftw_complex *)> fft;
-    std::function<void(fftw_complex *, const fftw_complex *)> ifft;
+    std::function<void(complexvector &, const complexvector &)> fft;
+    std::function<void(complexvector &, const complexvector &)> ifft;
 
-    std::tuple<std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>, std::function<void(fftw_complex *, const fftw_complex *)>> build_lensing_kernels();
+    std::tuple<std::function<void(complexvector &, const complexvector &)>, std::function<void(complexvector &, const complexvector &)>, std::function<void(complexvector &, const complexvector &)>> build_lensing_kernels();
 
-    std::function<void(fftw_complex *, const fftw_complex *)> D;
-    std::function<void(fftw_complex *, const fftw_complex *)> Dadj;
-    std::function<void(fftw_complex *, const fftw_complex *)> Dinv;
+    std::function<void(complexvector &, const complexvector &)> D;
+    std::function<void(complexvector &, const complexvector &)> Dadj;
+    std::function<void(complexvector &, const complexvector &)> Dinv;
 
     const uint imsizex;
     const uint imsizey;
