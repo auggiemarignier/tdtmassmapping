@@ -165,7 +165,7 @@ int main(int argc, char *argv[])
 
     // Setup
     Logger::open_log(logfile);
-    INFO("Reading in kappa map");
+    INFO("Reading in kappa map %s", input_kappa);
     std::ifstream file(input_kappa);
     complexvector kappa;
     double element;
