@@ -57,7 +57,11 @@ TEST_F(MMObsTest, KaiserSquiresInv)
 
     observations->kaiser_squires(output, input);
     observations->kaiser_squires_inv(recovered, output);
-
+    for (int i = 1; i < imsize; i++)
+    {
+        ASSERT_NE(std::complex<double>(0,0), output[i]);
+        ASSERT_NE(std::complex<double>(0,0), recovered[i]);
+    }
     // Mass sheet degeneracy says we can only recover kappa up to a constant
     // Check input - recovered == constant
     std::complex<double> const_diff = input[0] - recovered[0];
@@ -83,6 +87,11 @@ TEST_F(MMObsTest, KaiserSquiresAdj)
 
     observations->kaiser_squires(g1, k1);
     observations->kaiser_squires_adj(k2, g2);
+    for (int i = 1; i < imsize; i++)
+    {
+        ASSERT_NE(std::complex<double>(0,0), g1[i]);
+        ASSERT_NE(std::complex<double>(0,0), k2[i]);
+    }
 
     std::complex<double> g1dotg2 = 0;
     std::complex<double> k1dotk2 = 0;
@@ -91,7 +100,8 @@ TEST_F(MMObsTest, KaiserSquiresAdj)
         g1dotg2 += g1[j] * std::conj(g2[j]);
         k1dotk2 += k1[j] * std::conj(k2[j]);
     }
-
+    ASSERT_NE(std::complex<double>(0, 0), g1dotg2);
+    ASSERT_NE(std::complex<double>(0, 0), k1dotk2);
     ASSERT_FLOAT_EQ(g1dotg2.real(), k1dotk2.real());
     ASSERT_FLOAT_EQ(g1dotg2.imag(), k1dotk2.imag());
 }
