@@ -26,7 +26,6 @@ set(SOURCES src/mmobservations.cpp
             src/deathprop.cpp
             src/valueprop.cpp
             src/rng.cpp
-            src/hierarchicalmodel.cpp
             src/logging.cpp
             src/utils.cpp)
 

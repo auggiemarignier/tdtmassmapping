@@ -49,7 +49,6 @@ GlobalProposal::GlobalProposal(Observations *_observations,
       degreex(_degreex),
       degreey(_degreey),
       degreez(0),
-      lambda(1.0),
       observations(_observations),
       model(nullptr),
       workspace(nullptr),
@@ -58,7 +57,6 @@ GlobalProposal::GlobalProposal(Observations *_observations,
       size(-1),
       ncoeff(-1),
       zoffset(nullptr),
-      hierarchical(nullptr),
       current_likelihood(-1.0),
       coeff_hist(nullptr),
       random(seed),
@@ -77,9 +75,6 @@ GlobalProposal::GlobalProposal(Observations *_observations,
     {
         throw ERROR("Invalid horizontal wavelet %d\n", xywavelet);
     }
-
-    hierarchical = new independentgaussianhierarchicalmodel();
-    hierarchical->setparameter(0, lambda);
 
     wt = wavetree2d_sub_create(degreex, degreey, 0.0);
     if (wt == NULL)
@@ -210,10 +205,7 @@ GlobalProposal::GlobalProposal(Observations *_observations,
 
 GlobalProposal::~GlobalProposal()
 {
-    delete hierarchical;
-
     delete[] zoffset;
-
     delete[] model;
     delete[] workspace;
 

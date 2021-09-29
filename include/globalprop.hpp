@@ -22,8 +22,6 @@ extern "C"
 };
 
 #include "rng.hpp"
-#include "hierarchicalmodel.hpp"
-
 #include "mmobservations.hpp"
 
 class GlobalProposal
@@ -82,8 +80,6 @@ public:
     double *model;
     double *workspace;
 
-    double lambda;
-
     int width;
     int height;
     int depth;
@@ -91,8 +87,6 @@ public:
     int size;
     int ncoeff;
     double *zoffset;
-
-    hierarchicalmodel *hierarchical;
 
     double current_likelihood;
     double current_log_normalization;

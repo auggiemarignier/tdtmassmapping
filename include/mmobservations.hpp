@@ -9,8 +9,6 @@
 #include <functional>
 #include <memory>
 
-#include "hierarchicalmodel.hpp"
-
 typedef std::vector<std::complex<double>> complexvector;
 typedef unsigned int uint;
 

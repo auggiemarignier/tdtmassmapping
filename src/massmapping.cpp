@@ -216,7 +216,7 @@ int main(int argc, char *argv[])
                                  wavetree2d_sub_get_S_v(global.wt),
                                  global.current_likelihood,
                                  global.temperature,
-                                 global.hierarchical->getparameter(0)) < 0)
+                                 1.0) < 0)
     {
         ERROR("failed to initialise chain history\n");
         return -1;
@@ -285,7 +285,7 @@ int main(int argc, char *argv[])
         }
         step.header.likelihood = global.current_likelihood;
         step.header.temperature = global.temperature;
-        step.header.hierarchical = global.hierarchical->getparameter(0);
+        step.header.hierarchical = 1.0;
         if (chain_history_add_step(global.ch, &step) < 0)
         {
             ERROR("failed to add step to chain history\n");
