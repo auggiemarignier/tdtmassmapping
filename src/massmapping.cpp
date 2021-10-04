@@ -187,7 +187,7 @@ int main(int argc, char *argv[])
     mmobservations observations(1 << degreex, 1 << degreey);
     complexvector gamma = observations.single_frequency_predictions(kappa);
     observations.set_observed_data(gamma);
-    std::vector<double> sigma = {1.};
+    std::vector<double> sigma = {vector_stddev(gamma)};
     observations.set_sigmas(sigma);
 
     GlobalProposal global(&observations,
