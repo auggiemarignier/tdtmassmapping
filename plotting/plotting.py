@@ -12,7 +12,7 @@ truth = np.loadtxt(f"{directory}/truth.txt").reshape((256, 256))
 mean = np.loadtxt(f"{directory}/mean.txt")
 std = np.loadtxt(f"{directory}/stddev.txt")
 khist = np.loadtxt(f"{directory}/khistogram.txt")
-last = np.loadtxt(f"{directory}/final_model_pix.txt")
+best_fitting = np.loadtxt(f"{directory}/best_model.txt")
 last_nonzero_k = np.argwhere(khist[:, 1]).max()
 likelihoods = np.loadtxt(f"{directory}/likelihood.txt")
 khistory = np.loadtxt(f"{directory}/khistory.txt")
@@ -31,20 +31,20 @@ while os.path.isdir(f"{directory}/restart/"):
         )
         khist[:, 1] += np.loadtxt(f"{directory}/khistogram.txt", usecols=1)
         last_nonzero_k = np.argwhere(khist[:, 1]).max()
-        last = np.loadtxt(f"{directory}/final_model_pix.txt")
+        best_fitting = np.loadtxt(f"{directory}/best_model.txt")
         khistory = np.concatenate([khistory, np.loadtxt(f"{directory}/khistory.txt")])
 
 mean /= len(restarts) + 1
 std /= len(restarts) + 1
 diff = np.abs(truth - mean)
-diff_last = np.abs(truth - last)
+diff_best = np.abs(truth - best_fitting)
 
 vmin = truth.min()
 vmax = truth.max()
 stdmin = std.min()
 stdmax = std.max()
-diffmin = min([diff.min(), diff_last.min()])
-diffmax = max([diff.max(), diff_last.max()])
+diffmin = min([diff.min(), diff_best.min()])
+diffmax = max([diff.max(), diff_best.max()])
 
 cmap = cm.inferno
 diffcmap = cm.binary_r
@@ -74,12 +74,12 @@ axd["C"].imshow(std, cmap=stdcmap)
 axd["C"].set_title("Standard Dev.")
 axd["C"].axis("off")
 
-axd["H"].imshow(last, cmap=cmap)
-axd["H"].set_title("Last model")
+axd["H"].imshow(best_fitting, cmap=cmap)
+axd["H"].set_title("Best fitting model")
 axd["H"].axis("off")
 
-axd["I"].imshow(diff_last, vmin=diffmin, vmax=diffmax, cmap=diffcmap)
-axd["I"].set_title("|Truth - Last model|")
+axd["I"].imshow(diff_best, vmin=diffmin, vmax=diffmax, cmap=diffcmap)
+axd["I"].set_title("|Truth - Best fitting model|")
 axd["I"].axis("off")
 
 fig.colorbar(
