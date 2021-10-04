@@ -32,9 +32,11 @@ struct user_data
     int width;
     int height;
     int size;
+    int best_index = 0;
 
     double *mean;
     double *variance;
+    double min_likelihood = 1e6;
 
     int **hist;
     int bins;
@@ -42,6 +44,7 @@ struct user_data
     double vmax;
 
     double *model;
+    double *best_model;
     double *workspace;
 
     generic_lift_inverse1d_step_t hwaveletf;
@@ -58,6 +61,10 @@ static int process(int i,
                    void *user,
                    const chain_history_change_t *step,
                    const multiset_int_double_t *S_v);
+static int return_best(int i,
+                       void *user,
+                       const chain_history_change_t *step,
+                       const multiset_int_double_t *S_v);
 
 static int histogram_index(double v, double vmin, double vmax, int bins);
 
@@ -67,7 +74,7 @@ static double head_from_histogram(int *hist, double vmin, double vmax, int bins,
 static double tail_from_histogram(int *hist, double vmin, double vmax, int bins, int drop);
 static double hpd_from_histogram(int *hist, double vmin, double vmax, int bins, double hpd_interval, double &hpd_min, double &hpd_max);
 
-static char short_options[] = "x:y:i:o:D:l:H:W:t:s:m:M:c:C:g:p:P:Q:b:v:V:S:w:h";
+static char short_options[] = "x:y:i:o:D:l:H:W:t:s:m:M:N:c:C:g:p:P:Q:b:v:V:S:w:h";
 static struct option long_options[] = {
     {"degree-x", required_argument, 0, 'x'},
     {"degree-y", required_argument, 0, 'y'},
@@ -83,6 +90,7 @@ static struct option long_options[] = {
 
     {"mode", required_argument, 0, 'm'},
     {"median", required_argument, 0, 'M'},
+    {"max-likelihood", required_argument, 0, 'N'},
     {"credible-min", required_argument, 0, 'c'},
     {"credible-max", required_argument, 0, 'C'},
     {"histogram", required_argument, 0, 'g'},
@@ -126,6 +134,7 @@ int main(int argc, char *argv[])
 
     const char *mode_file;
     const char *median_file;
+    const char *max_likelihood_file;
     const char *credible_min;
     const char *credible_max;
     const char *histogram;
@@ -168,6 +177,7 @@ int main(int argc, char *argv[])
 
     mode_file = NULL;
     median_file = NULL;
+    max_likelihood_file = NULL;
     credible_min = NULL;
     credible_max = NULL;
     histogram = NULL;
@@ -240,6 +250,9 @@ int main(int argc, char *argv[])
             mode_file = optarg;
             break;
         case 'M':
+            median_file = optarg;
+            break;
+        case 'N':
             median_file = optarg;
             break;
         case 'c':
@@ -683,6 +696,43 @@ int main(int argc, char *argv[])
         }
     }
 
+    if (max_likelihood_file != NULL)
+    {
+        fp_in = fopen(input_file, "r");
+        while (!feof(fp_in))
+        {
+            if (chain_history_read(ch,
+                                   (ch_read_t)fread,
+                                   fp_in) < 0)
+            {
+                if (feof(fp_in))
+                    break;
+                fprintf(stderr, "error: failed to read chain history\n");
+                return -1;
+            }
+
+            if (chain_history_replay(ch,
+                                     S_v,
+                                     (chain_history_replay_function_t)return_best,
+                                     &data) < 0)
+            {
+                fprintf(stderr, "error: failed to replay\n");
+                return -1;
+            }
+        }
+        fclose(fp_in);
+
+        fp_out = fopen(max_likelihood_file, "w");
+        for (j = 0; j < data.height; j++)
+        {
+            for (i = 0; i < data.width; i++)
+            {
+                fprintf(fp_out, "%10.6f ", data.mean[j * data.width + i]);
+            }
+            fprintf(fp_out, "\n");
+        }
+        fclose(fp_out);
+    }
     chain_history_destroy(ch);
     multiset_int_double_destroy(S_v);
 
@@ -707,6 +757,11 @@ static int process(int stepi,
     if ((d->thincounter >= d->skip) && (d->thin <= 1 || ((d->thincounter - d->skip) % d->thin) == 0))
     {
         fprintf(d->fp_out, "%.6f\n", step->header.likelihood);
+        if (step->header.likelihood < d->min_likelihood)
+        {
+            d->min_likelihood = step->header.likelihood;
+            d->best_index = d->thincounter;
+        }
 
         memset(d->model, 0, sizeof(double) * d->size);
 
@@ -760,6 +815,45 @@ static int process(int stepi,
     }
     d->thincounter++;
 
+    return 0;
+}
+
+static int return_best(int stepi,
+                       void *user,
+                       const chain_history_change_t *step,
+                       const multiset_int_double_t *S_v)
+{
+    struct user_data *d = (struct user_data *)user;
+
+    if (stepi == d->best_index)
+    {
+        memset(d->best_model, 0, sizeof(double) * d->size);
+
+        if (wavetree2d_sub_set_from_S_v(d->wt, S_v) < 0)
+        {
+            fprintf(stderr, "process: failed to set wavetree (sub)\n");
+            return -1;
+        }
+        fprintf(d->fp_k, "%i\n", wavetree2d_sub_coeff_count(d->wt));
+
+        if (wavetree2d_sub_map_to_array(d->wt, d->best_model, d->size) < 0)
+        {
+            fprintf(stderr, "process: failed to map to array\n");
+            return -1;
+        }
+
+        if (generic_lift_inverse2d(d->best_model,
+                                   d->width,
+                                   d->height,
+                                   d->width,
+                                   d->workspace,
+                                   d->hwaveletf,
+                                   d->hwaveletf,
+                                   SUBTILE) < 0)
+        {
+            throw ERROR("Failed to do inverse transform on coefficients\n");
+        }
+    }
     return 0;
 }
 
