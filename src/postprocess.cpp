@@ -1,3 +1,4 @@
+#include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,6 +20,8 @@ extern "C"
 };
 
 #include "globalprop.cpp"
+#include "utils.hpp"
+#include "logging.hpp"
 
 struct user_data
 {
@@ -74,12 +77,13 @@ static double head_from_histogram(int *hist, double vmin, double vmax, int bins,
 static double tail_from_histogram(int *hist, double vmin, double vmax, int bins, int drop);
 static double hpd_from_histogram(int *hist, double vmin, double vmax, int bins, double hpd_interval, double &hpd_min, double &hpd_max);
 
-static char short_options[] = "x:y:i:o:D:l:H:W:t:s:m:M:N:c:C:g:p:P:Q:b:v:V:S:w:h";
+static char short_options[] = "x:y:i:k:o:D:l:H:W:t:s:m:M:N:c:C:g:p:P:Q:b:v:V:S:w:h";
 static struct option long_options[] = {
     {"degree-x", required_argument, 0, 'x'},
     {"degree-y", required_argument, 0, 'y'},
 
     {"input", required_argument, 0, 'i'},
+    {"input_kappa", required_argument, 0, 'k'},
     {"output", required_argument, 0, 'o'},
     {"stddev", required_argument, 0, 'D'},
     {"likelihood", required_argument, 0, 'l'},
@@ -120,6 +124,7 @@ int main(int argc, char *argv[])
     chain_history_t *ch;
 
     const char *input_file;
+    const char *input_kappa;
     const char *output_file;
     const char *stddev_file;
     const char *likelihood_file;
@@ -170,6 +175,7 @@ int main(int argc, char *argv[])
     degree_y = 8;
 
     input_file = NULL;
+    input_kappa = NULL;
     output_file = NULL;
     stddev_file = NULL;
     likelihood_file = NULL;
@@ -200,6 +206,8 @@ int main(int argc, char *argv[])
     vmin = 0.001;
     vmax = 1.0;
 
+    Logger::open_log(0);
+
     while (1)
     {
         c = getopt_long(argc, argv, short_options, long_options, &option_index);
@@ -227,6 +235,9 @@ int main(int argc, char *argv[])
             break;
         case 'i':
             input_file = optarg;
+            break;
+        case 'k':
+            input_kappa = optarg;
             break;
         case 'l':
             likelihood_file = optarg;
@@ -727,12 +738,40 @@ int main(int argc, char *argv[])
         {
             for (i = 0; i < data.width; i++)
             {
-                fprintf(fp_out, "%10.6f ", data.mean[j * data.width + i]);
+                fprintf(fp_out, "%10.6f ", data.best_model[j * data.width + i]);
             }
             fprintf(fp_out, "\n");
         }
         fclose(fp_out);
     }
+
+    if (input_kappa != NULL)
+    {
+        std::ifstream file(input_kappa);
+        std::vector<double> kappa;
+        double element;
+        if (file.is_open())
+        {
+            while (file >> element)
+                kappa.emplace_back(element);
+
+            if (data.size != kappa.size())
+                throw ERROR("Incorrect image size");
+
+            file.close();
+        }
+        else
+        {
+            throw ERROR("File not opened %s", input_kappa);
+        }
+
+        std::vector<double> model_v(data.best_model, data.best_model + data.size);
+        auto best_stats = statistics::run_statistics(kappa, model_v);
+        INFO("Best model likelihood %d", data.min_likelihood);
+        INFO("Best model SNR %ddB", std::get<0>(best_stats));
+        INFO("Best model Pearson correlation %d", std::get<1>(best_stats));
+    };
+
     chain_history_destroy(ch);
     multiset_int_double_destroy(S_v);
 
