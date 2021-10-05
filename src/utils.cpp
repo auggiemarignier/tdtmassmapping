@@ -68,7 +68,7 @@ std::string mkformatstring(const char *fmt, ...)
     return std::string(buffer);
 }
 
-std::tuple<complexvector, std::vector<double>> add_gaussian_noise(const complexvector &input, const int &ngal, const int &sidelength)
+std::tuple<complexvector, std::vector<double>> add_gaussian_noise(const complexvector &input, const double &ngal, const double &sidelength)
 {
     const int N = input.size();
     const double sigma_e = 0.37; // intrinsic ellipticity dispersion

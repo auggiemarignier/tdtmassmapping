@@ -186,9 +186,14 @@ int main(int argc, char *argv[])
 
     mmobservations observations(1 << degreex, 1 << degreey);
     complexvector gamma = observations.single_frequency_predictions(kappa);
+
+    const double ngal = 100.;
+    const double sidelength = 500.;
+    auto noise_tuple = add_gaussian_noise(gamma, ngal, sidelength);
+    auto gamma_noisy = std::get<0>(noise_tuple);
+    auto covariance = std::get<1>(noise_tuple);
     observations.set_observed_data(gamma);
-    std::vector<double> sigma = {vector_stddev(gamma)};
-    observations.set_sigmas(sigma);
+    observations.set_sigmas(covariance);
 
     GlobalProposal global(&observations,
                           initial_model,
