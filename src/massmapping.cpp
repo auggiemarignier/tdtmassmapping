@@ -207,9 +207,7 @@ int main(int argc, char *argv[])
 
     int *khistogram = new int[kmax];
     for (int i = 0; i < kmax; i++)
-    {
         khistogram[i] = 0;
-    }
 
     FILE *fp_ch = NULL;
     if (chain_history_initialise(global.ch,
@@ -217,18 +215,12 @@ int main(int argc, char *argv[])
                                  global.current_likelihood,
                                  global.temperature,
                                  1.0) < 0)
-    {
-        ERROR("failed to initialise chain history\n");
-        return -1;
-    }
+        throw ERROR("failed to initialise chain history\n");
 
     std::string filename = mkfilename(output_prefix, "ch.dat");
     fp_ch = fopen(filename.c_str(), "w");
     if (fp_ch == NULL)
-    {
-        ERROR("failed to create chain history file\n");
-        return -1;
-    }
+        throw ERROR("failed to create chain history file\n");
 
     Logger::flush();
     for (int i = 0; i < total; i++) // start MCMC loop
@@ -238,26 +230,17 @@ int main(int argc, char *argv[])
         if (u < Pb) // Birth
         {
             if (birth.step() < 0)
-            {
-                ERROR("failed to do birth step\n");
-                return -1;
-            }
+                throw ERROR("failed to do birth step\n");
         }
         else if (u < (2.0 * Pb)) // Death
         {
             if (death.step() < 0)
-            {
-                ERROR("failed to do death step\n");
-                return -1;
-            }
+                throw ERROR("failed to do death step\n");
         }
         else // Value
         {
             if (value.step() < 0)
-            {
-                ERROR("failed to do value step\n");
-                return -1;
-            }
+                throw ERROR("failed to do value step\n");
         }
 
         if (chain_history_full(global.ch))
@@ -266,31 +249,20 @@ int main(int argc, char *argv[])
             if (chain_history_write(global.ch,
                                     (ch_write_t)fwrite,
                                     fp_ch) < 0)
-            {
-                ERROR("failed to write chain history segment to file\n");
-                return -1;
-            }
+                throw ERROR("failed to write chain history segment to file\n");
             if (chain_history_reset(global.ch) < 0)
-            {
-                ERROR("failed to reset chain history\n");
-                return -1;
-            }
+                throw ERROR("failed to reset chain history\n");
         }
 
         chain_history_change_t step;
         if (wavetree2d_sub_get_last_perturbation(global.wt, &step) < 0)
-        {
-            ERROR("failed to get last step\n");
-            return -1;
-        }
+            throw ERROR("failed to get last step\n");
+
         step.header.likelihood = global.current_likelihood;
         step.header.temperature = global.temperature;
         step.header.hierarchical = 1.0;
         if (chain_history_add_step(global.ch, &step) < 0)
-        {
-            ERROR("failed to add step to chain history\n");
-            return -1;
-        }
+            throw ERROR("failed to add step to chain history\n");
 
         int current_k = wavetree2d_sub_coeff_count(global.wt);
         if (verbosity > 0 && (i + 1) % verbosity == 0)
@@ -313,14 +285,11 @@ int main(int argc, char *argv[])
     filename = mkfilename(output_prefix, "khistogram.txt");
     FILE *fp = fopen(filename.c_str(), "w");
     if (fp == NULL)
-    {
-        ERROR("failed to create khistogram file\n");
-        return -1;
-    }
+        throw ERROR("failed to create khistogram file\n");
+
     for (int i = 0; i < kmax; i++)
-    {
         fprintf(fp, "%d %d\n", i + 1, khistogram[i]);
-    }
+
     fclose(fp);
     delete[] khistogram;
 
@@ -331,10 +300,7 @@ int main(int argc, char *argv[])
         if (chain_history_write(global.ch,
                                 (ch_write_t)fwrite,
                                 fp_ch) < 0)
-        {
-            ERROR("failed to write chain history segment to file\n");
-            return -1;
-        }
+            throw ERROR("failed to write chain history segment to file\n");
     }
     fclose(fp_ch);
     chain_history_destroy(global.ch);
@@ -342,10 +308,7 @@ int main(int argc, char *argv[])
     filename = mkfilename(output_prefix, "acceptance.txt");
     fp = fopen(filename.c_str(), "w");
     if (fp == NULL)
-    {
-        ERROR("failed to create acceptance file\n");
-        return -1;
-    }
+        throw ERROR("failed to create acceptance file\n");
     fprintf(fp, "%s", birth.write_long_stats().c_str());
     fprintf(fp, "\n");
     fprintf(fp, "%s", death.write_long_stats().c_str());
@@ -356,18 +319,14 @@ int main(int argc, char *argv[])
 
     filename = mkfilename(output_prefix, "final_model.txt");
     if (wavetree2d_sub_save(global.wt, filename.c_str()) < 0)
-    {
-        ERROR("failed to save final model\n");
-        return -1;
-    }
+        throw ERROR("failed to save final model\n");
 
     filename = mkfilename(output_prefix, "final_model_pix.txt");
     model = new double[global.size];
     memset(model, 0, sizeof(double) * global.size);
     if (wavetree2d_sub_map_to_array(global.wt, model, global.size) < 0)
-    {
         throw ERROR("Failed to map model to array\n");
-    }
+
     if (generic_lift_inverse2d(model,
                                global.width,
                                global.height,
@@ -376,15 +335,12 @@ int main(int argc, char *argv[])
                                global.xywaveletf,
                                global.xywaveletf,
                                SUBTILE) < 0)
-    {
         throw ERROR("Failed to do inverse transform on coefficients\n");
-    }
+
     fp = fopen(filename.c_str(), "w");
     if (fp == NULL)
-    {
-        ERROR("failed to create final_model_pix.txt file\n");
-        return -1;
-    }
+        throw ERROR("failed to create final_model_pix.txt file\n");
+
     for (int j = 0; j < global.height; j++)
     {
         for (int i = 0; i < global.width; i++)
