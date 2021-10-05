@@ -264,7 +264,7 @@ int main(int argc, char *argv[])
             median_file = optarg;
             break;
         case 'N':
-            median_file = optarg;
+            max_likelihood_file = optarg;
             break;
         case 'c':
             credible_min = optarg;
@@ -721,7 +721,7 @@ int main(int argc, char *argv[])
                 fprintf(stderr, "error: failed to read chain history\n");
                 return -1;
             }
-
+            DEBUG("");
             if (chain_history_replay(ch,
                                      S_v,
                                      (chain_history_replay_function_t)return_best,
@@ -730,9 +730,11 @@ int main(int argc, char *argv[])
                 fprintf(stderr, "error: failed to replay\n");
                 return -1;
             }
+            DEBUG("");
         }
         fclose(fp_in);
 
+        DEBUG("%10.6f ", data.best_model[0]);
         fp_out = fopen(max_likelihood_file, "w");
         for (j = 0; j < data.height; j++)
         {
@@ -743,10 +745,12 @@ int main(int argc, char *argv[])
             fprintf(fp_out, "\n");
         }
         fclose(fp_out);
+        DEBUG("%10.6f ", data.best_model[0]);
     }
 
     if (input_kappa != NULL)
     {
+        DEBUG("");
         std::ifstream file(input_kappa);
         std::vector<double> kappa;
         double element;
@@ -759,13 +763,16 @@ int main(int argc, char *argv[])
                 throw ERROR("Incorrect image size");
 
             file.close();
+            DEBUG("");
         }
         else
         {
             throw ERROR("File not opened %s", input_kappa);
         }
 
+        DEBUG("%d", data.best_model[0]);
         std::vector<double> model_v(data.best_model, data.best_model + data.size);
+        DEBUG("");
         auto best_stats = statistics::run_statistics(kappa, model_v);
         INFO("Best model likelihood %d", data.min_likelihood);
         INFO("Best model SNR %ddB", std::get<0>(best_stats));
