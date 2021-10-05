@@ -362,6 +362,7 @@ int main(int argc, char *argv[])
     memset(data.variance, 0, sizeof(double) * data.size);
 
     data.model = new double[data.size];
+    data.best_model = new double[data.size];
 
     int workspacesize = data.width;
     if (data.height > data.width)
@@ -785,6 +786,7 @@ int main(int argc, char *argv[])
     delete[] data.mean;
     delete[] data.variance;
     delete[] data.model;
+    delete[] data.best_model;
     delete[] data.workspace;
 
     return 0;
@@ -873,8 +875,10 @@ static int return_best(int stepi,
 
     if (stepi == d->best_index)
     {
+        DEBUG("%i", stepi);
         memset(d->best_model, 0, sizeof(double) * d->size);
 
+        DEBUG("");
         if (wavetree2d_sub_set_from_S_v(d->wt, S_v) < 0)
         {
             fprintf(stderr, "process: failed to set wavetree (sub)\n");
@@ -882,12 +886,14 @@ static int return_best(int stepi,
         }
         fprintf(d->fp_k, "%i\n", wavetree2d_sub_coeff_count(d->wt));
 
+        DEBUG("");
         if (wavetree2d_sub_map_to_array(d->wt, d->best_model, d->size) < 0)
         {
             fprintf(stderr, "process: failed to map to array\n");
             return -1;
         }
 
+        DEBUG("");
         if (generic_lift_inverse2d(d->best_model,
                                    d->width,
                                    d->height,
@@ -899,6 +905,7 @@ static int return_best(int stepi,
         {
             throw ERROR("Failed to do inverse transform on coefficients\n");
         }
+        DEBUG("");
     }
     return 0;
 }
