@@ -25,7 +25,31 @@ T vector_mean(std::vector<T> &vec)
 }
 
 template <typename T>
+T vector_mean(const std::vector<T> &vec)
+{
+    T mean(0);
+    for (auto v : vec)
+        mean += v;
+    mean /= vec.size();
+    return mean;
+}
+
+template <typename T>
 double vector_stddev(std::vector<T> &vec)
+{
+    double var = 0;
+    T mean = vector_mean(vec);
+    for (auto v : vec)
+    {
+        double absdiff = std::abs(v - mean);
+        var += absdiff * absdiff;
+    }
+    var /= vec.size();
+    return sqrt(var);
+}
+
+template <typename T>
+double vector_stddev(const std::vector<T> &vec)
 {
     double var = 0;
     T mean = vector_mean(vec);
