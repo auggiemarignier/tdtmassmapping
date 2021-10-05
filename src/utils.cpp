@@ -68,28 +68,6 @@ std::string mkformatstring(const char *fmt, ...)
     return std::string(buffer);
 }
 
-std::complex<double> vector_mean(std::vector<std::complex<double>> &vec)
-{
-    std::complex<double> mean(0, 0);
-    for (auto v : vec)
-        mean += v;
-    mean /= vec.size();
-    return mean;
-}
-
-double vector_stddev(std::vector<std::complex<double>> &vec)
-{
-    double var = 0;
-    std::complex<double> mean = vector_mean(vec);
-    for (auto v : vec)
-    {
-        double absdiff = std::abs(v - mean);
-        var += absdiff * absdiff;
-    }
-    var /= vec.size();
-    return sqrt(var);
-}
-
 std::tuple<complexvector, std::vector<double>> add_gaussian_noise(const complexvector &input, const int &ngal, const int &sidelength)
 {
     const int N = input.size();
@@ -115,6 +93,7 @@ std::tuple<complexvector, std::vector<double>> add_gaussian_noise(const complexv
     return std::make_tuple(output, covariance);
 }
 
+#if 0
 namespace statistics
 {
     std::tuple<double, double> run_statistics(const std::vector<double> &truth,
@@ -160,3 +139,4 @@ namespace statistics
         return numerator / (std::sqrt(sum_truth_squares) * std::sqrt(sum_estimate_squares));
     };
 } // namespace statistics
+#endif
