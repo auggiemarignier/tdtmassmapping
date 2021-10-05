@@ -1,6 +1,7 @@
 #include "utils.hpp"
 #include <random>
 #include <time.h>
+#include "logging.hpp"
 
 std::string enum_to_string(wavetree_perturb_t type)
 {
@@ -92,7 +93,7 @@ double vector_stddev(std::vector<std::complex<double>> &vec)
 std::tuple<complexvector, std::vector<double>> add_gaussian_noise(const complexvector &input, const int &ngal, const int &sidelength)
 {
     const int N = input.size();
-    const double sigma_e = 0.37;               // intrinsic ellipticity dispersion
+    const double sigma_e = 0.37; // intrinsic ellipticity dispersion
     const auto gals_pix = ngal * std::pow(sidelength, 2) / static_cast<double>(N);
     const auto A = sigma_e / std::sqrt(2.0 * gals_pix);
 
@@ -113,3 +114,49 @@ std::tuple<complexvector, std::vector<double>> add_gaussian_noise(const complexv
 
     return std::make_tuple(output, covariance);
 }
+
+namespace statistics
+{
+    std::tuple<double, double> run_statistics(const std::vector<double> &truth,
+                                              const std::vector<double> &estimate)
+    {
+        return std::make_tuple(snr(truth, estimate), pearson_correlation(truth, estimate));
+    };
+
+    double snr(const std::vector<double> &truth, const std::vector<double> &estimate)
+    {
+        if (truth.size() != estimate.size())
+        {
+            WARNING("Vectors are of different sizes");
+            return -1;
+        }
+        else
+        {
+            double l2_true = 0.;
+            double l2_diff_to_true = 0.;
+            for (int i = 0; i < truth.size(); i++)
+            {
+                l2_true += truth[i] * truth[i];
+                l2_diff_to_true += (estimate[i] - truth[i]) * (estimate[i] - truth[i]);
+            }
+            return 10.0 * std::log10(l2_true / l2_diff_to_true);
+        };
+    }
+
+    double pearson_correlation(const std::vector<double> &truth, const std::vector<double> &estimate)
+    {
+        assert(truth.size() == estimate.size());
+        double numerator = 0.0;
+        double sum_truth_squares = 0.0;
+        double sum_estimate_squares = 0.0;
+        const double mean_truth = truth.mean();
+        const double mean_estimate = estimate.mean();
+        for (uint i = 0; i < truth.size(); i++)
+        {
+            numerator += (truth(i) - mean_truth) * (estimate(i) - mean_estimate);
+            sum_truth_squares += std::pow((truth(i) - mean_truth), 2);
+            sum_estimate_squares += std::pow((estimate(i) - mean_estimate), 2);
+        }
+        return numerator / (std::sqrt(sum_truth_squares) * std::sqrt(sum_estimate_squares));
+    };
+} // namespace statistics

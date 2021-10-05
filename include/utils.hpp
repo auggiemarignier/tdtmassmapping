@@ -18,3 +18,9 @@ std::complex<double> vector_mean(complexvector &v);
 double vector_stddev(complexvector &v);
 
 std::tuple<complexvector, std::vector<double>> add_gaussian_noise(const complexvector &input, const int &ngal, const int sidelegnth);
+
+namespace statistics {
+std::tuple<double, double> run_statistics(const std::vector<double>& truth, const std::vector<double>& estimate);
+double snr(const std::vector<double>& truth, const std::vector<double>& estimate); 
+double pearson_correlation(const std::vector<double>& truth, const std::vector<double>& estimate);
+};  // namespace statistics
