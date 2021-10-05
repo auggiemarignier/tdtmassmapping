@@ -93,7 +93,6 @@ std::tuple<complexvector, std::vector<double>> add_gaussian_noise(const complexv
     return std::make_tuple(output, covariance);
 }
 
-#if 0
 namespace statistics
 {
     std::tuple<double, double> run_statistics(const std::vector<double> &truth,
@@ -116,7 +115,7 @@ namespace statistics
             for (int i = 0; i < truth.size(); i++)
             {
                 l2_true += truth[i] * truth[i];
-                l2_diff_to_true += (estimate[i] - truth[i]) * (estimate[i] - truth[i]);
+                l2_diff_to_true += std::pow((estimate[i] - truth[i]), 2);
             }
             return 10.0 * std::log10(l2_true / l2_diff_to_true);
         };
@@ -124,19 +123,25 @@ namespace statistics
 
     double pearson_correlation(const std::vector<double> &truth, const std::vector<double> &estimate)
     {
-        assert(truth.size() == estimate.size());
-        double numerator = 0.0;
-        double sum_truth_squares = 0.0;
-        double sum_estimate_squares = 0.0;
-        const double mean_truth = truth.mean();
-        const double mean_estimate = estimate.mean();
-        for (uint i = 0; i < truth.size(); i++)
+        if (truth.size() != estimate.size())
         {
-            numerator += (truth(i) - mean_truth) * (estimate(i) - mean_estimate);
-            sum_truth_squares += std::pow((truth(i) - mean_truth), 2);
-            sum_estimate_squares += std::pow((estimate(i) - mean_estimate), 2);
+            WARNING("Vectors are of different sizes");
+            return -1;
         }
-        return numerator / (std::sqrt(sum_truth_squares) * std::sqrt(sum_estimate_squares));
+        else
+        {
+            double numerator = 0.0;
+            double sum_truth_squares = 0.0;
+            double sum_estimate_squares = 0.0;
+            const double mean_estimate = vector_mean(estimate);
+            const double mean_truth = vector_mean(truth);
+            for (uint i = 0; i < truth.size(); i++)
+            {
+                numerator += (truth[i] - mean_truth) * (estimate[i] - mean_estimate);
+                sum_truth_squares += std::pow((truth[i] - mean_truth), 2);
+                sum_estimate_squares += std::pow((estimate[i] - mean_estimate), 2);
+            }
+            return numerator / (std::sqrt(sum_truth_squares) * std::sqrt(sum_estimate_squares));
+        }
     };
 } // namespace statistics
-#endif
