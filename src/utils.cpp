@@ -1,4 +1,6 @@
 #include "utils.hpp"
+#include <random>
+#include <time.h>
 
 std::string enum_to_string(wavetree_perturb_t type)
 {
@@ -78,11 +80,36 @@ double vector_stddev(std::vector<std::complex<double>> &vec)
 {
     double var = 0;
     std::complex<double> mean = vector_mean(vec);
-    for (auto v:vec)
+    for (auto v : vec)
     {
         double absdiff = std::abs(v - mean);
         var += absdiff * absdiff;
     }
     var /= vec.size();
     return sqrt(var);
+}
+
+std::tuple<complexvector, std::vector<double>> add_gaussian_noise(const complexvector &input, const int &ngal, const int &sidelength)
+{
+    const int N = input.size();
+    const double sigma_e = 0.37;               // intrinsic ellipticity dispersion
+    const auto gals_pix = ngal * std::pow(sidelength, 2) / static_cast<double>(N);
+    const auto A = sigma_e / std::sqrt(2.0 * gals_pix);
+
+    // Initialize seed for Gaussian random number
+    auto const seed = time(0);
+    std::srand((unsigned int)seed);
+    std::mt19937 mersenne(time(0));
+    std::normal_distribution<> gaussian_dist(0, 1.0);
+
+    // Create empty maps for output + covariance and initialize factors.
+    complexvector output(N);
+    std::vector<double> covariance(N);
+    for (int i = 0; i < N; i++)
+    {
+        covariance[i] = A;
+        output[i] = input[i] + A * std::complex<double>(gaussian_dist(mersenne), gaussian_dist(mersenne));
+    }
+
+    return std::make_tuple(output, covariance);
 }
