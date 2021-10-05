@@ -51,7 +51,21 @@ TEST(SatisticsTest, SNR)
     int rand_ind = random.uniform(truth.size());
     estimate[rand_ind] += 1;
 
-    ASSERT_EQ(statistics::snr(truth, estimate), 10. * std::log10(l2_true));
+    ASSERT_FLOAT_EQ(statistics::snr(truth, estimate), 10. * std::log10(l2_true));
+};
+
+TEST(StatisticsTest, Pearson)
+{
+    Rng random(1);
+    std::vector<double> truth(50);
+    std::vector<double> estimate(50);
+    for (int i = 0; i < truth.size(); i++)
+    {
+        truth[i] = random.normal(1.);
+        estimate[i] = truth[i];
+    }
+
+    ASSERT_FLOAT_EQ(statistics::pearson_correlation(truth, estimate), 1);
 };
 
 int main(int argc, char **argv)
