@@ -76,9 +76,7 @@ std::tuple<complexvector, std::vector<double>> add_gaussian_noise(const complexv
     const auto A = sigma_e / std::sqrt(2.0 * gals_pix);
 
     // Initialize seed for Gaussian random number
-    auto const seed = time(0);
-    std::srand((unsigned int)seed);
-    std::mt19937 mersenne(time(0));
+    std::mt19937 mersenne;
     std::normal_distribution<> gaussian_dist(0, 1.0);
 
     // Create empty maps for output + covariance and initialize factors.
