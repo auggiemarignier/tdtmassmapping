@@ -310,6 +310,26 @@ int main(int argc, char *argv[])
     fclose(fp_ch);
     chain_history_destroy(global.ch);
 
+    filename = mkfilename(output_prefix, "coeff_mean.txt");
+    FILE *fp_mean = fopen(filename.c_str(), "w");
+    filename = mkfilename(output_prefix, "coeff_std.txt");
+    FILE *fp_std = fopen(filename.c_str(), "w");
+    int index = 0;
+    double mean;
+    double std;
+    for (int j = 0; j < global.height; j++)
+    {
+        for (int i = 0; i < global.width; i++)
+        {
+            coefficient_histogram_get_coefficient_mean_std(global.coeff_hist, index, &mean, &std);
+            fprintf(fp_mean, "%10.6f ", mean);
+            fprintf(fp_std, "%10.6f ", std);
+        }
+        fprintf(fp, "\n");
+    }
+    fclose(fp_mean);
+    fclose(fp_std);
+
     filename = mkfilename(output_prefix, "acceptance.txt");
     fp = fopen(filename.c_str(), "w");
     if (fp == NULL)
