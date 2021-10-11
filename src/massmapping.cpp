@@ -314,16 +314,21 @@ int main(int argc, char *argv[])
     FILE *fp_mean = fopen(filename.c_str(), "w");
     filename = mkfilename(output_prefix, "coeff_std.txt");
     FILE *fp_std = fopen(filename.c_str(), "w");
+    filename = mkfilename(output_prefix, "coeff_n.txt");
+    FILE *fp_n = fopen(filename.c_str(), "w");
     int index = 0;
     double mean;
     double std;
+    int n;
     for (int j = 0; j < global.height; j++)
     {
         for (int i = 0; i < global.width; i++)
         {
-            coefficient_histogram_get_coefficient_mean_std(global.coeff_hist, index, &mean, &std);
+            n = coefficient_histogram_get_coefficient_mean_std(global.coeff_hist, index, &mean, &std);
             fprintf(fp_mean, "%10.6f ", mean);
             fprintf(fp_std, "%10.6f ", std);
+            fprintf(fp_n, "%i ", n);
+            index++;
         }
         fprintf(fp, "\n");
     }
