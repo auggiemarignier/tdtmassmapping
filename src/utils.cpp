@@ -119,6 +119,26 @@ namespace statistics
         };
     }
 
+    double snr(const complexvector &truth, const complexvector &estimate)
+    {
+        if (truth.size() != estimate.size())
+        {
+            WARNING("Vectors are of different sizes");
+            return -1;
+        }
+        else
+        {
+            double l2_true = 0.;
+            double l2_diff_to_true = 0.;
+            for (int i = 0; i < truth.size(); i++)
+            {
+                l2_true += std::pow(std::abs(truth[i]), 2);
+                l2_diff_to_true += std::pow(std::abs(estimate[i] - truth[i]), 2);
+            }
+            return 10.0 * std::log10(l2_true / l2_diff_to_true);
+        };
+    }
+
     double pearson_correlation(const std::vector<double> &truth, const std::vector<double> &estimate)
     {
         if (truth.size() != estimate.size())
