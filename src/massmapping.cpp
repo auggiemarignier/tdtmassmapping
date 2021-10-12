@@ -334,6 +334,7 @@ int main(int argc, char *argv[])
     }
     fclose(fp_mean);
     fclose(fp_std);
+    fclose(fp_n);
 
     filename = mkfilename(output_prefix, "acceptance.txt");
     fp = fopen(filename.c_str(), "w");
