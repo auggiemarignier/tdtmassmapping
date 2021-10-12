@@ -335,6 +335,10 @@ int main(int argc, char *argv[])
     fclose(fp_mean);
     fclose(fp_std);
 
+    filename = mkfilename(output_prefix, "coeff_hist.txt");
+    if (coefficient_histogram_save(global.coeff_hist, filename.c_str()) < 0)
+        ERROR("Failed to save histogram");
+
     filename = mkfilename(output_prefix, "acceptance.txt");
     fp = fopen(filename.c_str(), "w");
     if (fp == NULL)
