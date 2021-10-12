@@ -195,6 +195,9 @@ int main(int argc, char *argv[])
     observations.set_observed_data(gamma);
     observations.set_sigmas(covariance);
 
+    double data_snr = statistics::snr(gamma, gamma_noisy);
+    INFO("Input data SNR %10.6f dB", data_snr);
+
     GlobalProposal global(&observations,
                           initial_model,
                           prior_file,
