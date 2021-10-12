@@ -143,6 +143,12 @@ int Proposal::step()
                     ERROR("failed to update histogram for %s acceptance\n", enum_to_string(name).c_str());
                     return -1;
                 }
+                
+                if (coefficient_histogram_sample(global.coeff_hist, prop_idx, prop_value)<0)
+                {
+                    ERROR("failed to update histogram");
+                    return -1;
+                }
 
                 if (wavetree2d_sub_commit(global.wt) < 0)
                 {
@@ -161,6 +167,12 @@ int Proposal::step()
                 if (coefficient_histogram_reject(global.coeff_hist, prop_idx, prop_value) < 0)
                 {
                     ERROR("failed to update histogram for %s rejection\n", enum_to_string(name).c_str());
+                    return -1;
+                }
+
+                if (coefficient_histogram_sample(global.coeff_hist, prop_idx, prop_value)<0)
+                {
+                    ERROR("failed to update histogram");
                     return -1;
                 }
 
