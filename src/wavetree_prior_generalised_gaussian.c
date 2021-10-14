@@ -17,7 +17,7 @@ struct depth_generalised_gaussian
 
     int ndepths;
     double *va;
-    double beta;
+    double *beta;
 };
 
 static int
@@ -38,9 +38,7 @@ range_depth_generalised_gaussian(void *user,
 
     d = level;
     if (d >= s->ndepths)
-    {
         d = s->ndepths - 1;
-    }
 
     /*
    * Just use 3 standard deviations for width
@@ -68,10 +66,9 @@ sample_depth_generalised_gaussian(void *user,
 
     d = level;
     if (d >= s->ndepths)
-    {
         d = s->ndepths - 1;
-    }
-    *coeff = gsl_ran_exppow(s->rng, s->va[d], s->beta);
+
+    *coeff = gsl_ran_exppow(s->rng, s->va[d], s->beta[d]);
 
     return 0;
 }
@@ -93,12 +90,9 @@ prob_depth_generalised_gaussian(void *user,
 
     d = level;
     if (d >= s->ndepths)
-    {
         d = s->ndepths - 1;
-    }
 
-    p = gsl_ran_exppow_pdf(coeff, s->va[d], s->beta);
-    /* printf("  p = %g (%d %f %f %f)\n", p, d, coeff, s->va[d], s->beta); */
+    p = gsl_ran_exppow_pdf(coeff, s->va[d], s->beta[d]);
     return p;
 }
 
@@ -133,7 +127,7 @@ destroy_depth_generalised_gaussian(void *user)
 
     gsl_rng_free(s->rng);
     free(s->va);
-
+    free(s->beta);
     free(s);
 
     return 0;
@@ -142,7 +136,7 @@ destroy_depth_generalised_gaussian(void *user)
 wavetree_prior_t *
 wavetree_prior_create_depth_generalised_gaussian(int ndepths,
                                                  double *va,
-                                                 double beta,
+                                                 double *beta,
                                                  unsigned long int seed)
 {
     wavetree_prior_t *w;
@@ -151,21 +145,15 @@ wavetree_prior_create_depth_generalised_gaussian(int ndepths,
 
     w = malloc(sizeof(wavetree_prior_t));
     if (w == NULL)
-    {
         return NULL;
-    }
 
     s = malloc(sizeof(struct depth_generalised_gaussian));
     if (s == NULL)
-    {
         return NULL;
-    }
 
     s->rng = gsl_rng_alloc(gsl_rng_taus);
     if (s->rng == NULL)
-    {
         return NULL;
-    }
 
     gsl_rng_set(s->rng, seed);
 
@@ -173,15 +161,17 @@ wavetree_prior_create_depth_generalised_gaussian(int ndepths,
 
     s->va = malloc(sizeof(double) * ndepths);
     if (s->va == NULL)
-    {
         return NULL;
-    }
+
+    s->beta = malloc(sizeof(double) * ndepths);
+    if (s->beta == NULL)
+        return NULL;
 
     for (i = 0; i < ndepths; i++)
     {
         s->va[i] = va[i];
+        s->beta[i] = beta[i];
     }
-    s->beta = beta;
 
     w->user = s;
     w->range = range_depth_generalised_gaussian;
