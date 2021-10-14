@@ -33,7 +33,8 @@ set(SOURCES src/mmobservations.cpp
             src/valueprop.cpp
             src/rng.cpp
             src/logging.cpp
-            src/utils.cpp)
+            src/utils.cpp
+            src/wavetree_prior_generalised_gaussian.c)
 
 add_library(${PROJECT_LIB} STATIC ${SOURCES})
 set_target_properties(${PROJECT_LIB} PROPERTIES OUTPUT_NAME ${PROJECT_NAME} ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
