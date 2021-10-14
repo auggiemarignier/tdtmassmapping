@@ -11,7 +11,7 @@
  * Coefficients generalised gaussian at each depth
  */
 
-struct depth_generalised_gaussian
+struct depth_full_generalised_gaussian
 {
     gsl_rng *rng;
 
@@ -21,7 +21,7 @@ struct depth_generalised_gaussian
 };
 
 static int
-range_depth_generalised_gaussian(void *user,
+range_depth_full_generalised_gaussian(void *user,
                                  int i,
                                  int j,
                                  int k,
@@ -31,10 +31,10 @@ range_depth_generalised_gaussian(void *user,
                                  double *vmin,
                                  double *vmax)
 {
-    struct depth_generalised_gaussian *s;
+    struct depth_full_generalised_gaussian *s;
     int d;
 
-    s = (struct depth_generalised_gaussian *)user;
+    s = (struct depth_full_generalised_gaussian *)user;
 
     d = level;
     if (d >= s->ndepths)
@@ -50,7 +50,7 @@ range_depth_generalised_gaussian(void *user,
 }
 
 static int
-sample_depth_generalised_gaussian(void *user,
+sample_depth_full_generalised_gaussian(void *user,
                                   int i,
                                   int j,
                                   int k,
@@ -59,10 +59,10 @@ sample_depth_generalised_gaussian(void *user,
                                   double parent_coeff,
                                   double *coeff)
 {
-    struct depth_generalised_gaussian *s;
+    struct depth_full_generalised_gaussian *s;
     int d;
 
-    s = (struct depth_generalised_gaussian *)user;
+    s = (struct depth_full_generalised_gaussian *)user;
 
     d = level;
     if (d >= s->ndepths)
@@ -74,7 +74,7 @@ sample_depth_generalised_gaussian(void *user,
 }
 
 static double
-prob_depth_generalised_gaussian(void *user,
+prob_depth_full_generalised_gaussian(void *user,
                                 int i,
                                 int j,
                                 int k,
@@ -83,10 +83,10 @@ prob_depth_generalised_gaussian(void *user,
                                 double parent_coeff,
                                 double coeff)
 {
-    struct depth_generalised_gaussian *s;
+    struct depth_full_generalised_gaussian *s;
     int d;
     double p;
-    s = (struct depth_generalised_gaussian *)user;
+    s = (struct depth_full_generalised_gaussian *)user;
 
     d = level;
     if (d >= s->ndepths)
@@ -97,7 +97,7 @@ prob_depth_generalised_gaussian(void *user,
 }
 
 static int
-valid_depth_generalised_gaussian(void *user,
+valid_depth_full_generalised_gaussian(void *user,
                                  int i,
                                  int j,
                                  int k,
@@ -111,7 +111,7 @@ valid_depth_generalised_gaussian(void *user,
 }
 
 static int
-setscale_depth_generalised_gaussian(void *user,
+setscale_depth_full_generalised_gaussian(void *user,
                                     double newscale,
                                     double *oldscale)
 {
@@ -119,11 +119,11 @@ setscale_depth_generalised_gaussian(void *user,
 }
 
 static int
-destroy_depth_generalised_gaussian(void *user)
+destroy_depth_full_generalised_gaussian(void *user)
 {
-    struct depth_generalised_gaussian *s;
+    struct depth_full_generalised_gaussian *s;
 
-    s = (struct depth_generalised_gaussian *)user;
+    s = (struct depth_full_generalised_gaussian *)user;
 
     gsl_rng_free(s->rng);
     free(s->va);
@@ -134,20 +134,20 @@ destroy_depth_generalised_gaussian(void *user)
 }
 
 wavetree_prior_t *
-wavetree_prior_create_depth_generalised_gaussian(int ndepths,
+wavetree_prior_create_depth_full_generalised_gaussian(int ndepths,
                                                  double *va,
                                                  double *beta,
                                                  unsigned long int seed)
 {
     wavetree_prior_t *w;
-    struct depth_generalised_gaussian *s;
+    struct depth_full_generalised_gaussian *s;
     int i;
 
     w = malloc(sizeof(wavetree_prior_t));
     if (w == NULL)
         return NULL;
 
-    s = malloc(sizeof(struct depth_generalised_gaussian));
+    s = malloc(sizeof(struct depth_full_generalised_gaussian));
     if (s == NULL)
         return NULL;
 
@@ -174,12 +174,12 @@ wavetree_prior_create_depth_generalised_gaussian(int ndepths,
     }
 
     w->user = s;
-    w->range = range_depth_generalised_gaussian;
-    w->sample = sample_depth_generalised_gaussian;
-    w->prob = prob_depth_generalised_gaussian;
-    w->valid = valid_depth_generalised_gaussian;
-    w->setscale = setscale_depth_generalised_gaussian;
-    w->destroy = destroy_depth_generalised_gaussian;
+    w->range = range_depth_full_generalised_gaussian;
+    w->sample = sample_depth_full_generalised_gaussian;
+    w->prob = prob_depth_full_generalised_gaussian;
+    w->valid = valid_depth_full_generalised_gaussian;
+    w->setscale = setscale_depth_full_generalised_gaussian;
+    w->destroy = destroy_depth_full_generalised_gaussian;
 
     return w;
 }
