@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.18)
 cmake_policy(SET CMP0048 NEW)
 
+if(APPLE)
+    execute_process(COMMAND "uname -m"
+                    OUTPUT_VARIABLE MACHINE_ARCHITECTURE)
+    set(CMAKE_OSX_ARCHITECTURES ${MACHINE_ARCHITECTURE} CACHE STRING "")
+endif(APPLE)
+
 project(mmtdt
         VERSION 0.0.0
         DESCRIPTION "Mass mapping with transdimensional trees"

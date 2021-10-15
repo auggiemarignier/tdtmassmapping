@@ -67,5 +67,6 @@ std::tuple<complexvector, std::vector<double>> add_gaussian_noise(const complexv
 namespace statistics {
 std::tuple<double, double> run_statistics(const std::vector<double>& truth, const std::vector<double>& estimate);
 double snr(const std::vector<double>& truth, const std::vector<double>& estimate); 
+double snr(const complexvector& truth, const complexvector& estimate); 
 double pearson_correlation(const std::vector<double>& truth, const std::vector<double>& estimate);
 };  // namespace statistics
