@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.18)
 cmake_policy(SET CMP0048 NEW)
 
+set(CMAKE_OSX_ARCHITECTURES "arm64" CACHE STRING "")
+
 project(mmtdt
         VERSION 0.0.0
         DESCRIPTION "Mass mapping with transdimensional trees"
@@ -9,7 +11,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(PROJECT_LIB lib${PROJECT_NAME})
 
-set(CMAKE_VERBOSE_MAKEFILE OFF)
+set(CMAKE_VERBOSE_MAKEFILE ON)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 option(tests "Enable testing" on)
