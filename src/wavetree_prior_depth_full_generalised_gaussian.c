@@ -5,9 +5,9 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 
-#include <wavetreepp.h>
-#include <wavetree_prior.h>
 #include <slog.h>
+
+#include "wavetree_prior_dfggd.h"
 
 /*
  * Coefficients generalised gaussian at each depth
@@ -202,7 +202,7 @@ wavetree_pp_t *load_wavetree_pp(const char *filename, unsigned long int seed, co
         return NULL;
     }
 
-    prior = wavetree_pp_load_prior(fp, seed);
+    prior = load_prior_wavetree_pp(fp, seed);
     if (prior == NULL)
     {
         return NULL;
