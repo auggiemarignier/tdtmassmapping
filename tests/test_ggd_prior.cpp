@@ -4,7 +4,10 @@
 #include <math.h>
 #include "gtest/gtest.h"
 
+extern "C"
+{
 #include "wavetree_prior_dfggd.h"
+}
 
 TEST(TestFGGD, Values)
 {
