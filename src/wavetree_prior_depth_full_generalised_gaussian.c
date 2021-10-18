@@ -5,6 +5,7 @@
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_randist.h>
 
+#include "wavetreepp.h"
 #include <wavetree_prior.h>
 
 /*
@@ -182,4 +183,215 @@ wavetree_prior_create_depth_full_generalised_gaussian(int ndepths,
     w->destroy = destroy_depth_full_generalised_gaussian;
 
     return w;
+}
+
+wavetree_pp_t *
+wavetree_pp_load(const char *filename, unsigned long int seed, coefficient_histogram_t *histogram)
+{
+    FILE *fp;
+
+    wavetree_prior_t *prior;
+    wavetree_bd_t *bd;
+    wavetree_value_t *value;
+
+    wavetree_pp_t *pp;
+
+    fp = fopen(filename, "r");
+    if (fp == NULL)
+    {
+        return NULL;
+    }
+
+    prior = wavetree_pp_load_prior(fp, seed);
+    if (prior == NULL)
+    {
+        return NULL;
+    }
+
+    bd = wavetree_pp_load_bd(fp, seed, prior);
+    if (bd == NULL)
+    {
+        return NULL;
+    }
+
+    value = wavetree_pp_load_value(fp, seed, histogram);
+    if (value == NULL)
+    {
+        return NULL;
+    }
+
+    pp = malloc(sizeof(wavetree_pp_t));
+    if (pp == NULL)
+    {
+        return NULL;
+    }
+
+    pp->prior = prior;
+    pp->bd = bd;
+    pp->value = value;
+
+    fclose(fp);
+
+    return pp;
+}
+
+wavetree_prior_t *
+wavetree_pp_load_prior(FILE *fp, unsigned long int seed)
+{
+    char buffer[256];
+    double vmin[16];
+    double vmax[16];
+    int ndepths;
+    double beta;
+    int i;
+
+    wavetree_prior_t *r;
+
+    if (fp == NULL)
+    {
+        return NULL;
+    }
+
+    if (fscanf(fp, "%s\n", buffer) != 1)
+    {
+        ERROR("failed to read prior name");
+        return NULL;
+    }
+
+    if (strcmp(buffer, "uniform") == 0)
+    {
+
+        if (fscanf(fp, "%lf %lf\n", &(vmin[0]), &(vmax[0])) != 2)
+        {
+            ERROR("failed to read uniform prior bounds");
+            return NULL;
+        }
+
+        r = wavetree_prior_create_globally_uniform(vmin[0], vmax[0], seed);
+        if (r == NULL)
+        {
+            ERROR("failed to create Globally Uniform prior");
+            return NULL;
+        }
+    }
+    else if (strcmp(buffer, "laplace") == 0)
+    {
+
+        if (fscanf(fp, "%lf\n", &beta) != 1)
+        {
+            ERROR("faield to read laplace prior width");
+            return NULL;
+        }
+
+        r = wavetree_prior_create_globally_laplacian(beta, seed);
+        if (r == NULL)
+        {
+            ERROR("failed to create Globally Laplacian prior");
+            return NULL;
+        }
+    }
+    else if (strcmp(buffer, "depthuniform") == 0)
+    {
+
+        if (fscanf(fp, "%d\n", &ndepths) != 1)
+        {
+            ERROR("failed to read n depths for Depth Uniform");
+            return NULL;
+        }
+
+        if (ndepths < 0 || ndepths > 16)
+        {
+            ERROR("invalid ndepths %d", ndepths);
+            return NULL;
+        }
+
+        for (i = 0; i < ndepths; i++)
+        {
+            if (fscanf(fp, "%lf %lf\n", &(vmin[i]), &(vmax[i])) != 2)
+            {
+                ERROR("failed to read std dev %d", i);
+                return NULL;
+            }
+        }
+
+        r = wavetree_prior_create_depth_uniform(ndepths,
+                                                vmin,
+                                                vmax,
+                                                seed);
+        if (r == NULL)
+        {
+            ERROR("failed to create Depth Uniform prior");
+            return NULL;
+        }
+
+        /* } else if (strcmp(buffer, "depthlaplacian") == 0) { */
+
+        /*   if (fscanf(fp, "%d\n", &ndepths) != 1) { */
+        /*     ERROR("failed to read n depths for Depth Laplacian"); */
+        /*     return NULL; */
+        /*   } */
+
+        /*   if (ndepths < 0 || ndepths > 16) { */
+        /*     ERROR("invalid ndepths %d", ndepths); */
+        /*     return NULL; */
+        /*   } */
+
+        /*   for (i = 0; i < ndepths; i ++) { */
+        /*     if (fscanf(fp, "%lf\n", &(vmin[i])) != 1) { */
+        /* 	ERROR("failed to read std dev %d", i); */
+        /* 	return NULL; */
+        /*     } */
+        /*   } */
+
+        /*   r = wavetree_prior_create_depth_laplacian(ndepths, vmin, seed); */
+
+        /*   if (r == NULL) { */
+        /*     ERROR("failed to create Depth Uniform prior"); */
+        /*     return NULL; */
+        /*   } */
+    }
+    else if (strcmp(buffer, "depthgeneralisedgaussian") == 0)
+    {
+
+        if (fscanf(fp, "%lf\n", &beta) != 1)
+        {
+            ERROR("failed to read prior beta");
+            return NULL;
+        }
+
+        if (fscanf(fp, "%d\n", &ndepths) != 1)
+        {
+            ERROR("failed to read n depths for Generalise Gaussian");
+            return NULL;
+        }
+
+        if (ndepths < 0 || ndepths > 16)
+        {
+            ERROR("invalid ndepths %d", ndepths);
+            return NULL;
+        }
+
+        for (i = 0; i < ndepths; i++)
+        {
+            if (fscanf(fp, "%lf\n", &(vmin[i])) != 1)
+            {
+                ERROR("failed to read std dev %d", i);
+                return NULL;
+            }
+        }
+
+        r = wavetree_prior_create_depth_generalised_gaussian(ndepths, vmin, beta, seed);
+        if (r == NULL)
+        {
+            ERROR("failed to create generalised gaussian");
+            return NULL;
+        }
+    }
+    else
+    {
+        ERROR("invalid bd proprosal name: %s", buffer);
+        return NULL;
+    }
+
+    return r;
 }
