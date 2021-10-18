@@ -4,6 +4,7 @@
 extern "C"
 {
 #include "hnk_cartesian_nonsquare.h"
+#include "wavetree_prior_dfggd.h"
 };
 
 static constexpr double LARGE_LIKELIHOOD = 1e99;
@@ -163,7 +164,7 @@ GlobalProposal::GlobalProposal(Observations *_observations,
     //
     if (prior_file != nullptr)
     {
-        proposal = wavetree_pp_load(prior_file, seed, coeff_hist);
+        proposal = load_wavetree_pp(prior_file, seed, coeff_hist);
         if (proposal == NULL)
         {
             throw ERROR("Failed to load proposal file\n");
