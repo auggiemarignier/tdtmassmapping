@@ -198,33 +198,23 @@ wavetree_pp_t *load_wavetree_pp(const char *filename, unsigned long int seed, co
 
     fp = fopen(filename, "r");
     if (fp == NULL)
-    {
         return NULL;
-    }
 
     prior = load_prior_wavetree_pp(fp, seed);
     if (prior == NULL)
-    {
         return NULL;
-    }
 
     bd = wavetree_pp_load_bd(fp, seed, prior);
     if (bd == NULL)
-    {
         return NULL;
-    }
 
     value = wavetree_pp_load_value(fp, seed, histogram);
     if (value == NULL)
-    {
         return NULL;
-    }
 
     pp = malloc(sizeof(wavetree_pp_t));
     if (pp == NULL)
-    {
         return NULL;
-    }
 
     pp->prior = prior;
     pp->bd = bd;
@@ -242,15 +232,13 @@ load_prior_wavetree_pp(FILE *fp, unsigned long int seed)
     double vmin[16];
     double vmax[16];
     int ndepths;
-    double beta;
+    double beta[16];
     int i;
 
     wavetree_prior_t *r;
 
     if (fp == NULL)
-    {
         return NULL;
-    }
 
     if (fscanf(fp, "%s\n", buffer) != 1)
     {
@@ -283,7 +271,7 @@ load_prior_wavetree_pp(FILE *fp, unsigned long int seed)
             return NULL;
         }
 
-        r = wavetree_prior_create_globally_laplacian(beta, seed);
+        r = wavetree_prior_create_globally_laplacian(beta[0], seed);
         if (r == NULL)
         {
             ERROR("failed to create Globally Laplacian prior");
@@ -380,7 +368,37 @@ load_prior_wavetree_pp(FILE *fp, unsigned long int seed)
             }
         }
 
-        r = wavetree_prior_create_depth_generalised_gaussian(ndepths, vmin, beta, seed);
+        r = wavetree_prior_create_depth_generalised_gaussian(ndepths, vmin, beta[0], seed);
+        if (r == NULL)
+        {
+            ERROR("failed to create generalised gaussian");
+            return NULL;
+        }
+    }
+    else if (strcmp(buffer, "depthfullgeneralisedgaussian") == 0)
+    {
+        if (fscanf(fp, "%d\n", &ndepths) != 1)
+        {
+            ERROR("failed to read n depths for Generalise Gaussian");
+            return NULL;
+        }
+
+        if (ndepths < 0 || ndepths > 16)
+        {
+            ERROR("invalid ndepths %d", ndepths);
+            return NULL;
+        }
+
+        for (i = 0; i < ndepths; i++)
+        {
+            if (fscanf(fp, "%lf %lf\n", &(beta[i]), &(vmin[i])) != 2)
+            {
+                ERROR("failed to read std dev %d", i);
+                return NULL;
+            }
+        }
+
+        r = wavetree_prior_create_depth_full_generalised_gaussian(ndepths, vmin, beta, seed);
         if (r == NULL)
         {
             ERROR("failed to create generalised gaussian");
