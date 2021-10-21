@@ -58,7 +58,7 @@ struct user_data
     FILE *fp_k;
 };
 
-static const double CREDIBLE_INTERVAL = 0.95;
+static const double CREDIBLE_INTERVAL = 0.99;
 
 static int process(int i,
                    void *user,
@@ -193,8 +193,6 @@ int main(int argc, char *argv[])
     hpd_range = NULL;
 
     bins = 1000;
-    vmin = 2.0;
-    vmax = 4.0;
 
     thin = 0;
     skip = 0;
@@ -390,22 +388,32 @@ int main(int argc, char *argv[])
     //
     // Likelihood output
     //
-    data.fp_out = fopen(likelihood_file, "w");
-    if (data.fp_out == NULL)
+    if (likelihood_file != NULL)
     {
-        fprintf(stderr, "error: failed to open likelihood file\n");
-        return -1;
+        data.fp_out = fopen(likelihood_file, "w");
+        if (data.fp_out == NULL)
+        {
+            fprintf(stderr, "error: failed to open likelihood file\n");
+            return -1;
+        }
     }
+    else
+        data.fp_out = nullptr;
 
     //
     // khistory output
     //
-    data.fp_k = fopen(khistory_file, "w");
-    if (data.fp_k == NULL)
+    if (khistory_file != NULL)
     {
-        fprintf(stderr, "error: failed to open khistory file\n");
-        return -1;
+        data.fp_k = fopen(khistory_file, "w");
+        if (data.fp_k == NULL)
+        {
+            fprintf(stderr, "error: failed to open khistory file\n");
+            return -1;
+        }
     }
+    else
+        data.fp_k = nullptr;
 
     /*
    * Process the chain history
@@ -436,29 +444,34 @@ int main(int argc, char *argv[])
         }
     }
     fclose(fp_in);
-    fclose(data.fp_out);
-    fclose(data.fp_k);
+    if (data.fp_out != nullptr)
+        fclose(data.fp_out);
+    if (data.fp_k != nullptr)
+        fclose(data.fp_k);
 
     /*
    * Mean output
    */
-    fp_out = fopen(output_file, "w");
-    if (fp_out == NULL)
+    if (output_file != NULL)
     {
-        fprintf(stderr, "error: failed to open mean file\n");
-        return -1;
-    }
-
-    for (j = 0; j < data.height; j++)
-    {
-        for (i = 0; i < data.width; i++)
+        fp_out = fopen(output_file, "w");
+        if (fp_out == NULL)
         {
-            fprintf(fp_out, "%10.6f ", data.mean[j * data.width + i]);
+            fprintf(stderr, "error: failed to open mean file\n");
+            return -1;
         }
-        fprintf(fp_out, "\n");
-    }
 
-    fclose(fp_out);
+        for (j = 0; j < data.height; j++)
+        {
+            for (i = 0; i < data.width; i++)
+            {
+                fprintf(fp_out, "%10.6f ", data.mean[j * data.width + i]);
+            }
+            fprintf(fp_out, "\n");
+        }
+
+        fclose(fp_out);
+    }
 
     for (i = 0; i < data.size; i++)
     {
@@ -796,7 +809,8 @@ static int process(int stepi,
 
     if ((d->thincounter >= d->skip) && (d->thin <= 1 || ((d->thincounter - d->skip) % d->thin) == 0))
     {
-        fprintf(d->fp_out, "%.6f\n", step->header.likelihood);
+        if (d->fp_out != nullptr)
+            fprintf(d->fp_out, "%.6f\n", step->header.likelihood);
         if (step->header.likelihood < d->min_likelihood)
         {
             d->min_likelihood = step->header.likelihood;
@@ -810,7 +824,8 @@ static int process(int stepi,
             fprintf(stderr, "process: failed to set wavetree (sub)\n");
             return -1;
         }
-        fprintf(d->fp_k, "%i\n", wavetree2d_sub_coeff_count(d->wt));
+        if (d->fp_k != nullptr)
+            fprintf(d->fp_k, "%i\n", wavetree2d_sub_coeff_count(d->wt));
 
         if (wavetree2d_sub_map_to_array(d->wt, d->model, d->size) < 0)
         {
