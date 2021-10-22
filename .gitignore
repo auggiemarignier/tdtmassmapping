@@ -1,9 +1,10 @@
 build/
 bin/
 .vscode/
-.venv/
+*.venv/
 outputs/
 runs/
 data/
 *.o
 *.ipynb*
+*__pycache__
