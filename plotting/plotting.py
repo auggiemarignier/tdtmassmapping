@@ -5,37 +5,47 @@ from matplotlib.colors import Normalize
 from matplotlib.lines import Line2D
 import sys
 import os
+from utils import meanvar_from_submeanvar
 
 
 directory = sys.argv[1]
 truth = np.loadtxt(f"{directory}/truth.txt").reshape((256, 256))
 mean = np.loadtxt(f"{directory}/mean.txt")
 std = np.loadtxt(f"{directory}/stddev.txt")
+var = std ** 2
 khist = np.loadtxt(f"{directory}/khistogram.txt")
 best_fitting = np.loadtxt(f"{directory}/best_model.txt")
 last_nonzero_k = np.argwhere(khist[:, 1]).max()
 likelihoods = np.loadtxt(f"{directory}/likelihood.txt")
 khistory = np.loadtxt(f"{directory}/khistory.txt")
-
+current_n = likelihoods.shape[0]
 restarts = []
 while os.path.isdir(f"{directory}/restart/"):
     restarts.append(likelihoods.shape[0])
     directory += "/restart"
     if os.path.isfile(f"{directory}/mean.txt"):
-        mean += np.loadtxt(f"{directory}/mean.txt")
-        std += np.loadtxt(
-            f"{directory}/stddev.txt"
-        )  # note this assumes NO correlation between pixels
-        likelihoods = np.concatenate(
-            [likelihoods, np.loadtxt(f"{directory}/likelihood.txt")]
+        mean2 = np.loadtxt(f"{directory}/mean.txt")
+        std2 = np.loadtxt(f"{directory}/stddev.txt")
+        var2 = std2 ** 2
+        likelihoods2 = np.loadtxt(f"{directory}/likelihood.txt")
+        n_add = len(likelihoods2)
+
+        mean, var = meanvar_from_submeanvar(
+            mean,
+            mean2,
+            var,
+            var2,
+            current_n,
+            n_add
         )
+        current_n += n_add
+
+        likelihoods = np.concatenate([likelihoods, likelihoods2])
         khist[:, 1] += np.loadtxt(f"{directory}/khistogram.txt", usecols=1)
         last_nonzero_k = np.argwhere(khist[:, 1]).max()
         best_fitting = np.loadtxt(f"{directory}/best_model.txt")
         khistory = np.concatenate([khistory, np.loadtxt(f"{directory}/khistory.txt")])
 
-mean /= len(restarts) + 1
-std /= len(restarts) + 1
 diff = np.abs(truth - mean)
 diff_best = np.abs(truth - best_fitting)
 

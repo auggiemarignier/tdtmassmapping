@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+import os
+from utils import meanvar_from_submeanvar
 
 
 def index_to_2d(index, width):
@@ -47,8 +49,30 @@ try:
 except IndexError:
     levels = 8
 means = np.loadtxt(f"{directory}/coeff_mean.txt")
-stddevs = np.loadtxt(f"{directory}/coeff_std.txt").flatten()
+stddevs = np.loadtxt(f"{directory}/coeff_std.txt").flatten()  # not sure why this shape is different
+var = stddevs**2
 counts = np.loadtxt(f"{directory}/coeff_n.txt")
+current_n = np.loadtxt(f"{directory}/likelihood.txt").shape[0]
+restarts = []
+while os.path.isdir(f"{directory}/restart/"):
+    restarts.append(current_n)
+    directory += "/restart"
+    if os.path.isfile(f"{directory}/coeff_mean.txt"):
+        means2 = np.loadtxt(f"{directory}/coeff_mean.txt")
+        stddevs2 = np.loadtxt(f"{directory}/coeff_std.txt").flatten()
+        counts += np.loadtxt(f"{directory}/coeff_n.txt")
+        var2 = stddevs2 ** 2
+        n_add = np.loadtxt(f"{directory}/likelihood.txt").shape[0]
+
+        mean, var = meanvar_from_submeanvar(
+            means,
+            means2,
+            var,
+            var2,
+            current_n,
+            n_add
+        )
+        current_n += n_add
 
 for model in [means, stddevs, counts]:
     indexes = np.nonzero(model)[0]
@@ -72,6 +96,10 @@ for model in [means, stddevs, counts]:
         )
     cbar_end = np.abs(wavelet_img).max()
     axd = img_to_mosaicaxes(
-        abs(wavelet_img), axd, cmap="cividis", vmin=0, vmax=cbar_end,
+        abs(wavelet_img),
+        axd,
+        cmap="cividis",
+        vmin=0,
+        vmax=cbar_end,
     )
     plt.show()
