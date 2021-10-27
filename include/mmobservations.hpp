@@ -76,7 +76,7 @@ public:
     void kaiser_squires_adj(complexvector &output, const complexvector &input);
 
 private:
-    std::tuple<std::function<void(complexvector &, const complexvector &)>, std::function<void(complexvector &, const complexvector &)>> init_fft_2d();
+    std::tuple<std::function<void(complexvector &, const complexvector &)>, std::function<void(complexvector &, const complexvector &)>> init_fft_2d(const uint _imsizex, const uint _imsizey);
 
     std::function<void(complexvector &, const complexvector &)> fft;
     std::function<void(complexvector &, const complexvector &)> ifft;

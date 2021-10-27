@@ -141,29 +141,27 @@ complexvector mmobservations::single_frequency_predictions(complexvector &kappa)
     return gamma;
 }
 
-std::tuple<std::function<void(complexvector &, const complexvector &)>, std::function<void(complexvector &, const complexvector &)>> mmobservations::init_fft_2d()
+std::tuple<std::function<void(complexvector &, const complexvector &)>, std::function<void(complexvector &, const complexvector &)>> mmobservations::init_fft_2d(const uint _imsizex, const uint _imsizey)
 {
-    complexvector superin(imsize);
-    complexvector superout(imsize);
+    const uint _imsize = _imsizex * _imsizey;
+    complexvector in(_imsize);
+    complexvector out(_imsize);
 
     auto del = [](fftw_plan_s *plan)
     { fftw_destroy_plan(plan); };
     std::shared_ptr<fftw_plan_s> plan_forward(
         fftw_plan_dft_2d(
-            superimsizey,
-            superimsizex,
-            reinterpret_cast<fftw_complex *>(&superin[0]),
-            reinterpret_cast<fftw_complex *>(&superout[0]),
+            _imsizey,
+            _imsizex,
+            reinterpret_cast<fftw_complex *>(&in[0]),
+            reinterpret_cast<fftw_complex *>(&out[0]),
             FFTW_FORWARD,
             FFTW_MEASURE),
         del);
-
-    complexvector in(imsize);
-    complexvector out(imsize);
     std::shared_ptr<fftw_plan_s> plan_inverse(
         fftw_plan_dft_2d(
-            imsizey,
-            imsizex,
+            _imsizey,
+            _imsizex,
             reinterpret_cast<fftw_complex *>(&in[0]),
             reinterpret_cast<fftw_complex *>(&out[0]),
             FFTW_BACKWARD,
