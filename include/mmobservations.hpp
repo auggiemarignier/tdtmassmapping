@@ -80,6 +80,8 @@ private:
 
     std::function<void(complexvector &, const complexvector &)> fft;
     std::function<void(complexvector &, const complexvector &)> ifft;
+    std::function<void(complexvector &, const complexvector &)> s_fft;
+    std::function<void(complexvector &, const complexvector &)> s_ifft;
 
     std::tuple<std::function<void(complexvector &, const complexvector &)>, std::function<void(complexvector &, const complexvector &)>, std::function<void(complexvector &, const complexvector &)>> build_lensing_kernels();
 

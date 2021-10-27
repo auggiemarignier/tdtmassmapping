@@ -124,9 +124,15 @@ mmobservations::mmobservations(const uint _imsizex, const uint _imsizey, const u
         superimsizey = imsizey << super;
         superimsize = superimsizex * superimsizey;
     }
-    auto fft_tuple = init_fft_2d();
+    auto fft_tuple = init_fft_2d(imsizex, imsizey);
     fft = std::get<0>(fft_tuple);
     ifft = std::get<1>(fft_tuple);
+    if (super > 1)
+    {
+        auto s_fft_tuple = init_fft_2d(superimsizex, superimsizey);
+        s_fft = std::get<0>(s_fft_tuple);
+        s_ifft = std::get<1>(s_fft_tuple);
+    }
 
     auto operator_tuple = build_lensing_kernels();
     D = std::get<0>(operator_tuple);
