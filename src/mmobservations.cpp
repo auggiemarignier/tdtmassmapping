@@ -108,12 +108,22 @@ complexvector Identity::single_frequency_predictions(complexvector &model)
     return predictions;
 }
 
-mmobservations::mmobservations(const uint _imsizex, const uint _imsizey)
+mmobservations::mmobservations(const uint _imsizex, const uint _imsizey, const uint _super)
     : Observations(),
       imsizex(_imsizex),
       imsizey(_imsizey),
-      imsize(_imsizey * _imsizex)
+      imsize(_imsizey * _imsizex),
+      super(_super),
+      superimsizex(_imsizex),
+      superimsizey(_imsizey),
+      superimsize(_imsizex * _imsizey)
 {
+    if (super > 1)
+    {
+        superimsizex = imsizex << super;
+        superimsizey = imsizey << super;
+        superimsize = superimsizex * superimsizey;
+    }
     auto fft_tuple = init_fft_2d();
     fft = std::get<0>(fft_tuple);
     ifft = std::get<1>(fft_tuple);

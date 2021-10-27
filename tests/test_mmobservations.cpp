@@ -15,7 +15,7 @@ protected:
     {
         const uint imsizex = 32;
         const uint imsizey = 32;
-        observations = new mmobservations(imsizex, imsizey);
+        observations = new mmobservations(imsizex, imsizey, 1);
         random = new Rng(1);
     }
     void TearDown() override

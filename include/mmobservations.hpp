@@ -53,7 +53,7 @@ class mmobservations : public Observations
 {
 public:
     // Default constructor
-    mmobservations(const uint _imsizex, const uint _imsizey);
+    mmobservations(const uint _imsizex, const uint _imsizey, const uint super);
 
 #if 0 // Need to decide exactly how/when data gets read
     // Constructor that takes in vectors
@@ -90,4 +90,8 @@ private:
     const uint imsizex;
     const uint imsizey;
     const uint imsize;
+    const uint super;
+    uint superimsizex;
+    uint superimsizey;
+    uint superimsize;
 };
