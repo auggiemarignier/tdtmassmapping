@@ -89,6 +89,9 @@ private:
     std::function<void(complexvector &, const complexvector &)> Dadj;
     std::function<void(complexvector &, const complexvector &)> Dinv;
 
+    void upsample(complexvector &hires, const complexvector &lowres);
+    void downsample(complexvector &lowres, const complexvector &hires);
+
     const uint imsizex;
     const uint imsizey;
     const uint imsize;

@@ -250,6 +250,38 @@ std::tuple<std::function<void(complexvector &, const complexvector &)>, std::fun
     return std::make_tuple(forward, inverse, adjoint);
 }
 
+void mmobservations::upsample(complexvector &hires, const complexvector &lowres)
+{ // inputs and outputs in fourier space
+    std::memset(&hires, 0, superimsize);
+    for (int i = 0; i < (int)(imsizey / 2); i++)
+    {
+        for (int j = 0; j < (int)(imsizex / 2); i++)
+        {
+            hires[i * superimsizey + j] = lowres[i * imsizey + j];
+            
+            hires[i * superimsizey + superimsizex - j - 1] = lowres[i * imsizey + imsizex - j - 1];
+
+            hires[(superimsizey - i - 1) * superimsizey + j] = lowres[(imsizey - i - 1) * imsizey + j];
+            
+            hires[(superimsizey - i - 1) * superimsizey + superimsizex - j] = lowres[(imsizey - i - 1) * imsizey + imsizex - j - 1];
+        }
+    }
+}
+
+void mmobservations::downsample(complexvector &lowres, const complexvector &hires)
+{ // inputs and outputs in fourier space
+    int ky, kx;
+    for (int i = 0; i < imsizey; i++)
+    {
+        ky = (2 * i < imsizex) ? (static_cast<double>(i)) : (static_cast<double>(i - imsizex));
+        for (int j = 0; j < imsizex; j++)
+        {
+            kx = (2 * j < imsizex) ? (static_cast<double>(i)) : (static_cast<double>(i - imsizex));
+            lowres[i * imsizey + j] = hires[ky * imsizey + kx];
+        }
+    }
+}
+
 void mmobservations::kaiser_squires(complexvector &output, const complexvector &input)
 {
     complexvector temp(imsize);
