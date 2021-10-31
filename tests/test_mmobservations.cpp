@@ -30,13 +30,14 @@ protected:
 
 TEST_F(MMObsTest, MMLikelihood)
 {
-    complexvector f(imsize);;
+    complexvector f(imsize);
+    ;
     for (uint j = 0; j < imsize; j++)
         f[j] = std::complex<double>(random->normal(1.), 0);
 
     complexvector predictions = observations->single_frequency_predictions(f);
     for (int i = 1; i < imsize; i++)
-        ASSERT_NE(std::complex<double>(0,0), predictions[i]);
+        ASSERT_NE(std::complex<double>(0, 0), predictions[i]);
     observations->set_observed_data(predictions);
 
     std::vector<double> sig = {1.};
@@ -59,8 +60,8 @@ TEST_F(MMObsTest, KaiserSquiresInv)
     observations->kaiser_squires_inv(recovered, output);
     for (int i = 1; i < imsize; i++)
     {
-        ASSERT_NE(std::complex<double>(0,0), output[i]);
-        ASSERT_NE(std::complex<double>(0,0), recovered[i]);
+        ASSERT_NE(std::complex<double>(0, 0), output[i]);
+        ASSERT_NE(std::complex<double>(0, 0), recovered[i]);
     }
     // Mass sheet degeneracy says we can only recover kappa up to a constant
     // Check input - recovered == constant
@@ -89,8 +90,8 @@ TEST_F(MMObsTest, KaiserSquiresAdj)
     observations->kaiser_squires_adj(k2, g2);
     for (int i = 1; i < imsize; i++)
     {
-        ASSERT_NE(std::complex<double>(0,0), g1[i]);
-        ASSERT_NE(std::complex<double>(0,0), k2[i]);
+        ASSERT_NE(std::complex<double>(0, 0), g1[i]);
+        ASSERT_NE(std::complex<double>(0, 0), k2[i]);
     }
 
     std::complex<double> g1dotg2 = 0;
@@ -104,6 +105,31 @@ TEST_F(MMObsTest, KaiserSquiresAdj)
     ASSERT_NE(std::complex<double>(0, 0), k1dotk2);
     ASSERT_FLOAT_EQ(g1dotg2.real(), k1dotk2.real());
     ASSERT_FLOAT_EQ(g1dotg2.imag(), k1dotk2.imag());
+}
+
+TEST(MMObsTest, UpsampleDownsample)
+{
+    const uint imsizex = 32;
+    const uint imsizey = 32;
+    const uint imsize = imsizex * imsizey;
+    const uint super = 2;
+    const double pi = 4. * acos(1. / sqrt(2));
+
+    mmobservations observations(imsizex, imsizey, super);
+    complexvector kappa(imsize);
+    for (int i = 0; i < imsizey; i++)
+    {
+        for (int j = 0; j < imsizex; j++)
+        {
+            kappa[i * imsizey + j] = std::complex<double>(
+                sin(8 * pi * i) + sin(8 * pi * j),
+                sin(16 * pi * i) + sin(16 * pi * j));
+            kappa[i * imsizey + j] += std::complex<double>(
+                sin(4 * pi * i) + sin(4 * pi * j),
+                -sin(8 * pi * i) - sin(8 * pi * j));
+        }
+    }
+    
 }
 
 int main(int argc, char **argv)
