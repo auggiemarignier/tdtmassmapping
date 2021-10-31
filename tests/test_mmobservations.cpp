@@ -168,6 +168,12 @@ TEST(MMObsTest, UpsampleDownsample)
     fclose(fp0);
     fclose(fp1);
     fclose(fp2);
+
+    for (uint i = 0; i < imsize; i++)
+    {
+        EXPECT_NEAR(kappa[i].real() - kapparec[i].real(), 0., 1e-12) << i;
+        EXPECT_NEAR(kappa[i].imag() - kapparec[i].imag(), 0., 1e-12) << i;
+    }
 }
 
 int main(int argc, char **argv)
