@@ -113,25 +113,61 @@ TEST(MMObsTest, UpsampleDownsample)
     const uint imsizey = 32;
     const uint imsize = imsizex * imsizey;
     const uint super = 2;
+    const uint superimsizex = super * imsizex;
+    const uint superimsizey = super * imsizey;
+    const uint superimsize = super * imsize;
     const double pi = 4. * acos(1. / sqrt(2));
 
     mmobservations observations(imsizex, imsizey, super);
-    complexvector kappa(imsize);
-    for (int i = 0; i < imsizey; i++)
+    complexvector kappa(superimsize);
+    for (int i = 0; i < superimsizey; i++)
     {
-        for (int j = 0; j < imsizex; j++)
+        for (int j = 0; j < superimsizex; j++)
         {
-            kappa[i * imsizey + j] = std::complex<double>(
+            kappa[i * superimsizey + j] = std::complex<double>(
                 sin(8 * pi * i) + sin(8 * pi * j),
                 sin(16 * pi * i) + sin(16 * pi * j));
-            kappa[i * imsizey + j] += std::complex<double>(
+            kappa[i * superimsizey + j] += std::complex<double>(
                 sin(4 * pi * i) + sin(4 * pi * j),
                 -sin(8 * pi * i) - sin(8 * pi * j));
         }
     }
 
-    complexvector kappahat(imsize);
-    complexvector kappadownhat((int)(imsize / 2));
+    complexvector kappahat(superimsize);
+    complexvector kappadownhat(imsize);
+    complexvector kappadown(imsize);
+    complexvector kapparechat(superimsize);
+    complexvector kapparec(superimsize);
+
+    observations.s_fft(kappahat, kappa);
+    observations.downsample(kappadownhat, kappahat);
+    observations.ifft(kappadown, kappadownhat);
+    observations.upsample(kapparechat, kappadownhat);
+    observations.s_ifft(kapparec, kapparechat);
+
+    FILE *fp0 = fopen("/Users/auggiemarignier/Documents/PhD/TDT/massmapping/outputs/checker.txt", "w");
+    FILE *fp1 = fopen("/Users/auggiemarignier/Documents/PhD/TDT/massmapping/outputs/checkerdown.txt", "w");
+    FILE *fp2 = fopen("/Users/auggiemarignier/Documents/PhD/TDT/massmapping/outputs/checkerrec.txt", "w");
+
+    for (int i = 0; i < imsizey; i++)
+    {
+        for (int j = 0; j < imsizex; j++)
+        {
+            fprintf(fp0, "%10.6f", kappadown[i * imsizey + j]);
+        }
+    }
+    for (int i = 0; i < (int)(superimsizey); i++)
+    {
+        for (int j = 0; j < (int)(superimsizex); j++)
+        {
+            fprintf(fp0, "%10.6f", kappa[i * superimsizey + j]);
+            fprintf(fp0, "%10.6f", kapparec[i * superimsizey + j]);
+        }
+    }
+
+    fclose(fp0);
+    fclose(fp1);
+    fclose(fp2);
 }
 
 int main(int argc, char **argv)
