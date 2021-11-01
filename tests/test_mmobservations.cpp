@@ -107,7 +107,7 @@ TEST_F(MMObsTest, KaiserSquiresAdj)
     ASSERT_FLOAT_EQ(g1dotg2.imag(), k1dotk2.imag());
 }
 
-TEST(MMObsTest, UpsampleDownsample)
+TEST(MMObsDummyTest, UpsampleDownsample)
 {
     const uint imsizex = 32;
     const uint imsizey = 32;
@@ -125,11 +125,11 @@ TEST(MMObsTest, UpsampleDownsample)
         for (int j = 0; j < superimsizex; j++)
         {
             kappa[i * superimsizey + j] = std::complex<double>(
-                sin(8 * pi * i) + sin(8 * pi * j),
-                sin(16 * pi * i) + sin(16 * pi * j));
+                sin(i / pi) + sin(j / pi),
+                sin(2 * i / pi) + sin(2 * j / pi));
             kappa[i * superimsizey + j] += std::complex<double>(
-                sin(4 * pi * i) + sin(4 * pi * j),
-                -sin(8 * pi * i) - sin(8 * pi * j));
+                sin(i / (2 * pi)) + sin(j / (2 * pi)),
+                -sin(i / pi) - sin(j / pi));
         }
     }
 
@@ -153,16 +153,19 @@ TEST(MMObsTest, UpsampleDownsample)
     {
         for (int j = 0; j < imsizex; j++)
         {
-            fprintf(fp0, "%10.6f", kappadown[i * imsizey + j]);
+            fprintf(fp1, "%10.6f", kappadown[i * imsizey + j].real());
         }
+        fprintf(fp1, "\n");
     }
     for (int i = 0; i < (int)(superimsizey); i++)
     {
         for (int j = 0; j < (int)(superimsizex); j++)
         {
-            fprintf(fp0, "%10.6f", kappa[i * superimsizey + j]);
-            fprintf(fp0, "%10.6f", kapparec[i * superimsizey + j]);
+            fprintf(fp0, "%10.6f", kappa[i * superimsizey + j].real());
+            fprintf(fp2, "%10.6f", kapparec[i * superimsizey + j].real());
         }
+        fprintf(fp0, "\n");
+        fprintf(fp2, "\n");
     }
 
     fclose(fp0);
