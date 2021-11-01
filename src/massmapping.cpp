@@ -9,7 +9,7 @@
 #include "globalprop.cpp"
 #include "logging.hpp"
 
-static char short_options[] = "i:I:M:o:x:y:t:S:k:B:w:v:l:h";
+static char short_options[] = "i:I:M:o:x:y:t:S:s:k:B:w:v:l:h";
 static struct option long_options[] = {
     {"input", required_argument, 0, 'i'},
     {"initial_model", required_argument, 0, 'I'},
@@ -22,6 +22,7 @@ static struct option long_options[] = {
     {"total", required_argument, 0, 't'},
     {"seed", required_argument, 0, 'S'},
 
+    {"super", required_argument, 0, 's'},
     {"kmax", required_argument, 0, 'k'},
     {"birth-probability", required_argument, 0, 'B'},
 
@@ -55,6 +56,7 @@ int main(int argc, char *argv[])
     int wavelet_xy = 4;
     int degreex = 8;
     int degreey = 8;
+    int super = 1;
 
     double *model;
 
@@ -107,6 +109,9 @@ int main(int argc, char *argv[])
             break;
         case 'S':
             seed = atoi(optarg);
+            break;
+        case 's':
+            super = atoi(optarg);
             break;
         case 'k':
             kmax = atoi(optarg);
@@ -184,7 +189,7 @@ int main(int argc, char *argv[])
         throw ERROR("File not opened %s", input_kappa);
     }
 
-    mmobservations observations(1 << degreex, 1 << degreey);
+    mmobservations observations(1 << degreex, 1 << degreey, super);
     complexvector gamma = observations.single_frequency_predictions(kappa);
 
     const double ngal = 100.;
@@ -405,6 +410,7 @@ static void usage(const char *pname)
             "\n"
             " -t|--total <int>                Total number of iterations\n"
             " -S|--seed <int>                 Random number seed\n"
+            " -s|--seed <int>                 Super-resolution factor\n"
             "\n"
             " -k|--kmax <int>                 Max. no. of coefficients\n"
             "\n"
