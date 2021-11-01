@@ -180,8 +180,8 @@ std::tuple<std::function<void(complexvector &, const complexvector &)>, std::fun
             plan_forward.get(),
             const_cast<fftw_complex *>(reinterpret_cast<const fftw_complex *>(&input[0])),
             reinterpret_cast<fftw_complex *>(&output[0]));
-        for (int i = 0; i < (int)(imsize); i++)
-            output[i] /= std::sqrt(imsize);
+        for (int i = 0; i < (int)(_imsize); i++)
+            output[i] /= std::sqrt(_imsize);
     };
 
     auto backward = [=](complexvector &output, const complexvector &input)
@@ -190,8 +190,8 @@ std::tuple<std::function<void(complexvector &, const complexvector &)>, std::fun
             plan_inverse.get(),
             const_cast<fftw_complex *>(reinterpret_cast<const fftw_complex *>(&input[0])),
             reinterpret_cast<fftw_complex *>(&output[0]));
-        for (int i = 0; i < (int)(imsize); i++)
-            output[i] /= std::sqrt(imsize);
+        for (int i = 0; i < (int)(_imsize); i++)
+            output[i] /= std::sqrt(_imsize);
     };
 
     return std::make_tuple(forward, backward);
@@ -252,17 +252,16 @@ std::tuple<std::function<void(complexvector &, const complexvector &)>, std::fun
 
 void mmobservations::upsample(complexvector &hires, const complexvector &lowres)
 { // inputs and outputs in fourier space
-    std::memset(&hires, 0, superimsize);
     for (int i = 0; i < (int)(imsizey / 2); i++)
     {
-        for (int j = 0; j < (int)(imsizex / 2); i++)
+        for (int j = 0; j < (int)(imsizex / 2); j++)
         {
             hires[i * superimsizey + j] = lowres[i * imsizey + j];
-            
+
             hires[i * superimsizey + superimsizex - j - 1] = lowres[i * imsizey + imsizex - j - 1];
 
             hires[(superimsizey - i - 1) * superimsizey + j] = lowres[(imsizey - i - 1) * imsizey + j];
-            
+
             hires[(superimsizey - i - 1) * superimsizey + superimsizex - j] = lowres[(imsizey - i - 1) * imsizey + imsizex - j - 1];
         }
     }
@@ -270,14 +269,18 @@ void mmobservations::upsample(complexvector &hires, const complexvector &lowres)
 
 void mmobservations::downsample(complexvector &lowres, const complexvector &hires)
 { // inputs and outputs in fourier space
-    int ky, kx;
-    for (int i = 0; i < imsizey; i++)
+    for (int i = 0; i < (int)(imsizey / 2); i++)
     {
-        ky = (2 * i < imsizex) ? (static_cast<double>(i)) : (static_cast<double>(i - imsizex));
-        for (int j = 0; j < imsizex; j++)
+        for (int j = 0; j < (int)(imsizex / 2); j++)
         {
-            kx = (2 * j < imsizex) ? (static_cast<double>(i)) : (static_cast<double>(i - imsizex));
-            lowres[i * imsizey + j] = hires[ky * imsizey + kx];
+            lowres[i * imsizey + j] = hires[i * superimsizey + j];
+
+            lowres[i * imsizey + imsizex - j - 1] = hires[i * superimsizey + superimsizex - j - 1];
+
+            lowres[(imsizey - i - 1) * imsizey + j] = hires[(superimsizey - i - 1) * superimsizey + j];
+
+            lowres[(imsizey - i - 1) * imsizey + imsizex - j] = hires[(superimsizey - i - 1) * superimsizey + superimsizex - j - 1];
+
         }
     }
 }
