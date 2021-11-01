@@ -115,7 +115,7 @@ TEST(MMObsDummyTest, UpsampleDownsample)
     const uint super = 2;
     const uint superimsizex = super * imsizex;
     const uint superimsizey = super * imsizey;
-    const uint superimsize = super * imsize;
+    const uint superimsize = superimsizex * superimsizey;
     const double pi = 4. * acos(1. / sqrt(2));
 
     mmobservations observations(imsizex, imsizey, super);
@@ -132,17 +132,6 @@ TEST(MMObsDummyTest, UpsampleDownsample)
                 -sin(i / pi) - sin(j / pi));
         }
     }
-
-    FILE *fp = fopen("/Users/auggiemarignier/Documents/PhD/TDT/massmapping/outputs/checker0.txt", "w");
-    for (int i = 0; i < superimsizey; i++)
-    {
-        for (int j = 0; j < superimsizex; j++)
-        {
-            fprintf(fp, "%10.6f ", kappa[i * superimsizey + j].real());
-        }
-        fprintf(fp, "\n");
-    }
-    fclose(fp);
     complexvector kappahat(superimsize);
     complexvector kappadownhat(imsize);
     complexvector kappadown(imsize);
@@ -150,16 +139,6 @@ TEST(MMObsDummyTest, UpsampleDownsample)
     complexvector kapparec(superimsize);
 
     observations.s_fft(kappahat, kappa);
-    fp = fopen("/Users/auggiemarignier/Documents/PhD/TDT/massmapping/outputs/checker1.txt", "w");
-    for (int i = 0; i < superimsizey; i++)
-    {
-        for (int j = 0; j < superimsizex; j++)
-        {
-            fprintf(fp, "%10.6f ", kappa[i * superimsizey + j].real());
-        }
-        fprintf(fp, "\n");
-    }
-    fclose(fp);
     observations.downsample(kappadownhat, kappahat);
     observations.ifft(kappadown, kappadownhat);
     observations.upsample(kapparechat, kappadownhat);
