@@ -264,7 +264,6 @@ void mmobservations::upsample(complexvector &hires, const complexvector &lowres)
             hires[(superimsizey - i - 1) * superimsizey + j - 1] = lowres[(imsizey - i - 1) * imsizey + j - 1] * _super;
 
             hires[(superimsizey - i - 1) * superimsizey + superimsizex - j - 1] = lowres[(imsizey - i - 1) * imsizey + imsizex - j - 1] * _super;
-
         }
     }
 }
@@ -283,34 +282,72 @@ void mmobservations::downsample(complexvector &lowres, const complexvector &hire
             lowres[(imsizey - i - 1) * imsizey + j - 1] = hires[(superimsizey - i - 1) * superimsizey + j - 1] / _super;
 
             lowres[(imsizey - i - 1) * imsizey + imsizex - j - 1] = hires[(superimsizey - i - 1) * superimsizey + superimsizex - j - 1] / _super;
-
         }
     }
 }
 
 void mmobservations::kaiser_squires(complexvector &output, const complexvector &input)
 {
-    complexvector temp(imsize);
-    complexvector temp2(imsize);
-    fft(temp, input);
-    D(temp2, temp);
-    ifft(output, temp2);
+    if (super > 1)
+    {
+        complexvector temp(superimsize);
+        complexvector temp2(imsize);
+        complexvector temp3(imsize);
+        s_fft(temp, input);
+        downsample(temp2, temp);
+        D(temp3, temp2);
+        ifft(output, temp3);
+    }
+    else
+    {
+        complexvector temp(imsize);
+        complexvector temp2(imsize);
+        fft(temp, input);
+        D(temp2, temp);
+        ifft(output, temp2);
+    }
 }
 
 void mmobservations::kaiser_squires_inv(complexvector &output, const complexvector &input)
 {
-    complexvector temp(imsize);
-    complexvector temp2(imsize);
-    fft(temp, input);
-    Dinv(temp2, temp);
-    ifft(output, temp2);
+    if (super > 1)
+    {
+        complexvector temp(imsize);
+        complexvector temp2(imsize);
+        complexvector temp3(superimsize);
+        fft(temp, input);
+        Dinv(temp2, temp);
+        upsample(temp3, temp2);
+        s_ifft(output, temp3);
+    }
+    else
+    {
+        complexvector temp(imsize);
+        complexvector temp2(imsize);
+        fft(temp, input);
+        Dinv(temp2, temp);
+        ifft(output, temp2);
+    }
 }
 
 void mmobservations::kaiser_squires_adj(complexvector &output, const complexvector &input)
 {
-    complexvector temp(imsize);
-    complexvector temp2(imsize);
-    fft(temp, input);
-    Dadj(temp2, temp);
-    ifft(output, temp2);
+    if (super > 1)
+    {
+        complexvector temp(imsize);
+        complexvector temp2(imsize);
+        complexvector temp3(superimsize);
+        fft(temp, input);
+        Dadj(temp2, temp);
+        upsample(temp3, temp2);
+        s_ifft(output, temp3);
+    }
+    else
+    {
+        complexvector temp(imsize);
+        complexvector temp2(imsize);
+        fft(temp, input);
+        Dadj(temp2, temp);
+        ifft(output, temp2);
+    }
 }
