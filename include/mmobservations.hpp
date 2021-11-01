@@ -74,16 +74,14 @@ public:
     void kaiser_squires(complexvector &output, const complexvector &input);
     void kaiser_squires_inv(complexvector &output, const complexvector &input);
     void kaiser_squires_adj(complexvector &output, const complexvector &input);
-    void upsample(complexvector &hires, const complexvector &lowres);
-    void downsample(complexvector &lowres, const complexvector &hires);
+
+private:
+    std::tuple<std::function<void(complexvector &, const complexvector &)>, std::function<void(complexvector &, const complexvector &)>> init_fft_2d(const uint _imsizex, const uint _imsizey);
+
     std::function<void(complexvector &, const complexvector &)> fft;
     std::function<void(complexvector &, const complexvector &)> ifft;
     std::function<void(complexvector &, const complexvector &)> s_fft;
     std::function<void(complexvector &, const complexvector &)> s_ifft;
-private:
-    std::tuple<std::function<void(complexvector &, const complexvector &)>, std::function<void(complexvector &, const complexvector &)>> init_fft_2d(const uint _imsizex, const uint _imsizey);
-
-
 
     std::tuple<std::function<void(complexvector &, const complexvector &)>, std::function<void(complexvector &, const complexvector &)>, std::function<void(complexvector &, const complexvector &)>> build_lensing_kernels();
 
@@ -91,7 +89,8 @@ private:
     std::function<void(complexvector &, const complexvector &)> Dadj;
     std::function<void(complexvector &, const complexvector &)> Dinv;
 
-
+    void upsample(complexvector &hires, const complexvector &lowres);
+    void downsample(complexvector &lowres, const complexvector &hires);
 
     const uint imsizex;
     const uint imsizey;
