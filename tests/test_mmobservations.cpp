@@ -133,6 +133,16 @@ TEST(MMObsDummyTest, UpsampleDownsample)
         }
     }
 
+    FILE *fp = fopen("/Users/auggiemarignier/Documents/PhD/TDT/massmapping/outputs/checker0.txt", "w");
+    for (int i = 0; i < superimsizey; i++)
+    {
+        for (int j = 0; j < superimsizex; j++)
+        {
+            fprintf(fp, "%10.6f ", kappa[i * superimsizey + j]);
+        }
+        fprintf(fp, "\n");
+    }
+    fclose(fp);
     complexvector kappahat(superimsize);
     complexvector kappadownhat(imsize);
     complexvector kappadown(imsize);
@@ -153,7 +163,7 @@ TEST(MMObsDummyTest, UpsampleDownsample)
     {
         for (int j = 0; j < imsizex; j++)
         {
-            fprintf(fp1, "%10.6f", kappadown[i * imsizey + j].real());
+            fprintf(fp1, "%10.6f ", kappadown[i * imsizey + j].real());
         }
         fprintf(fp1, "\n");
     }
@@ -161,8 +171,8 @@ TEST(MMObsDummyTest, UpsampleDownsample)
     {
         for (int j = 0; j < (int)(superimsizex); j++)
         {
-            fprintf(fp0, "%10.6f", kappa[i * superimsizey + j].real());
-            fprintf(fp2, "%10.6f", kapparec[i * superimsizey + j].real());
+            fprintf(fp0, "%10.6f ", kappa[i * superimsizey + j].real());
+            fprintf(fp2, "%10.6f ", kapparec[i * superimsizey + j].real());
         }
         fprintf(fp0, "\n");
         fprintf(fp2, "\n");
