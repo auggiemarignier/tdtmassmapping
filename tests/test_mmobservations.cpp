@@ -138,7 +138,7 @@ TEST(MMObsDummyTest, UpsampleDownsample)
     {
         for (int j = 0; j < superimsizex; j++)
         {
-            fprintf(fp, "%10.6f ", kappa[i * superimsizey + j]);
+            fprintf(fp, "%10.6f ", kappa[i * superimsizey + j].real());
         }
         fprintf(fp, "\n");
     }
@@ -150,6 +150,16 @@ TEST(MMObsDummyTest, UpsampleDownsample)
     complexvector kapparec(superimsize);
 
     observations.s_fft(kappahat, kappa);
+    fp = fopen("/Users/auggiemarignier/Documents/PhD/TDT/massmapping/outputs/checker1.txt", "w");
+    for (int i = 0; i < superimsizey; i++)
+    {
+        for (int j = 0; j < superimsizex; j++)
+        {
+            fprintf(fp, "%10.6f ", kappa[i * superimsizey + j].real());
+        }
+        fprintf(fp, "\n");
+    }
+    fclose(fp);
     observations.downsample(kappadownhat, kappahat);
     observations.ifft(kappadown, kappadownhat);
     observations.upsample(kapparechat, kappadownhat);
