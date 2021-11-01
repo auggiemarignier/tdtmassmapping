@@ -120,8 +120,8 @@ mmobservations::mmobservations(const uint _imsizex, const uint _imsizey, const u
 {
     if (super > 1)
     {
-        superimsizex = imsizex << super;
-        superimsizey = imsizey << super;
+        superimsizex = imsizex << (super - 1);
+        superimsizey = imsizey << (super - 1);
         superimsize = superimsizex * superimsizey;
     }
     auto fft_tuple = init_fft_2d(imsizex, imsizey);
