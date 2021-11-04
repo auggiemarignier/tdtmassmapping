@@ -232,8 +232,8 @@ int main(int argc, char *argv[])
     GlobalProposal global(&observations,
                           initial_model,
                           prior_file,
-                          degreex,
-                          degreey,
+                          degreex + super - 1,
+                          degreey + super - 1,
                           seed,
                           kmax,
                           wavelet_xy);
@@ -437,7 +437,7 @@ static void usage(const char *pname)
             "\n"
             " -t|--total <int>                Total number of iterations\n"
             " -S|--seed <int>                 Random number seed\n"
-            " -s|--seed <int>                 Super-resolution factor\n"
+            " -s|--super <int>                Super-resolution factor. Default = 1 i.e. no superresolution\n"
             "\n"
             " -k|--kmax <int>                 Max. no. of coefficients\n"
             "\n"
