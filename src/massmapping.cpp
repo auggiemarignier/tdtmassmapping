@@ -205,13 +205,14 @@ int main(int argc, char *argv[])
     {
         INFO("Reading in gamma data %s", input_gamma);
         std::ifstream file(input_gamma);
-        double re, im, cov;
+        double re, im;
+        int ngal;
         if (file.is_open())
         {
-            while (file >> re >> im >> cov)
+            while (file >> re >> im >> ngal)
             {
                 gamma_noisy.emplace_back(re, im);
-                covariance.emplace_back(cov);
+                covariance.emplace_back(0.37 / sqrt(2. * ngal));
             }
 
             if (1 << degreex * 1 << degreey != gamma_noisy.size())
@@ -426,7 +427,7 @@ static void usage(const char *pname)
             "where options is one or more of:\n"
             "\n"
             " -i|--input <file>               Input kappa file.  One column\n"
-            " -g|--input_gamma <file>         Input gamma file. Three columns (g1, g2, cov)\n"
+            " -g|--input_gamma <file>         Input gamma file. Three columns (g1, g2, ngal)\n"
             " -I|--inital_model <file>        Initial model file for restarts\n"
             " -M|--prior <file>               Prior/Proposal file\n"
             " -o|--output <path>              Output prefix for output files\n"
