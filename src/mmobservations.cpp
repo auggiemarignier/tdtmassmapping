@@ -73,10 +73,13 @@ double Observations::single_frequency_likelihood(
     double loglikelihood = 0.0;
     for (size_t i = 0; i < n_obs; i++)
     {
-        std::complex<double> res = obs[i] - predictions[i];
-        std::complex<double> res_normed = res / sigma[i];
-        loglikelihood += std::norm(res_normed) * 0.5;
-        log_normalization += log(sigma[i]);
+        if (isfinite(sigma[i]))
+        {
+            std::complex<double> res = obs[i] - predictions[i];
+            std::complex<double> res_normed = res / sigma[i];
+            loglikelihood += std::norm(res_normed) * 0.5;
+            log_normalization += log(sigma[i]);
+        }
     }
 
     return loglikelihood;
