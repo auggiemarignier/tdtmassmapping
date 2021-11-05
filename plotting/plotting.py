@@ -38,6 +38,7 @@ while os.path.isdir(f"{directory}/restart/"):
             current_n,
             n_add
         )
+        std = np.sqrt(var)
         current_n += n_add
 
         likelihoods = np.concatenate([likelihoods, likelihoods2])
