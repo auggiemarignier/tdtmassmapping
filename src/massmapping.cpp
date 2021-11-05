@@ -192,7 +192,7 @@ int main(int argc, char *argv[])
     auto noise_tuple = add_gaussian_noise(gamma, ngal, sidelength);
     auto gamma_noisy = std::get<0>(noise_tuple);
     auto covariance = std::get<1>(noise_tuple);
-    observations.set_observed_data(gamma);
+    observations.set_observed_data(gamma_noisy);
     observations.set_sigmas(covariance);
 
     double data_snr = statistics::snr(gamma, gamma_noisy);
