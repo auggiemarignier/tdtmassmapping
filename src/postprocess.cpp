@@ -361,6 +361,7 @@ int main(int argc, char *argv[])
 
     data.model = new double[data.size];
     data.best_model = new double[data.size];
+    memset(data.best_model, 0, sizeof(double) * data.size);
 
     int workspacesize = data.width;
     if (data.height > data.width)
@@ -723,29 +724,6 @@ int main(int argc, char *argv[])
 
     if (max_likelihood_file != NULL)
     {
-        fp_in = fopen(input_file, "r");
-        while (!feof(fp_in))
-        {
-            if (chain_history_read(ch,
-                                   (ch_read_t)fread,
-                                   fp_in) < 0)
-            {
-                if (feof(fp_in))
-                    break;
-                fprintf(stderr, "error: failed to read chain history\n");
-                return -1;
-            }
-            if (chain_history_replay(ch,
-                                     S_v,
-                                     (chain_history_replay_function_t)return_best,
-                                     &data) < 0)
-            {
-                fprintf(stderr, "error: failed to replay\n");
-                return -1;
-            }
-        }
-        fclose(fp_in);
-
         fp_out = fopen(max_likelihood_file, "w");
         for (j = 0; j < data.height; j++)
         {
@@ -811,11 +789,6 @@ static int process(int stepi,
     {
         if (d->fp_out != nullptr)
             fprintf(d->fp_out, "%.6f\n", step->header.likelihood);
-        if (step->header.likelihood < d->min_likelihood)
-        {
-            d->min_likelihood = step->header.likelihood;
-            d->best_index = d->thincounter;
-        }
 
         memset(d->model, 0, sizeof(double) * d->size);
 
@@ -867,48 +840,17 @@ static int process(int stepi,
 
             d->hist[i][hi]++;
         }
+
+        if (step->header.likelihood < d->min_likelihood)
+        {
+            d->min_likelihood = step->header.likelihood;
+            d->best_index = d->thincounter;
+            for (i = 0; i < d->size; i ++)
+                d->best_model[i] = d->model[i];
+        }
     }
     d->thincounter++;
 
-    return 0;
-}
-
-static int return_best(int stepi,
-                       void *user,
-                       const chain_history_change_t *step,
-                       const multiset_int_double_t *S_v)
-{
-    struct user_data *d = (struct user_data *)user;
-
-    if (stepi == d->best_index)
-    {
-        memset(d->best_model, 0, sizeof(double) * d->size);
-
-        if (wavetree2d_sub_set_from_S_v(d->wt, S_v) < 0)
-        {
-            fprintf(stderr, "process: failed to set wavetree (sub)\n");
-            return -1;
-        }
-        fprintf(d->fp_k, "%i\n", wavetree2d_sub_coeff_count(d->wt));
-
-        if (wavetree2d_sub_map_to_array(d->wt, d->best_model, d->size) < 0)
-        {
-            fprintf(stderr, "process: failed to map to array\n");
-            return -1;
-        }
-
-        if (generic_lift_inverse2d(d->best_model,
-                                   d->width,
-                                   d->height,
-                                   d->width,
-                                   d->workspace,
-                                   d->hwaveletf,
-                                   d->hwaveletf,
-                                   SUBTILE) < 0)
-        {
-            throw ERROR("Failed to do inverse transform on coefficients\n");
-        }
-    }
     return 0;
 }
 
