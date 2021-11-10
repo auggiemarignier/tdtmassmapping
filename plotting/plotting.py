@@ -12,6 +12,7 @@ directory = sys.argv[1]
 truth = np.loadtxt(f"{directory}/truth.txt").reshape((256, 256))
 mean = np.loadtxt(f"{directory}/mean.txt")
 std = np.loadtxt(f"{directory}/stddev.txt")
+hpdrange = np.loadtxt(f"{directory}/hpdrange.txt")
 var = std ** 2
 khist = np.loadtxt(f"{directory}/khistogram.txt")
 best_fitting = np.loadtxt(f"{directory}/best_model.txt")
@@ -27,17 +28,11 @@ while os.path.isdir(f"{directory}/restart/"):
         mean2 = np.loadtxt(f"{directory}/mean.txt")
         std2 = np.loadtxt(f"{directory}/stddev.txt")
         var2 = std2 ** 2
+        hpdrange = np.loadtxt(f"{directory}/hpdrange.txt")
         likelihoods2 = np.loadtxt(f"{directory}/likelihood.txt")
         n_add = len(likelihoods2)
 
-        mean, var = meanvar_from_submeanvar(
-            mean,
-            mean2,
-            var,
-            var2,
-            current_n,
-            n_add
-        )
+        mean, var = meanvar_from_submeanvar(mean, mean2, var, var2, current_n, n_add)
         current_n += n_add
 
         likelihoods = np.concatenate([likelihoods, likelihoods2])
@@ -48,17 +43,17 @@ while os.path.isdir(f"{directory}/restart/"):
 
 diff = np.abs(truth - mean)
 diff_best = np.abs(truth - best_fitting)
+hpdrange_meandiff = hpdrange - hpdrange.mean()
 
 vmin = truth.min()
 vmax = truth.max()
-stdmin = std.min()
-stdmax = std.max()
+hpdrange_meandiff_min = hpdrange_meandiff.min()
+hpdrange_meandiff_max = hpdrange_meandiff.max()
 diffmin = min([diff.min(), diff_best.min()])
 diffmax = max([diff.max(), diff_best.max()])
 
 cmap = cm.inferno
 diffcmap = cm.binary_r
-stdcmap = cm.turbo
 
 mosaic = """.ABHE
             GCDIF"""
@@ -80,8 +75,8 @@ axd["D"].imshow(diff, vmin=diffmin, vmax=diffmax, cmap=diffcmap)
 axd["D"].set_title("|Truth - Mean|")
 axd["D"].axis("off")
 
-axd["C"].imshow(std, cmap=stdcmap)
-axd["C"].set_title("Standard Dev.")
+axd["C"].imshow(hpdrange_meandiff, cmap=cmap)
+axd["C"].set_title("HPDrange - <HPDrange>")
 axd["C"].axis("off")
 
 axd["H"].imshow(best_fitting, cmap=cmap)
@@ -98,7 +93,10 @@ fig.colorbar(
     shrink=0.1,
 )
 fig.colorbar(
-    cm.ScalarMappable(norm=Normalize(vmin=stdmin, vmax=stdmax), cmap=stdcmap),
+    cm.ScalarMappable(
+        norm=Normalize(vmin=hpdrange_meandiff_min, vmax=hpdrange_meandiff_max),
+        cmap=cmap,
+    ),
     axd["G"],
     shrink=0.1,
 )
