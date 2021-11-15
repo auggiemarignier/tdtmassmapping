@@ -126,6 +126,7 @@ mmobservations::mmobservations(const uint _imsizex, const uint _imsizey, const u
         superimsizex = imsizex << (super - 1);
         superimsizey = imsizey << (super - 1);
         superimsize = superimsizex * superimsizey;
+        get_resampling();
     }
     auto fft_tuple = init_fft_2d(imsizex, imsizey);
     fft = std::get<0>(fft_tuple);
@@ -253,20 +254,35 @@ std::tuple<std::function<void(complexvector &, const complexvector &)>, std::fun
     return std::make_tuple(forward, inverse, adjoint);
 }
 
+void mmobservations::get_resampling()
+{ // vector indices mapping low-res Fourier coeffs to high-res
+    const uint n = (uint)std::sqrt(imsize);
+    const uint N = (uint)std::sqrt(superimsize);
+
+    std::vector<uint> bounds = {(uint)(n / 2), (uint)(N - n / 2)};
+    for (uint i = 0; i < superimsizey; i++)
+    {
+        for (uint j = 0; j < superimsizex; j++)
+        {
+            if (i < bounds[0] || i >= bounds[1])
+            {
+                if (j < bounds[0] || j >= bounds[1])
+                {
+                    resampling.push_back(i * superimsizey + j);
+                }
+            }
+        }
+    }
+}
+
 void mmobservations::upsample(complexvector &hires, const complexvector &lowres)
 { // inputs and outputs in fourier space
     std::complex<double> _super(super, super);
-    for (int i = 0; i < (int)(imsizey / 2); i++)
+    for (int i = 0; i < imsizey; i++)
     {
-        for (int j = 0; j < (int)(imsizex / 2); j++)
+        for (int j = 0; j < imsizex; j++)
         {
-            hires[i * superimsizey + j] = lowres[i * imsizey + j] * _super;
-
-            hires[i * superimsizey + superimsizex - j - 1] = lowres[i * imsizey + imsizex - j - 1] * _super;
-
-            hires[(superimsizey - i - 1) * superimsizey + j - 1] = lowres[(imsizey - i - 1) * imsizey + j - 1] * _super;
-
-            hires[(superimsizey - i - 1) * superimsizey + superimsizex - j - 1] = lowres[(imsizey - i - 1) * imsizey + imsizex - j - 1] * _super;
+            hires.at(resampling[i * imsizey + j]) = lowres[i * imsizey + j] * _super;
         }
     }
 }
@@ -274,17 +290,11 @@ void mmobservations::upsample(complexvector &hires, const complexvector &lowres)
 void mmobservations::downsample(complexvector &lowres, const complexvector &hires)
 { // inputs and outputs in fourier space
     std::complex<double> _super(super, super);
-    for (int i = 0; i < (int)(imsizey / 2); i++)
+    for (int i = 0; i < imsizey; i++)
     {
-        for (int j = 0; j < (int)(imsizex / 2); j++)
+        for (int j = 0; j < imsizex; j++)
         {
-            lowres[i * imsizey + j] = hires[i * superimsizey + j] / _super;
-
-            lowres[i * imsizey + imsizex - j - 1] = hires[i * superimsizey + superimsizex - j - 1] / _super;
-
-            lowres[(imsizey - i - 1) * imsizey + j - 1] = hires[(superimsizey - i - 1) * superimsizey + j - 1] / _super;
-
-            lowres[(imsizey - i - 1) * imsizey + imsizex - j - 1] = hires[(superimsizey - i - 1) * superimsizey + superimsizex - j - 1] / _super;
+            lowres[i * imsizey + j] = hires.at(resampling[i * imsizey + j]) / _super;
         }
     }
 }

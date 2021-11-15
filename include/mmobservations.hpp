@@ -91,6 +91,8 @@ private:
 
     void upsample(complexvector &hires, const complexvector &lowres);
     void downsample(complexvector &lowres, const complexvector &hires);
+    void get_resampling();
+    std::vector<uint> resampling;
 
     const uint imsizex;
     const uint imsizey;
