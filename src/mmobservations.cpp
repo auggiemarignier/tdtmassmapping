@@ -276,7 +276,7 @@ void mmobservations::upsample(complexvector &hires, const complexvector &lowres)
     {
         for (int j = 0; j < imsizex; j++)
         {
-            hires.at(resampling[i * imsizey + j]) = lowres[i * imsizey + j] * (double)super;
+            hires.at(resampling[i * imsizey + j]) = lowres[i * imsizey + j];
         }
     }
 }
@@ -287,7 +287,7 @@ void mmobservations::downsample(complexvector &lowres, const complexvector &hire
     {
         for (int j = 0; j < imsizex; j++)
         {
-            lowres[i * imsizey + j] = hires.at(resampling[i * imsizey + j]) / (double)super;
+            lowres[i * imsizey + j] = hires.at(resampling[i * imsizey + j]);
         }
     }
 }
