@@ -272,24 +272,22 @@ void mmobservations::get_resampling()
 
 void mmobservations::upsample(complexvector &hires, const complexvector &lowres)
 { // inputs and outputs in fourier space
-    std::complex<double> _super(super, super);
     for (int i = 0; i < imsizey; i++)
     {
         for (int j = 0; j < imsizex; j++)
         {
-            hires.at(resampling[i * imsizey + j]) = lowres[i * imsizey + j] * _super;
+            hires.at(resampling[i * imsizey + j]) = lowres[i * imsizey + j] * (double)super;
         }
     }
 }
 
 void mmobservations::downsample(complexvector &lowres, const complexvector &hires)
 { // inputs and outputs in fourier space
-    std::complex<double> _super(super, super);
     for (int i = 0; i < imsizey; i++)
     {
         for (int j = 0; j < imsizex; j++)
         {
-            lowres[i * imsizey + j] = hires.at(resampling[i * imsizey + j]) / _super;
+            lowres[i * imsizey + j] = hires.at(resampling[i * imsizey + j]) / (double)super;
         }
     }
 }
