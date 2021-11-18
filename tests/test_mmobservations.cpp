@@ -7,6 +7,9 @@
 
 #include "mmobservations.hpp"
 #include "rng.hpp"
+#include "utils.hpp"
+
+#define SAVEIMS 0
 
 class MMObsTest : public ::testing::Test
 {
@@ -126,8 +129,14 @@ protected:
 
     mmobservations *observations;
     Rng *random;
-    static constexpr uint imsize = 32 * 32;
-    static constexpr uint superimsize = 64 * 64;
+
+    static constexpr uint imsizex = 32;
+    static constexpr uint imsizey = 32;
+    static constexpr uint imsize = imsizex * imsizey;
+    static constexpr uint super = 2;
+    static constexpr uint superimsizex = super * imsizex;
+    static constexpr uint superimsizey = super * imsizey;
+    static constexpr uint superimsize = superimsizex * superimsizey;
 };
 
 TEST_F(MMObsSuperTest, KaiserSquiresAdj)
@@ -159,6 +168,72 @@ TEST_F(MMObsSuperTest, KaiserSquiresAdj)
     ASSERT_NE(std::complex<double>(0, 0), k1dotk2);
     ASSERT_FLOAT_EQ(g1dotg2.real(), k1dotk2.real());
     ASSERT_FLOAT_EQ(g1dotg2.imag(), k1dotk2.imag());
+}
+
+TEST_F(MMObsSuperTest, UpsampleDownsample)
+{
+    const double pi = 4. * acos(1. / sqrt(2));
+    complexvector kappa(superimsize);
+    for (int i = 0; i < superimsizey; i++)
+    {
+        for (int j = 0; j < superimsizex; j++)
+        {
+            kappa[i * superimsizey + j] = std::complex<double>(
+                sin(i / pi) + sin(j / pi),
+                sin(2 * i / pi) + sin(2 * j / pi));
+            kappa[i * superimsizey + j] += std::complex<double>(
+                sin(i / (2 * pi)) + sin(j / (2 * pi)),
+                -sin(i / pi) - sin(j / pi));
+        }
+    }
+    complexvector kappahat(superimsize);
+    complexvector kappadownhat(imsize);
+    complexvector kappadown(imsize);
+    complexvector kapparechat(superimsize);
+    complexvector kapparec(superimsize);
+
+    observations->s_fft(kappahat, kappa);
+    observations->downsample(kappadownhat, kappahat);
+    observations->ifft(kappadown, kappadownhat);
+    observations->upsample(kapparechat, kappadownhat);
+    observations->s_ifft(kapparec, kapparechat);
+
+    complexvector diff(superimsize);
+    for (int i = 0; i < superimsize; i++)
+        diff[i] = kappa[i] - kapparec[i];
+    auto mean = vector_mean(diff);
+
+    ASSERT_NEAR(mean.real(), 0, 1e-8);
+    ASSERT_NEAR(mean.imag(), 0, 1e-8);
+
+#if SAVEIMS
+    FILE *fp0 = fopen("checker.txt", "w");
+    FILE *fp1 = fopen("checkerdown.txt", "w");
+    FILE *fp2 = fopen("checkerrec.txt", "w");
+
+    for (int i = 0; i < imsizey; i++)
+    {
+        for (int j = 0; j < imsizex; j++)
+        {
+            fprintf(fp1, "%10.6f ", kappadown[i * imsizey + j].real());
+        }
+        fprintf(fp1, "\n");
+    }
+    for (int i = 0; i < (int)(superimsizey); i++)
+    {
+        for (int j = 0; j < (int)(superimsizex); j++)
+        {
+            fprintf(fp0, "%10.6f ", kappa[i * superimsizey + j].real());
+            fprintf(fp2, "%10.6f ", kapparec[i * superimsizey + j].real());
+        }
+        fprintf(fp0, "\n");
+        fprintf(fp2, "\n");
+    }
+
+    fclose(fp0);
+    fclose(fp1);
+    fclose(fp2);
+#endif
 }
 
 int main(int argc, char **argv)
