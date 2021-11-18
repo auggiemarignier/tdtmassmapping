@@ -195,7 +195,8 @@ int main(int argc, char *argv[])
         gamma = observations.single_frequency_predictions(kappa);
         const double ngal = 100.;
         const double sidelength = 500.;
-        auto noise_tuple = add_gaussian_noise(gamma, ngal, sidelength);
+        bool aniso = true;
+        auto noise_tuple = add_gaussian_noise(gamma, ngal, sidelength, aniso);
         gamma_noisy = std::get<0>(noise_tuple);
         covariance = std::get<1>(noise_tuple);
         double data_snr = statistics::snr(gamma, gamma_noisy);
