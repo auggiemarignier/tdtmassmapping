@@ -192,7 +192,8 @@ int main(int argc, char *argv[])
         {
             throw ERROR("File not opened %s", input_kappa);
         }
-        gamma = observations.single_frequency_predictions(kappa);
+        mmobservations dummy_obs(1 << degreex, 1 << degreey, 1);
+        gamma = dummy_obs.single_frequency_predictions(kappa);
         const double ngal = 100.;
         const double sidelength = 500.;
         bool aniso = true;
