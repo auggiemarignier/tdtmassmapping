@@ -9,12 +9,14 @@
 #include "globalprop.cpp"
 #include "logging.hpp"
 
-static char short_options[] = "i:I:M:o:x:y:t:S:k:B:w:v:l:h";
+static char short_options[] = "i:g:I:M:o:m:x:y:t:S:s:k:B:w:v:l:h";
 static struct option long_options[] = {
     {"input", required_argument, 0, 'i'},
+    {"input_gamma", required_argument, 0, 'g'},
     {"initial_model", required_argument, 0, 'I'},
     {"prior-file", required_argument, 0, 'M'},
     {"output", required_argument, 0, 'o'},
+    {"mask", required_argument, 0, 'm'},
 
     {"degree-x", required_argument, 0, 'x'},
     {"degree-y", required_argument, 0, 'y'},
@@ -22,6 +24,7 @@ static struct option long_options[] = {
     {"total", required_argument, 0, 't'},
     {"seed", required_argument, 0, 'S'},
 
+    {"super", required_argument, 0, 's'},
     {"kmax", required_argument, 0, 'k'},
     {"birth-probability", required_argument, 0, 'B'},
 
@@ -39,10 +42,12 @@ int main(int argc, char *argv[])
 {
     // Defaults
     char *input_kappa = nullptr;
+    char *input_gamma = nullptr;
     char *initial_model = nullptr;
     char *prior_file = nullptr;
     char *output_prefix = nullptr;
     char *logfile = nullptr;
+    char *maskfile = nullptr;
 
     int total = 10000;
     int seed = 1;
@@ -55,6 +60,7 @@ int main(int argc, char *argv[])
     int wavelet_xy = 4;
     int degreex = 8;
     int degreey = 8;
+    int super = 1;
 
     double *model;
 
@@ -72,6 +78,9 @@ int main(int argc, char *argv[])
         case 'i':
             input_kappa = optarg;
             break;
+        case 'g':
+            input_gamma = optarg;
+            break;
         case 'I':
             initial_model = optarg;
             break;
@@ -80,6 +89,9 @@ int main(int argc, char *argv[])
             break;
         case 'o':
             output_prefix = optarg;
+            break;
+        case 'm':
+            maskfile = optarg;
             break;
         case 'x':
             degreex = atoi(optarg);
@@ -107,6 +119,9 @@ int main(int argc, char *argv[])
             break;
         case 'S':
             seed = atoi(optarg);
+            break;
+        case 's':
+            super = atoi(optarg);
             break;
         case 'k':
             kmax = atoi(optarg);
@@ -145,64 +160,107 @@ int main(int argc, char *argv[])
             break;
         }
     }
+    Logger::open_log(logfile);
 
     // Check files
-    if (input_kappa == NULL)
-    {
-        fprintf(stderr, "Please provide an input file\n");
-        return -1;
-    }
+    if (input_kappa == NULL & input_gamma == NULL)
+        throw ERROR("Please provide an input file\n");
+    if (input_kappa != NULL & input_gamma != NULL)
+        throw ERROR("Please provide only one of kappa or gamma file\n");
     if (prior_file == NULL)
-    {
-        fprintf(stderr, "Please provide a prior file\n");
-        return -1;
-    }
+        throw ERROR("Please provide a prior file\n");
     if (output_prefix == NULL)
+        throw ERROR("Please provide an output directory\n");
+
+    mmobservations observations(1 << degreex, 1 << degreey, super);
+    complexvector gamma;
+    complexvector gamma_noisy;
+    std::vector<double> covariance;
+
+    if (input_kappa != NULL)
     {
-        fprintf(stderr, "Please provide an output directory\n");
-        return -1;
+        INFO("Reading in kappa map %s", input_kappa);
+        std::ifstream file(input_kappa);
+        complexvector kappa;
+        double element;
+        if (file.is_open())
+        {
+            while (file >> element)
+                kappa.emplace_back(element, 0);
+
+            if (1 << degreex * 1 << degreey != kappa.size())
+                throw ERROR("Incorrect image size");
+
+            file.close();
+        }
+        else
+        {
+            throw ERROR("File not opened %s", input_kappa);
+        }
+        std::vector<int> mask(kappa.size(), 1);
+        if (maskfile != nullptr)
+        {
+            std::ifstream mfile(maskfile);
+            int melement;
+            int i = 0;
+            if (mfile.is_open())
+            {
+                while (mfile >> melement)
+                {
+                    mask[i] = melement;
+                    i++;
+                }
+            }
+        }
+        mmobservations dummy_obs(1 << degreex, 1 << degreey, 1);
+        gamma = dummy_obs.single_frequency_predictions(kappa);
+        const double ngal = 1000.;
+        const double sidelength = 500.;
+        bool aniso = true;
+        auto noise_tuple = add_gaussian_noise(gamma, ngal, sidelength, aniso);
+        gamma_noisy = std::get<0>(noise_tuple);
+        covariance = std::get<1>(noise_tuple);
+        for (int i = 0; i < gamma_noisy.size(); i++)
+        {
+            gamma_noisy[i] *= mask[i];
+            covariance[i] /= mask[i]; // infinite covariance where mask=0
+        }
+        double data_snr = statistics::snr(gamma, gamma_noisy);
+        INFO("Input data SNR %10.6f dB", data_snr);
+    }
+    else if (input_gamma != NULL)
+    {
+        INFO("Reading in gamma data %s", input_gamma);
+        std::ifstream file(input_gamma);
+        double re, im;
+        int ngal;
+        if (file.is_open())
+        {
+            while (file >> re >> im >> ngal)
+            {
+                gamma_noisy.emplace_back(re, im);
+                covariance.emplace_back(0.37 / sqrt(2. * ngal)); // infinite covariance where ngal=0
+            }
+
+            if (1 << degreex * 1 << degreey != gamma_noisy.size())
+                throw ERROR("Incorrect image size");
+
+            file.close();
+        }
+        else
+        {
+            throw ERROR("File not opened %s", input_gamma);
+        }
     }
 
-    // Setup
-    Logger::open_log(logfile);
-    INFO("Reading in kappa map %s", input_kappa);
-    std::ifstream file(input_kappa);
-    complexvector kappa;
-    double element;
-    if (file.is_open())
-    {
-        while (file >> element)
-            kappa.emplace_back(element, 0);
-
-        if (1 << degreex * 1 << degreey != kappa.size())
-            throw ERROR("Incorrect image size");
-
-        file.close();
-    }
-    else
-    {
-        throw ERROR("File not opened %s", input_kappa);
-    }
-
-    mmobservations observations(1 << degreex, 1 << degreey);
-    complexvector gamma = observations.single_frequency_predictions(kappa);
-
-    const double ngal = 100.;
-    const double sidelength = 500.;
-    auto noise_tuple = add_gaussian_noise(gamma, ngal, sidelength);
-    auto gamma_noisy = std::get<0>(noise_tuple);
-    auto covariance = std::get<1>(noise_tuple);
     observations.set_observed_data(gamma_noisy);
     observations.set_sigmas(covariance);
-
-    double data_snr = statistics::snr(gamma, gamma_noisy);
-    INFO("Input data SNR %10.6f dB", data_snr);
 
     GlobalProposal global(&observations,
                           initial_model,
                           prior_file,
-                          degreex,
-                          degreey,
+                          degreex + super - 1,
+                          degreey + super - 1,
                           seed,
                           kmax,
                           wavelet_xy);
@@ -395,9 +453,11 @@ static void usage(const char *pname)
             "usage: %s [options]\n"
             "where options is one or more of:\n"
             "\n"
-            " -i|--input <file>               Input observations file\n"
+            " -i|--input <file>               Input kappa file.  One column\n"
+            " -g|--input_gamma <file>         Input gamma file. Three columns (g1, g2, ngal)\n"
             " -I|--inital_model <file>        Initial model file for restarts\n"
             " -M|--prior <file>               Prior/Proposal file\n"
+            " -m|--mask <file>                Mask file\n"
             " -o|--output <path>              Output prefix for output files\n"
             "\n"
             " -x|--degree-x <int>             Number of samples in x direction as power of 2\n"
@@ -405,6 +465,7 @@ static void usage(const char *pname)
             "\n"
             " -t|--total <int>                Total number of iterations\n"
             " -S|--seed <int>                 Random number seed\n"
+            " -s|--super <int>                Super-resolution factor. Default = 1 i.e. no superresolution\n"
             "\n"
             " -k|--kmax <int>                 Max. no. of coefficients\n"
             "\n"

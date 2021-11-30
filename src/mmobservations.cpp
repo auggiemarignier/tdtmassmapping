@@ -73,10 +73,13 @@ double Observations::single_frequency_likelihood(
     double loglikelihood = 0.0;
     for (size_t i = 0; i < n_obs; i++)
     {
-        std::complex<double> res = obs[i] - predictions[i];
-        std::complex<double> res_normed = res / sigma[i];
-        loglikelihood += std::norm(res_normed) * 0.5;
-        log_normalization += log(sigma[i]);
+        if (isfinite(sigma[i]))
+        {
+            std::complex<double> res = obs[i] - predictions[i];
+            std::complex<double> res_normed = res / sigma[i];
+            loglikelihood += std::norm(res_normed) * 0.5;
+            log_normalization += log(sigma[i]);
+        }
     }
 
     return loglikelihood;
@@ -108,15 +111,27 @@ complexvector Identity::single_frequency_predictions(complexvector &model)
     return predictions;
 }
 
-mmobservations::mmobservations(const uint _imsizex, const uint _imsizey)
+mmobservations::mmobservations(const uint _imsizex, const uint _imsizey, const uint _super)
     : Observations(),
       imsizex(_imsizex),
       imsizey(_imsizey),
-      imsize(_imsizey * _imsizex)
+      imsize(_imsizey * _imsizex),
+      super(_super),
+      superimsizex(_imsizex),
+      superimsizey(_imsizey),
+      superimsize(_imsizex * _imsizey)
 {
-    auto fft_tuple = init_fft_2d();
+    superimsizex = imsizex << (super - 1);
+    superimsizey = imsizey << (super - 1);
+    superimsize = superimsizex * superimsizey;
+    get_resampling();
+
+    auto fft_tuple = init_fft_2d(imsizex, imsizey);
     fft = std::get<0>(fft_tuple);
     ifft = std::get<1>(fft_tuple);
+    auto s_fft_tuple = init_fft_2d(superimsizex, superimsizey);
+    s_fft = std::get<0>(s_fft_tuple);
+    s_ifft = std::get<1>(s_fft_tuple);
 
     auto operator_tuple = build_lensing_kernels();
     D = std::get<0>(operator_tuple);
@@ -131,17 +146,18 @@ complexvector mmobservations::single_frequency_predictions(complexvector &kappa)
     return gamma;
 }
 
-std::tuple<std::function<void(complexvector &, const complexvector &)>, std::function<void(complexvector &, const complexvector &)>> mmobservations::init_fft_2d()
+std::tuple<std::function<void(complexvector &, const complexvector &)>, std::function<void(complexvector &, const complexvector &)>> mmobservations::init_fft_2d(const uint _imsizex, const uint _imsizey)
 {
-    complexvector in(imsize);
-    complexvector out(imsize);
+    const uint _imsize = _imsizex * _imsizey;
+    complexvector in(_imsize);
+    complexvector out(_imsize);
 
     auto del = [](fftw_plan_s *plan)
     { fftw_destroy_plan(plan); };
     std::shared_ptr<fftw_plan_s> plan_forward(
         fftw_plan_dft_2d(
-            imsizey,
-            imsizex,
+            _imsizey,
+            _imsizex,
             reinterpret_cast<fftw_complex *>(&in[0]),
             reinterpret_cast<fftw_complex *>(&out[0]),
             FFTW_FORWARD,
@@ -149,8 +165,8 @@ std::tuple<std::function<void(complexvector &, const complexvector &)>, std::fun
         del);
     std::shared_ptr<fftw_plan_s> plan_inverse(
         fftw_plan_dft_2d(
-            imsizey,
-            imsizex,
+            _imsizey,
+            _imsizex,
             reinterpret_cast<fftw_complex *>(&in[0]),
             reinterpret_cast<fftw_complex *>(&out[0]),
             FFTW_BACKWARD,
@@ -163,8 +179,8 @@ std::tuple<std::function<void(complexvector &, const complexvector &)>, std::fun
             plan_forward.get(),
             const_cast<fftw_complex *>(reinterpret_cast<const fftw_complex *>(&input[0])),
             reinterpret_cast<fftw_complex *>(&output[0]));
-        for (int i = 0; i < (int)(imsize); i++)
-            output[i] /= std::sqrt(imsize);
+        for (int i = 0; i < (int)(_imsize); i++)
+            output[i] /= std::sqrt(_imsize);
     };
 
     auto backward = [=](complexvector &output, const complexvector &input)
@@ -173,8 +189,8 @@ std::tuple<std::function<void(complexvector &, const complexvector &)>, std::fun
             plan_inverse.get(),
             const_cast<fftw_complex *>(reinterpret_cast<const fftw_complex *>(&input[0])),
             reinterpret_cast<fftw_complex *>(&output[0]));
-        for (int i = 0; i < (int)(imsize); i++)
-            output[i] /= std::sqrt(imsize);
+        for (int i = 0; i < (int)(_imsize); i++)
+            output[i] /= std::sqrt(_imsize);
     };
 
     return std::make_tuple(forward, backward);
@@ -233,29 +249,79 @@ std::tuple<std::function<void(complexvector &, const complexvector &)>, std::fun
     return std::make_tuple(forward, inverse, adjoint);
 }
 
+void mmobservations::get_resampling()
+{ // vector indices mapping low-res Fourier coeffs to high-res
+    const uint n = (uint)std::sqrt(imsize);
+    const uint N = (uint)std::sqrt(superimsize);
+
+    std::vector<uint> bounds = {(uint)(n / 2), (uint)(N - n / 2)};
+    for (uint i = 0; i < superimsizey; i++)
+    {
+        for (uint j = 0; j < superimsizex; j++)
+        {
+            if (i < bounds[0] || i >= bounds[1])
+            {
+                if (j < bounds[0] || j >= bounds[1])
+                {
+                    resampling.push_back(i * superimsizey + j);
+                }
+            }
+        }
+    }
+}
+
+void mmobservations::upsample(complexvector &hires, const complexvector &lowres)
+{ // inputs and outputs in fourier space
+    for (int i = 0; i < imsizey; i++)
+    {
+        for (int j = 0; j < imsizex; j++)
+        {
+            hires.at(resampling[i * imsizey + j]) = lowres[i * imsizey + j];
+        }
+    }
+}
+
+void mmobservations::downsample(complexvector &lowres, const complexvector &hires)
+{ // inputs and outputs in fourier space
+    for (int i = 0; i < imsizey; i++)
+    {
+        for (int j = 0; j < imsizex; j++)
+        {
+            lowres[i * imsizey + j] = hires.at(resampling[i * imsizey + j]);
+        }
+    }
+}
+
 void mmobservations::kaiser_squires(complexvector &output, const complexvector &input)
 {
-    complexvector temp(imsize);
+
+    complexvector temp(superimsize);
     complexvector temp2(imsize);
-    fft(temp, input);
-    D(temp2, temp);
-    ifft(output, temp2);
+    complexvector temp3(imsize);
+    s_fft(temp, input);
+    downsample(temp2, temp);
+    D(temp3, temp2);
+    ifft(output, temp3);
 }
 
 void mmobservations::kaiser_squires_inv(complexvector &output, const complexvector &input)
 {
     complexvector temp(imsize);
     complexvector temp2(imsize);
+    complexvector temp3(superimsize);
     fft(temp, input);
     Dinv(temp2, temp);
-    ifft(output, temp2);
+    upsample(temp3, temp2);
+    s_ifft(output, temp3);
 }
 
 void mmobservations::kaiser_squires_adj(complexvector &output, const complexvector &input)
 {
     complexvector temp(imsize);
     complexvector temp2(imsize);
+    complexvector temp3(superimsize);
     fft(temp, input);
     Dadj(temp2, temp);
-    ifft(output, temp2);
+    upsample(temp3, temp2);
+    s_ifft(output, temp3);
 }

@@ -1,21 +1,26 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib import cm
-from matplotlib.colors import Normalize
-from matplotlib.lines import Line2D
 import sys
 import os
+import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 from utils import meanvar_from_submeanvar
 
 
+def append_colourbar(im, ax, side):
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes(side, size="5%", pad=0.05)
+    plt.colorbar(im, cax=cax)
+    cax.yaxis.set_ticks_position(side)
+
+
 directory = sys.argv[1]
-truth = np.loadtxt(f"{directory}/truth.txt").reshape((256, 256))
 mean = np.loadtxt(f"{directory}/mean.txt")
 std = np.loadtxt(f"{directory}/stddev.txt")
-hpdrange = np.loadtxt(f"{directory}/hpdrange.txt")
 var = std ** 2
 khist = np.loadtxt(f"{directory}/khistogram.txt")
 best_fitting = np.loadtxt(f"{directory}/best_model.txt")
+hpdrange = np.loadtxt(f"{directory}/hpdrange.txt")
 last_nonzero_k = np.argwhere(khist[:, 1]).max()
 likelihoods = np.loadtxt(f"{directory}/likelihood.txt")
 khistory = np.loadtxt(f"{directory}/khistory.txt")
@@ -28,92 +33,33 @@ while os.path.isdir(f"{directory}/restart/"):
         mean2 = np.loadtxt(f"{directory}/mean.txt")
         std2 = np.loadtxt(f"{directory}/stddev.txt")
         var2 = std2 ** 2
-        hpdrange = np.loadtxt(f"{directory}/hpdrange.txt")
         likelihoods2 = np.loadtxt(f"{directory}/likelihood.txt")
         n_add = len(likelihoods2)
 
-        mean, var = meanvar_from_submeanvar(
-            mean,
-            mean2,
-            var,
-            var2,
-            current_n,
-            n_add
-        )
+        mean, var = meanvar_from_submeanvar(mean, mean2, var, var2, current_n, n_add)
         std = np.sqrt(var)
         current_n += n_add
 
+        # what about the hpdrange?
         likelihoods = np.concatenate([likelihoods, likelihoods2])
         khist[:, 1] += np.loadtxt(f"{directory}/khistogram.txt", usecols=1)
         last_nonzero_k = np.argwhere(khist[:, 1]).max()
         best_fitting = np.loadtxt(f"{directory}/best_model.txt")
         khistory = np.concatenate([khistory, np.loadtxt(f"{directory}/khistory.txt")])
 
-diff = np.abs(truth - mean)
-diff_best = np.abs(truth - best_fitting)
-hpdrange_meandiff = hpdrange - hpdrange.mean()
+mosaic = """AB
+            CD"""
+fig = plt.figure(figsize=(10, 10))
+axd = fig.subplot_mosaic(mosaic, gridspec_kw={"wspace": 0.05})
 
-vmin = truth.min()
-vmax = truth.max()
-hpdrange_meandiff_min = hpdrange_meandiff.min()
-hpdrange_meandiff_max = hpdrange_meandiff.max()
-diffmin = min([diff.min(), diff_best.min()])
-diffmax = max([diff.max(), diff_best.max()])
-
-cmap = cm.inferno
-diffcmap = cm.binary_r
-
-mosaic = """.ABHE
-            GCDIF"""
-fig = plt.figure(figsize=(13, 9))
-axd = fig.subplot_mosaic(
-    mosaic,
-    gridspec_kw={"width_ratios": [1, 15, 15, 15, 1], "wspace": 0.05},
-)
-
-axd["A"].imshow(truth, vmin=vmin, vmax=vmax, cmap=cmap)
-axd["A"].set_title("Truth")
-axd["A"].axis("off")
-
-axd["B"].imshow(mean, vmin=vmin, vmax=vmax, cmap=cmap)
-axd["B"].set_title("Mean TDT")
-axd["B"].axis("off")
-
-axd["D"].imshow(diff, vmin=diffmin, vmax=diffmax, cmap=diffcmap)
-axd["D"].set_title("|Truth - Mean|")
-axd["D"].axis("off")
-
-axd["C"].imshow(hpdrange_meandiff, cmap=cmap)
-axd["C"].set_title("HPDrange - <HPDrange>")
-axd["C"].axis("off")
-
-axd["H"].imshow(best_fitting, cmap=cmap)
-axd["H"].set_title("Best fitting model")
-axd["H"].axis("off")
-
-axd["I"].imshow(diff_best, vmin=diffmin, vmax=diffmax, cmap=diffcmap)
-axd["I"].set_title("|Truth - Best fitting model|")
-axd["I"].axis("off")
-
-fig.colorbar(
-    cm.ScalarMappable(norm=Normalize(vmin=vmin, vmax=vmax), cmap=cmap),
-    axd["E"],
-    shrink=0.1,
-)
-fig.colorbar(
-    cm.ScalarMappable(
-        norm=Normalize(vmin=hpdrange_meandiff_min, vmax=hpdrange_meandiff_max),
-        cmap=cmap,
-    ),
-    axd["G"],
-    shrink=0.1,
-)
-fig.colorbar(
-    cm.ScalarMappable(norm=Normalize(vmin=diffmin, vmax=diffmax), cmap=diffcmap),
-    axd["F"],
-    shrink=0.1,
-)
-axd["G"].yaxis.set_ticks_position("left")
+images = [mean, best_fitting, std, hpdrange - hpdrange.mean()]
+sides = ["left", "right", "left", "right"]
+titles = ["Mean", "Best fitting", "Standard Dev", "HPD range - <HPD range>"]
+for ax, img, side, title in zip(axd, images, sides, titles):
+    im = axd[ax].imshow(img, cmap="inferno")
+    append_colourbar(im, axd[ax], side)
+    axd[ax].axis("off")
+    axd[ax].set_title(title)
 
 plt.show()
 
