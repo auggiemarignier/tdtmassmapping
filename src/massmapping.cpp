@@ -239,7 +239,7 @@ int main(int argc, char *argv[])
             while (file >> re >> im >> ngal)
             {
                 gamma_noisy.emplace_back(re, im);
-                covariance.emplace_back(0.37 / sqrt(2. * ngal)); // infinite covariance where ngal=0
+                covariance.emplace_back(0.37 * 1e-5 / sqrt(2. * ngal)); // infinite covariance where ngal=0
             }
 
             if (1 << degreex * 1 << degreey != gamma_noisy.size())
