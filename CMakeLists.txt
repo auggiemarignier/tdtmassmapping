@@ -70,6 +70,9 @@ target_link_libraries(${PROJECT_NAME} ${PROJECT_LIB})
 add_executable(${PROJECT_NAME}_pp src/postprocess.cpp)
 target_link_libraries(${PROJECT_NAME}_pp ${PROJECT_LIB})
 
+add_executable(ks src/ks_inversion.cpp)
+target_link_libraries(ks ${PROJECT_LIB})
+
 if(install)
     install(TARGETS ${PROJECT_NAME} ${PROJECT_NAME}_pp RUNTIME)
     install(TARGETS ${PROJECT_LIB} LIBRARY)
