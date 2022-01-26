@@ -9,7 +9,8 @@ from utils import meanvar_from_submeanvar
 
 
 directory = sys.argv[1]
-truth = np.loadtxt(f"{directory}/truth.txt").reshape((256, 256))
+truth = np.loadtxt(f"{directory}/truth.txt")
+truth = truth.reshape(2 * (int(np.sqrt(truth.size)),))
 mean = np.loadtxt(f"{directory}/mean.txt")
 std = np.loadtxt(f"{directory}/stddev.txt")
 hpdrange = np.loadtxt(f"{directory}/hpdrange.txt")
@@ -32,14 +33,7 @@ while os.path.isdir(f"{directory}/restart/"):
         likelihoods2 = np.loadtxt(f"{directory}/likelihood.txt")
         n_add = len(likelihoods2)
 
-        mean, var = meanvar_from_submeanvar(
-            mean,
-            mean2,
-            var,
-            var2,
-            current_n,
-            n_add
-        )
+        mean, var = meanvar_from_submeanvar(mean, mean2, var, var2, current_n, n_add)
         std = np.sqrt(var)
         current_n += n_add
 
