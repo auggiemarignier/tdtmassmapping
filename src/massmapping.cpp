@@ -9,7 +9,7 @@
 #include "globalprop.cpp"
 #include "logging.hpp"
 
-static char short_options[] = "i:g:I:M:o:m:x:y:t:S:s:k:B:w:v:l:h";
+static char short_options[] = "i:g:I:M:o:m:x:y:t:S:s:k:B:w:v:l:h:n:";
 static struct option long_options[] = {
     {"input", required_argument, 0, 'i'},
     {"input_gamma", required_argument, 0, 'g'},
@@ -33,6 +33,8 @@ static struct option long_options[] = {
     {"verbosity", required_argument, 0, 'v'},
     {"logfile", required_argument, 0, 'l'},
     {"help", no_argument, 0, 'h'},
+
+    {"ngals", required_argument, 0, 'n'},
 
     {0, 0, 0, 0}};
 
@@ -61,6 +63,8 @@ int main(int argc, char *argv[])
     int degreex = 8;
     int degreey = 8;
     int super = 1;
+
+    double ngal = 480.;     // galaxies per arcmin^2
 
     double *model;
 
@@ -153,6 +157,9 @@ int main(int argc, char *argv[])
         case 'l':
             logfile = optarg;
             break;
+        case 'n':
+            ngal = atof(optarg);
+            break;
         case 'h':
         default:
             usage(argv[0]);
@@ -214,8 +221,8 @@ int main(int argc, char *argv[])
         }
         mmobservations dummy_obs(1 << degreex, 1 << degreey, 1);
         gamma = dummy_obs.single_frequency_predictions(kappa);
-        const double ngal = 1000.;
-        const double sidelength = 500.;
+        const double sidelength = 8.; // arcmin
+        INFO("%4.0f galaxies per pixel", ngal * std::pow(sidelength, 2) / kappa.size());
         bool aniso = true;
         auto noise_tuple = add_gaussian_noise(gamma, ngal, sidelength, aniso);
         gamma_noisy = std::get<0>(noise_tuple);
