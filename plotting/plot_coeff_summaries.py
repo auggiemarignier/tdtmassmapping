@@ -49,8 +49,10 @@ try:
 except IndexError:
     levels = 8
 means = np.loadtxt(f"{directory}/coeff_mean.txt")
-stddevs = np.loadtxt(f"{directory}/coeff_std.txt").flatten()  # not sure why this shape is different
-var = stddevs**2
+stddevs = np.loadtxt(
+    f"{directory}/coeff_std.txt"
+).flatten()  # not sure why this shape is different
+var = stddevs ** 2
 counts = np.loadtxt(f"{directory}/coeff_n.txt")
 current_n = np.loadtxt(f"{directory}/likelihood.txt").shape[0]
 restarts = []
@@ -64,20 +66,13 @@ while os.path.isdir(f"{directory}/restart/"):
         var2 = stddevs2 ** 2
         n_add = np.loadtxt(f"{directory}/likelihood.txt").shape[0]
 
-        mean, var = meanvar_from_submeanvar(
-            means,
-            means2,
-            var,
-            var2,
-            current_n,
-            n_add
-        )
+        mean, var = meanvar_from_submeanvar(means, means2, var, var2, current_n, n_add)
         current_n += n_add
 
 for model in [means, stddevs, counts]:
     indexes = np.nonzero(model)[0]
-    ii, ij = index_to_2d(indexes, 256)
-    wavelet_img = np.zeros((256, 256))
+    ii, ij = index_to_2d(indexes, 2 ** levels)
+    wavelet_img = np.zeros((2 ** levels, 2 ** levels))
     wavelet_img[ii, ij] = model[indexes]
 
     mosaic = build_mosaic_array(levels)
