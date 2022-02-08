@@ -20,7 +20,7 @@ void Logger::open_log_imp(const char *filename)
 {
     if (filename != nullptr)
     {
-        log_file = fopen(filename, "w");
+        log_file = fopen(filename, "a");
         if (log_file == NULL)
         {
             fprintf(stderr, "Failed to open log file %s\n", filename);
