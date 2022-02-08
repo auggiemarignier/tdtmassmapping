@@ -77,7 +77,7 @@ static double head_from_histogram(int *hist, double vmin, double vmax, int bins,
 static double tail_from_histogram(int *hist, double vmin, double vmax, int bins, int drop);
 static double hpd_from_histogram(int *hist, double vmin, double vmax, int bins, double hpd_interval, double &hpd_min, double &hpd_max);
 
-static char short_options[] = "x:y:i:k:o:D:l:H:W:t:s:m:M:N:c:C:g:p:P:Q:b:v:V:S:w:h";
+static char short_options[] = "x:y:i:k:o:D:L:H:W:t:s:m:M:N:c:C:g:p:P:Q:b:v:V:S:w:l:h";
 static struct option long_options[] = {
     {"degree-x", required_argument, 0, 'x'},
     {"degree-y", required_argument, 0, 'y'},
@@ -86,8 +86,9 @@ static struct option long_options[] = {
     {"input_kappa", required_argument, 0, 'k'},
     {"output", required_argument, 0, 'o'},
     {"stddev", required_argument, 0, 'D'},
-    {"likelihood", required_argument, 0, 'l'},
+    {"likelihood", required_argument, 0, 'L'},
     {"khistory", required_argument, 0, 'H'},
+    {"logfile", required_argument, 0, 'l'},
 
     {"thin", required_argument, 0, 't'},
     {"skip", required_argument, 0, 's'},
@@ -129,6 +130,7 @@ int main(int argc, char *argv[])
     const char *stddev_file;
     const char *likelihood_file;
     const char *khistory_file;
+    const char *logfile;
 
     int degree_x;
     int degree_y;
@@ -180,6 +182,7 @@ int main(int argc, char *argv[])
     stddev_file = NULL;
     likelihood_file = NULL;
     khistory_file = NULL;
+    logfile = NULL;
 
     mode_file = NULL;
     median_file = NULL;
@@ -203,8 +206,6 @@ int main(int argc, char *argv[])
 
     vmin = 0.001;
     vmax = 1.0;
-
-    Logger::open_log(0);
 
     while (1)
     {
@@ -237,7 +238,7 @@ int main(int argc, char *argv[])
         case 'k':
             input_kappa = optarg;
             break;
-        case 'l':
+        case 'L':
             likelihood_file = optarg;
             break;
         case 'H':
@@ -312,12 +313,17 @@ int main(int argc, char *argv[])
                 return -1;
             }
             break;
+        case 'l':
+            logfile = optarg;
+            break;
         case 'h':
         default:
             usage(argv[0]);
             return -1;
         }
     }
+
+    Logger::open_log(logfile);
 
     ch = chain_history_create(maxsteps);
     if (ch == NULL)
@@ -1039,7 +1045,7 @@ static void usage(const char *pname)
             " -i|--input <file>                Input ch file\n"
             " -o|--output <file>               Output mean model file\n"
             " -D|--stddev <file>               Output std dev. file\n"
-            " -l|--likelihood <file>           Output likelihoods file\n"
+            " -L|--likelihood <file>           Output likelihoods file\n"
             " -H|--khistory<file>              Output khistory file\n"
             "\n"
             " -t|--thin <int>                  Only processing every ith sample\n"
