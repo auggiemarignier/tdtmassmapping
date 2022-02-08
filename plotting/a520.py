@@ -47,6 +47,9 @@ while os.path.isdir(f"{directory}/restart/"):
         best_fitting = np.loadtxt(f"{directory}/best_model.txt")
         khistory = np.concatenate([khistory, np.loadtxt(f"{directory}/khistory.txt")])
 
+best_fitting[best_fitting < 0] = 0
+mean[mean < 0] = 0
+
 mosaic = """AB
             CD"""
 fig = plt.figure(figsize=(10, 10))

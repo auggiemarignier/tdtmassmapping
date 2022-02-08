@@ -43,6 +43,9 @@ while os.path.isdir(f"{directory}/restart/"):
         best_fitting = np.loadtxt(f"{directory}/best_model.txt")
         khistory = np.concatenate([khistory, np.loadtxt(f"{directory}/khistory.txt")])
 
+best_fitting[best_fitting < 0] = 0
+mean[mean < 0] = 0
+
 diff = np.abs(truth - mean)
 diff_best = np.abs(truth - best_fitting)
 hpdrange_meandiff = hpdrange - hpdrange.mean()
