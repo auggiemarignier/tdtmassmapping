@@ -40,16 +40,19 @@ TEST_F(MMObsTest, MMLikelihood)
         f[j] = std::complex<double>(random->normal(1.), 0);
 
     complexvector predictions = observations->single_frequency_predictions(f);
-    for (int i = 1; i < imsize; i++)
+    for (int i = 0; i < imsize; i++)
+    {
+        predictions[i] += std::complex<double>(2, 1);
         ASSERT_NE(std::complex<double>(0, 0), predictions[i]);
+    }
     observations->set_observed_data(predictions);
 
-    std::vector<double> sig = {1.};
+    std::vector<double> sig = {2.};
     observations->set_sigmas(sig);
 
     double log_normalization = 0.0;
 
-    ASSERT_EQ(0, observations->single_frequency_likelihood(f, log_normalization));
+    ASSERT_EQ(640., observations->single_frequency_likelihood(f, log_normalization));
 }
 
 TEST_F(MMObsTest, KaiserSquiresInv)
