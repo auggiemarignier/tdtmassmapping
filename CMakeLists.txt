@@ -43,14 +43,23 @@ add_dependencies(${PROJECT_LIB} ${TDTBASE})
 find_package(GSL REQUIRED)
 find_package(GMP REQUIRED)
 find_package(FFTW3 REQUIRED)
+
+FetchContent_Declare(json
+                    GIT_REPOSITORY https://github.com/nlohmann/json
+                    GIT_TAG v3.10.5
+                    GIT_SHALLOW true)
+FetchContent_MakeAvailable(json)
+
 target_link_libraries(${PROJECT_LIB}
                       GSL::gsl
                       ${GMP_LIBRARY}
                       ${TDTBASE_LIBS}
-                      FFTW3::FFTW3)
+                      FFTW3::FFTW3
+                      nlohmann_json::nlohmann_json)
 
-include_directories(include ${TDTBASE_INCLUDE}
-                            ${GMP_INCLUDE_DIR})
+include_directories(include
+                    ${TDTBASE_INCLUDE}
+                    ${GMP_INCLUDE_DIR})
 
 if(tests)
     enable_testing()
