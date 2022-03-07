@@ -14,6 +14,12 @@ def meanvar_from_submeanvar(mu_x, mu_y, var_x, var_y, n_x, n_y):
     return mu_z, var_z
 
 
+def snr(signal, noise):
+    return 20 * np.log10(
+        np.linalg.norm(signal) / np.linalg.norm(noise)
+    )
+
+
 class PlanarForwardModel:
     """
     Weak Gravitational Lensing planar Forward model
