@@ -1,0 +1,41 @@
+{
+    "inputs": {
+        "input_gamma": nullptr,
+        "initial_model": nullptr,
+        "prior_file": nullptr,
+        "logfile": nullptr
+    },
+    "WL_simulations": {
+        "input_kappa": nullptr,
+        "sidelength": 10.0,
+        "ngal": 30,
+        "anisotropic_noise": false,
+        "maskfile": nullptr
+    },
+    "outputs":{
+        "output_prefix": nullptr,
+        "mean_file": nullptr,
+        "mode_file": nullptr,
+        "median_file": nullptr,
+        "stddev_file": nullptr,
+        "likelihood_file": nullptr,
+        "khistory_file": nullptr,
+        "maxlikelihood_file": nullptr,
+        "hpd_range": nullptr
+    },
+    "paramtrisation": {
+        "degree_x": 8,
+        "degree_y": 8,
+        "wavelet_xy": 4,
+        "kmax": 100,
+        "super": 1
+    },
+    "MCMC": {
+        "total": 10000,
+        "thin": 0,
+        "skip": 0,
+        "seed": 1,
+        "verbosity": 1000,
+        "birth_fraction": 0.05
+    },
+}

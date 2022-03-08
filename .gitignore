@@ -4,7 +4,8 @@ bin/
 *.venv/
 outputs/
 runs/
-data/
+data/*
+!data/config.json
 *.o
 *.ipynb*
 *__pycache__
