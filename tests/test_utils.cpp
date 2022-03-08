@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include <fstream>
 
 #include "utils.hpp"
 #include "rng.hpp"
@@ -73,17 +74,12 @@ TEST(JSONParserTEST, LoadConfig)
 {
     using json = nlohmann::json;
 
-    auto j = json::parse(R"(
-        {
-            "happy": true,
-            "pi": 3.141 
-        }
-    )");
-    auto happy = j["happy"];
-    auto pi = j["pi"];
+    json j;
+    std::ifstream file("../../data/config.json");
+    file >> j;
 
-    ASSERT_TRUE(happy);
-    ASSERT_FLOAT_EQ(pi, 3.141);
+    ASSERT_TRUE(j["inputs"]["input_gamma"] == nullptr);
+    ASSERT_EQ(j["paramtrisation"]["kmax"], 100);
 };
 
 int main(int argc, char **argv)
