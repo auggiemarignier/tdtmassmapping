@@ -75,11 +75,15 @@ TEST(JSONParserTEST, LoadConfig)
     using json = nlohmann::json;
 
     json j;
-    std::ifstream file("../../data/config.json");
+    std::ifstream file("../../../data/config.json");
     file >> j;
 
+    int dx = j["parametrisation"]["degree_x"].get<int>();
+    std::cout << std::setw(4) << j << std::endl;
+
     ASSERT_TRUE(j["inputs"]["input_gamma"] == nullptr);
-    ASSERT_EQ(j["paramtrisation"]["kmax"], 100);
+    ASSERT_EQ(j["parametrisation"]["kmax"], 100);
+    ASSERT_EQ(dx, 8);
 };
 
 int main(int argc, char **argv)
