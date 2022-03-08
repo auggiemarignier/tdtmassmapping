@@ -23,7 +23,7 @@
         "maxlikelihood_file": null,
         "hpd_range": null
     },
-    "paramtrisation": {
+    "parametrisation": {
         "degree_x": 8,
         "degree_y": 8,
         "wavelet_xy": 4,
