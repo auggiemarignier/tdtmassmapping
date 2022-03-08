@@ -2,6 +2,7 @@
 
 #include "utils.hpp"
 #include "rng.hpp"
+#include <nlohmann/json.hpp>
 
 TEST(UtilsTest, MeanComplex)
 {
@@ -66,6 +67,23 @@ TEST(StatisticsTest, Pearson)
     }
 
     ASSERT_FLOAT_EQ(statistics::pearson_correlation(truth, estimate), 1);
+};
+
+TEST(JSONParserTEST, LoadConfig)
+{
+    using json = nlohmann::json;
+
+    auto j = json::parse(R"(
+        {
+            "happy": true,
+            "pi": 3.141 
+        }
+    )");
+    auto happy = j["happy"];
+    auto pi = j["pi"];
+
+    ASSERT_TRUE(happy);
+    ASSERT_FLOAT_EQ(pi, 3.141);
 };
 
 int main(int argc, char **argv)
