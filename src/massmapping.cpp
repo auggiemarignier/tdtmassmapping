@@ -17,7 +17,6 @@ using json = nlohmann::json;
 int main(int argc, char *argv[])
 {
     // Defaults
-    char *input_gamma = nullptr;
     char *initial_model = nullptr;
     char *prior_file = nullptr;
     char *output_prefix = nullptr;
@@ -48,11 +47,12 @@ int main(int argc, char *argv[])
 
     Logger::open_log(j["inputs"]["logfile"].get<json::string_t>());
     std::string input_kappa = j["WL_simulations"]["input_kappa"].get<json::string_t>();
+    std::string input_gamma = j["WL_simulations"]["input_gamma"].get<json::string_t>();
 
     // Check files
-    if (input_kappa.empty() & (input_gamma == NULL))
+    if (input_kappa.empty() & input_gamma.empty())
         throw ERROR("Please provide an input file\n");
-    if (!input_kappa.empty() & (input_gamma != NULL))
+    if (!input_kappa.empty() & !input_gamma.empty())
         throw ERROR("Please provide only one of kappa or gamma file\n");
     if (prior_file == NULL)
         throw ERROR("Please provide a prior file\n");
@@ -115,9 +115,9 @@ int main(int argc, char *argv[])
         double data_snr = statistics::snr(gamma, gamma_noisy);
         INFO("Input data SNR %10.6f dB", data_snr);
     }
-    else if (input_gamma != NULL)
+    else if (!input_gamma.empty())
     {
-        INFO("Reading in gamma data %s", input_gamma);
+        INFO("Reading in gamma data %s", input_gamma.c_str());
         std::ifstream file(input_gamma);
         double re, im;
         int ngal;
@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-            throw ERROR("File not opened %s", input_gamma);
+            throw ERROR("File not opened %s", input_gamma.c_str());
         }
     }
 
