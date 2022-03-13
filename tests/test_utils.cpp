@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include <fstream>
+#include <string>
 
 #include "utils.hpp"
 #include "rng.hpp"
@@ -78,11 +79,12 @@ TEST(JSONParserTEST, LoadConfig)
     std::ifstream file("../../../data/config.json");
     file >> j;
 
+    std::string input_gamma;
+    input_gamma = j["inputs"]["input_gamma"].get<json::string_t>();
     int dx = j["parametrisation"]["degree_x"].get<int>();
     std::cout << std::setw(4) << j << std::endl;
 
-    ASSERT_TRUE(j["inputs"]["input_gamma"] == nullptr);
-    ASSERT_EQ(j["parametrisation"]["kmax"], 100);
+    ASSERT_TRUE(input_gamma.empty());
     ASSERT_EQ(dx, 8);
 };
 
