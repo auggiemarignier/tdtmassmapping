@@ -58,6 +58,11 @@ public:
         Logger::Get().open_log_imp(filename);
     }
 
+    static void open_log(std::string filename)
+    {
+        Logger::Get().open_log_imp(filename);
+    }
+
     static void close_log()
     {
         Logger::Get().close_log_imp();
@@ -71,6 +76,7 @@ public:
 private:
     Logger(){};
     void open_log_imp(const char *filename);
+    void open_log_imp(std::string filename);
     void close_log_imp();
     void flush_imp();
 

@@ -1,6 +1,7 @@
 #include "logging.hpp"
 
 #include <stdarg.h>
+#include <string>
 
 static char *timestamp();
 
@@ -14,6 +15,12 @@ Logger::~Logger()
 {
     close_log();
     log_open = false;
+}
+
+void Logger::open_log_imp(std::string filename)
+{
+    const char *c = const_cast<char *>(filename.c_str());
+    open_log_imp(c);
 }
 
 void Logger::open_log_imp(const char *filename)
