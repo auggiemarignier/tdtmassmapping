@@ -1,27 +1,27 @@
 {
     "inputs": {
-        "input_gamma": null,
-        "initial_model": null,
-        "prior_file": null,
-        "logfile": null
+        "input_gamma": "",
+        "initial_model": "",
+        "prior_file": "",
+        "logfile": ""
     },
     "WL_simulations": {
-        "input_kappa": null,
+        "input_kappa": "",
         "sidelength": 10.0,
         "ngal": 30,
         "anisotropic_noise": false,
-        "maskfile": null
+        "maskfile": ""
     },
     "outputs": {
-        "output_prefix": null,
-        "mean_file": null,
-        "mode_file": null,
-        "median_file": null,
-        "stddev_file": null,
-        "likelihood_file": null,
-        "khistory_file": null,
-        "maxlikelihood_file": null,
-        "hpd_range": null
+        "output_prefix": "",
+        "mean_file": "",
+        "mode_file": "",
+        "median_file": "",
+        "stddev_file": "",
+        "likelihood_file": "",
+        "khistory_file": "",
+        "maxlikelihood_file": "",
+        "hpd_range": ""
     },
     "parametrisation": {
         "degree_x": 8,
