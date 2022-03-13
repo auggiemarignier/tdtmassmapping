@@ -2,6 +2,7 @@
 #include <fstream>
 #include <gsl/gsl_rng.h>
 #include <getopt.h>
+#include <nlohmann/json.hpp>
 
 #include "proposals.hpp"
 #include "mmobservations.hpp"
@@ -9,13 +10,13 @@
 #include "globalprop.cpp"
 #include "logging.hpp"
 
-
 static void usage(const char *pname);
+
+using json = nlohmann::json;
 
 int main(int argc, char *argv[])
 {
     // Defaults
-    char *input_kappa = nullptr;
     char *input_gamma = nullptr;
     char *initial_model = nullptr;
     char *prior_file = nullptr;
@@ -36,16 +37,22 @@ int main(int argc, char *argv[])
     int degreey = 8;
     int super = 1;
 
-    double ngal = 480.;     // galaxies per arcmin^2
+    double ngal = 480.; // galaxies per arcmin^2
 
     double *model;
 
-    Logger::open_log(logfile);
+    // Load configuration
+    json j;
+    std::fstream cfile("../../data/config.json");
+    cfile >> j;
+
+    Logger::open_log(j["inputs"]["logfile"].get<json::string_t>());
+    std::string input_kappa = j["WL_simulations"]["input_kappa"].get<json::string_t>();
 
     // Check files
-    if (input_kappa == NULL & input_gamma == NULL)
+    if (input_kappa.empty() & (input_gamma == NULL))
         throw ERROR("Please provide an input file\n");
-    if (input_kappa != NULL & input_gamma != NULL)
+    if (!input_kappa.empty() & (input_gamma != NULL))
         throw ERROR("Please provide only one of kappa or gamma file\n");
     if (prior_file == NULL)
         throw ERROR("Please provide a prior file\n");
@@ -57,9 +64,9 @@ int main(int argc, char *argv[])
     complexvector gamma_noisy;
     std::vector<double> covariance;
 
-    if (input_kappa != NULL)
+    if (!input_kappa.empty())
     {
-        INFO("Reading in kappa map %s", input_kappa);
+        INFO("Reading in kappa map %s", input_kappa.c_str());
         std::ifstream file(input_kappa);
         complexvector kappa;
         double element;
@@ -75,7 +82,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-            throw ERROR("File not opened %s", input_kappa);
+            throw ERROR("File not opened %s", input_kappa.c_str());
         }
         std::vector<int> mask(kappa.size(), 1);
         if (maskfile != nullptr)
