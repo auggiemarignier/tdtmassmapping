@@ -17,12 +17,6 @@ using json = nlohmann::json;
 int main(int argc, char *argv[])
 {
     // Defaults
-    char *initial_model = nullptr;
-    char *prior_file = nullptr;
-    char *output_prefix = nullptr;
-    char *logfile = nullptr;
-    char *maskfile = nullptr;
-
     int total = 10000;
     int seed = 1;
     int verbosity = 1000;
@@ -42,12 +36,17 @@ int main(int argc, char *argv[])
 
     // Load configuration
     json j;
-    std::fstream cfile("../../data/config.json");
+    std::fstream cfile("data/config.json");
     cfile >> j;
 
     Logger::open_log(j["inputs"]["logfile"].get<json::string_t>());
     std::string input_kappa = j["WL_simulations"]["input_kappa"].get<json::string_t>();
-    std::string input_gamma = j["WL_simulations"]["input_gamma"].get<json::string_t>();
+    std::string maskfile = j["WL_simulations"]["maskfile"].get<json::string_t>();
+    std::string input_gamma = j["inputs"]["input_gamma"].get<json::string_t>();
+    const char *prior_file = const_cast<char *>(j["inputs"]["prior_file"].get<json::string_t>().c_str());
+    const char *initial_model = const_cast<char *>(j["inputs"]["initial_model"].get<json::string_t>().c_str());
+    const char *output_prefix = const_cast<char *>(j["inputs"]["output_prefix"].get<json::string_t>().c_str());
+    LOG("%s", prior_file);
 
     // Check files
     if (input_kappa.empty() & input_gamma.empty())
@@ -85,7 +84,7 @@ int main(int argc, char *argv[])
             throw ERROR("File not opened %s", input_kappa.c_str());
         }
         std::vector<int> mask(kappa.size(), 1);
-        if (maskfile != nullptr)
+        if (!maskfile.empty())
         {
             std::ifstream mfile(maskfile);
             int melement;
