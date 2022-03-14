@@ -221,9 +221,9 @@ int main(int argc, char *argv[])
         }
         mmobservations dummy_obs(1 << degreex, 1 << degreey, 1);
         gamma = dummy_obs.single_frequency_predictions(kappa);
-        const double sidelength = 8.; // arcmin
+        const double sidelength = 10.; // arcmin
         INFO("%4.0f galaxies per pixel", ngal * std::pow(sidelength, 2) / kappa.size());
-        bool aniso = true;
+        bool aniso = false;
         auto noise_tuple = add_gaussian_noise(gamma, ngal, sidelength, aniso);
         gamma_noisy = std::get<0>(noise_tuple);
         covariance = std::get<1>(noise_tuple);
