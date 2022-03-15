@@ -15,9 +15,21 @@ def meanvar_from_submeanvar(mu_x, mu_y, var_x, var_y, n_x, n_y):
 
 
 def snr(signal, noise):
-    return 20 * np.log10(
-        np.linalg.norm(signal) / np.linalg.norm(noise)
-    )
+    """
+    Signal to noise ratio
+    """
+    return 20 * np.log10(np.linalg.norm(signal) / np.linalg.norm(noise))
+
+
+def pcorr(x, y):
+    """
+    Pearson correlation coefficient
+    """
+    x_minus_mean = x - x.mean()
+    y_minus_mean = y - y.mean()
+    n = np.sum(x_minus_mean * y_minus_mean)
+    d = np.linalg.norm(x_minus_mean) * np.linalg.norm(y_minus_mean)
+    return n / d
 
 
 class PlanarForwardModel:
