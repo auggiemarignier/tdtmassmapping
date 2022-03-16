@@ -92,7 +92,7 @@ std::tuple<complexvector, std::vector<double>> add_gaussian_noise(const complexv
 
         gals_pix = ngal_an[i] * std::pow(sidelength, 2) / static_cast<double>(N);
         A = sigma_e / std::sqrt(2.0 * gals_pix);
-        covariance[i] = A;
+        covariance[i] = std::pow(A, 2);
         output[i] = input[i] + A * std::complex<double>(gaussian_dist(mersenne), gaussian_dist(mersenne));
     }
 
