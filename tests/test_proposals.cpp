@@ -20,7 +20,7 @@ protected:
         std::vector<double> sigma = {1.41};
         observations = new Identity();
         observations->set_observed_data(obs);
-        observations->set_sigmas(sigma);
+        observations->set_data_errors(sigma);
 
         global = new GlobalProposal(observations,
                                     NULL,
@@ -60,7 +60,7 @@ protected:
         std::vector<double> sigma = {1.41};
         observations = new Identity();
         observations->set_observed_data(obs);
-        observations->set_sigmas(sigma);
+        observations->set_data_errors(sigma);
 
         global = new GlobalProposal(observations,
                                     NULL,
@@ -103,7 +103,7 @@ protected:
         std::vector<double> sigma = {1.41};
         observations = new Identity();
         observations->set_observed_data(obs);
-        observations->set_sigmas(sigma);
+        observations->set_data_errors(sigma);
 
         global = new GlobalProposal(observations,
                                     NULL,

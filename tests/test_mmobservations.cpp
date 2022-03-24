@@ -48,7 +48,7 @@ TEST_F(MMObsTest, MMLikelihood)
     observations->set_observed_data(predictions);
 
     std::vector<double> sig = {2.};
-    observations->set_sigmas(sig);
+    observations->set_data_errors(sig);
 
     double log_normalization = 0.0;
 

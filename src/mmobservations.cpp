@@ -91,7 +91,7 @@ void Observations::set_observed_data(complexvector &_obs)
     n_obs = _obs.size();
 }
 
-void Observations::set_sigmas(std::vector<double> &_sigmas)
+void Observations::set_data_errors(std::vector<double> &_sigmas)
 {
     if (_sigmas.size() == n_obs)
         sigma = _sigmas;

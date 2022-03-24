@@ -200,7 +200,7 @@ int main(int argc, char *argv[])
     }
 
     observations.set_observed_data(gamma_noisy);
-    observations.set_sigmas(covariance);
+    observations.set_data_errors(covariance);
 
     complexvector kappa_out(gamma_noisy.size());
 
