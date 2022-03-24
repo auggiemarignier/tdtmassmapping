@@ -91,18 +91,22 @@ void Observations::set_observed_data(complexvector &_obs)
     n_obs = _obs.size();
 }
 
-void Observations::set_data_errors(std::vector<double> &_sigmas)
+void Observations::set_data_errors(std::vector<double> &_sigmas, bool variance)
 {
-    if (_sigmas.size() == n_obs)
-        sigma = _sigmas;
-    else if (_sigmas.size() == 1)
-    {
-        sigma.reserve(n_obs);
+    sigma.reserve(n_obs);
+    uint s = _sigmas.size();
+    bool acceptable_size = s == 1 || s == n_obs;
+    if (acceptable_size)
         for (uint i = 0; i < n_obs; i++)
-            sigma.emplace_back(_sigmas[0]);
-    }
+        {
+            uint j = s == 1 ? 0 : i;
+            if (variance)
+                sigma.emplace_back(std::sqrt(_sigmas[j]));
+            else
+                sigma.emplace_back(_sigmas[j]);
+        }
     else
-        ERROR("Input data has size %i.  Expected size %i.", _sigmas.size(), n_obs);
+        throw ERROR("Input data has size %i.  Expected size %i.", _sigmas.size(), n_obs);
 }
 
 complexvector Identity::single_frequency_predictions(complexvector &model)
