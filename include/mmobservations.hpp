@@ -36,7 +36,7 @@ public:
     virtual complexvector single_frequency_predictions(complexvector &model) = 0;
 
     virtual void set_observed_data(complexvector &_obs);
-    virtual void set_data_errors(std::vector<double> &_simgas);
+    virtual void set_data_errors(std::vector<double> &_simgas, bool variance = true);
 
     complexvector obs;
     std::vector<double> sigma;
