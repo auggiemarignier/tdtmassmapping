@@ -223,8 +223,7 @@ int main(int argc, char *argv[])
         gamma = dummy_obs.single_frequency_predictions(kappa);
         const double sidelength = 10.; // arcmin
         INFO("%4.0f galaxies per pixel", ngal * std::pow(sidelength, 2) / kappa.size());
-        bool aniso = false;
-        auto noise_tuple = add_gaussian_noise(gamma, ngal, sidelength, aniso);
+        auto noise_tuple = add_gaussian_noise(gamma, ngal, sidelength);
         gamma_noisy = std::get<0>(noise_tuple);
         covariance = std::get<1>(noise_tuple);
         for (int i = 0; i < gamma_noisy.size(); i++)
