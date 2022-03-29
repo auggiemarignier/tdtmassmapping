@@ -50,11 +50,11 @@ TEST_F(MMObsTest, MMLikelihood)
     observations->set_observed_data(predictions);
 
     // Assume a variance of 2 everywhere
-    std::vector<double> sig = {2.};
-    observations->set_data_errors(sig);
+    std::vector<double> variance = {2.};
+    observations->set_data_errors(variance, true);
 
     double log_normalization = 0.0;
-    double expected = imsize * std::norm(diff) / (2 * sig[0]);
+    double expected = imsize * std::norm(diff) / (2 * variance[0]);
     ASSERT_FLOAT_EQ(expected, observations->single_frequency_likelihood(f, log_normalization));
 }
 
