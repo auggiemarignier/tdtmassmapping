@@ -68,7 +68,7 @@ std::string mkformatstring(const char *fmt, ...)
     return std::string(buffer);
 }
 
-std::tuple<complexvector, std::vector<double>> add_gaussian_noise(const complexvector &input, const double &ngal, const double &sidelength, const bool aniso)
+std::tuple<complexvector, std::vector<double>> add_gaussian_noise(const complexvector &input, const double &ngal, const double &sidelength)
 {
     const int N = input.size();
     const double sigma_e = 0.37; // intrinsic ellipticity dispersion
@@ -83,16 +83,11 @@ std::tuple<complexvector, std::vector<double>> add_gaussian_noise(const complexv
     complexvector output(N);
     std::vector<double> covariance(N);
 
+    gals_pix = ngal * std::pow(sidelength, 2) / static_cast<double>(N);
+    A = sigma_e / std::sqrt(2.0 * gals_pix);
     for (int i = 0; i < N; i++)
     {
-        if (aniso)
-            ngal_an.push_back(ngal * std::abs(input[i]) + 1);
-        else
-            ngal_an.push_back(ngal);
-
-        gals_pix = ngal_an[i] * std::pow(sidelength, 2) / static_cast<double>(N);
-        A = sigma_e / std::sqrt(2.0 * gals_pix);
-        covariance[i] = A;
+        covariance[i] = std::pow(A, 2);
         output[i] = input[i] + A * std::complex<double>(gaussian_dist(mersenne), gaussian_dist(mersenne));
     }
 

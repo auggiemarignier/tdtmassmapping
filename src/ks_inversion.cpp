@@ -7,7 +7,7 @@
 #include "logging.hpp"
 #include "utils.hpp"
 
-static char short_options[] = "i:g:I:M:o:m:x:y:t:S:s:k:B:w:v:l:h";
+static char short_options[] = "i:g:I:M:o:m:x:y:t:S:s:k:B:w:v:l:h:n:";
 static struct option long_options[] = {
     {"input", required_argument, 0, 'i'},
     {"input_gamma", required_argument, 0, 'g'},
@@ -22,6 +22,7 @@ static struct option long_options[] = {
     {"verbosity", required_argument, 0, 'v'},
     {"logfile", required_argument, 0, 'l'},
     {"help", no_argument, 0, 'h'},
+    {"ngals", required_argument, 0, 'n'},
 
     {0, 0, 0, 0}};
 
@@ -44,6 +45,8 @@ int main(int argc, char *argv[])
     int super = 1;
 
     double *model;
+
+    double ngal = 480.;     // galaxies per arcmin^2
 
     // Command line options
     int option_index = 0;
@@ -92,6 +95,9 @@ int main(int argc, char *argv[])
             break;
         case 'l':
             logfile = optarg;
+            break;
+        case 'n':
+            ngal = atof(optarg);
             break;
         case 'h':
         default:
@@ -154,10 +160,9 @@ int main(int argc, char *argv[])
             mmobservations dummy_obs(1 << degreex, 1 << degreey, 1);
             gamma = dummy_obs.single_frequency_predictions(kappa);
         }
-        const double ngal = 1000.;
-        const double sidelength = 500.;
-        bool aniso = true;
-        auto noise_tuple = add_gaussian_noise(gamma, ngal, sidelength, aniso);
+        const double sidelength = 10.; // arcmin
+        INFO("%4.0f galaxies per pixel", ngal * std::pow(sidelength, 2) / kappa.size());
+        auto noise_tuple = add_gaussian_noise(gamma, ngal, sidelength);
         gamma_noisy = std::get<0>(noise_tuple);
         covariance = std::get<1>(noise_tuple);
         for (int i = 0; i < gamma_noisy.size(); i++)
@@ -194,7 +199,7 @@ int main(int argc, char *argv[])
     }
 
     observations.set_observed_data(gamma_noisy);
-    observations.set_sigmas(covariance);
+    observations.set_data_errors(covariance);
 
     complexvector kappa_out(gamma_noisy.size());
 

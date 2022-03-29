@@ -62,7 +62,7 @@ double vector_stddev(const std::vector<T> &vec)
     return sqrt(var);
 }
 
-std::tuple<complexvector, std::vector<double>> add_gaussian_noise(const complexvector &input, const double &ngal, const double &sidelegnth, const bool aniso = true);
+std::tuple<complexvector, std::vector<double>> add_gaussian_noise(const complexvector &input, const double &ngal, const double &sidelegnth);
 
 namespace statistics {
 std::tuple<double, double> run_statistics(const std::vector<double>& truth, const std::vector<double>& estimate);

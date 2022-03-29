@@ -34,22 +34,28 @@ protected:
 
 TEST_F(MMObsTest, MMLikelihood)
 {
+    // some image
     complexvector f(imsize);
-    ;
     for (uint j = 0; j < imsize; j++)
         f[j] = std::complex<double>(random->normal(1.), 0);
 
+    // create observed data that is the predictions of the image + (2+1i)
     complexvector predictions = observations->single_frequency_predictions(f);
-    for (int i = 1; i < imsize; i++)
+    std::complex<double> diff = (2, 1);
+    for (int i = 0; i < imsize; i++)
+    {
+        predictions[i] += diff;
         ASSERT_NE(std::complex<double>(0, 0), predictions[i]);
+    }
     observations->set_observed_data(predictions);
 
-    std::vector<double> sig = {1.};
-    observations->set_sigmas(sig);
+    // Assume a variance of 2 everywhere
+    std::vector<double> variance = {2.};
+    observations->set_data_errors(variance, true);
 
     double log_normalization = 0.0;
-
-    ASSERT_EQ(0, observations->single_frequency_likelihood(f, log_normalization));
+    double expected = imsize * std::norm(diff) / (2 * variance[0]);
+    ASSERT_FLOAT_EQ(expected, observations->single_frequency_likelihood(f, log_normalization));
 }
 
 TEST_F(MMObsTest, KaiserSquiresInv)
