@@ -32,6 +32,36 @@ def pcorr(x, y):
     return n / d
 
 
+def upsample_image(im, factor):
+    """
+    Upsamples a square image by adding 0 Fourier coefficients.
+
+    im: Image with shape (2^N, 2^N) or (2^(N+1),) for some integer N
+    factor: factor by which to scale each dimension
+
+    out: Image with shape (factor * 2^N, factor * 2^N)
+    """
+    if len(im.shape) == 1:
+        n = im.shape[0]
+        if not (
+            (n & (n - 1) == 0) and n != 0
+        ):  # check for power of 2 using bit operations
+            raise ValueError("Shape is not a power of 2")
+        im = im.reshape((n // 2, n // 2))
+        return _upsample(im, factor)
+    elif len(im.shape) == 2:
+        if not im.shape[0] == im.shape[1]:
+            raise ValueError("Image must be square")
+        n = im.shape[0]
+        if not (
+            (n & (n - 1) == 0) and n != 0
+        ):  # check for power of 2 using bit operations
+            raise ValueError("Shape is not a power of 2")
+        return _upsample(im, factor)
+    else:
+        raise ValueError("Incorrect shape")
+
+
 class PlanarForwardModel:
     """
     Weak Gravitational Lensing planar Forward model
