@@ -62,6 +62,19 @@ def upsample_image(im, factor):
         raise ValueError("Incorrect shape")
 
 
+def _upsample(im, factor):
+    out_size = 2 ** factor * im.shape[0]
+    pad_size = (out_size - im.shape[0]) // 2
+    return ifft2(
+        ifftshift(
+            np.pad(
+                fftshift(fft2(im, norm="ortho")), pad_width=pad_size, mode="constant"
+            )
+        ),
+        norm="ortho",
+    ) * (2 ** factor)
+
+
 class PlanarForwardModel:
     """
     Weak Gravitational Lensing planar Forward model
