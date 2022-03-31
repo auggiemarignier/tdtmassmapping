@@ -48,7 +48,7 @@ diff_best = np.abs(truth - best_fitting)
 hpdrange_meandiff = hpdrange - hpdrange.mean()
 
 if truth.shape[0] < 256:
-    upsample_factor = np.log2(256 - truth.shape[0])  # assuming image shapes are powers of 2
+    upsample_factor = int(np.log2(256 - truth.shape[0]))  # assuming image shapes are powers of 2
     truth = upsample_image(truth, upsample_factor)
     mean = upsample_image(mean, upsample_factor)
     best_fitting = upsample_image(best_fitting, upsample_factor)
