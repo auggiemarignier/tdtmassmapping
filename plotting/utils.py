@@ -48,7 +48,7 @@ def upsample_image(im, factor):
         ):  # check for power of 2 using bit operations
             raise ValueError("Shape is not a power of 2")
         im = im.reshape((n // 2, n // 2))
-        return _upsample(im, factor)
+        return _upsample(im, factor).real
     elif len(im.shape) == 2:
         if not im.shape[0] == im.shape[1]:
             raise ValueError("Image must be square")
@@ -57,7 +57,7 @@ def upsample_image(im, factor):
             (n & (n - 1) == 0) and n != 0
         ):  # check for power of 2 using bit operations
             raise ValueError("Shape is not a power of 2")
-        return _upsample(im, factor)
+        return _upsample(im, factor).real
     else:
         raise ValueError("Incorrect shape")
 
