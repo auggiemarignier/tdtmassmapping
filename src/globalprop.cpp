@@ -259,6 +259,21 @@ GlobalProposal::likelihood(double &log_normalization)
                                                      log_normalization);
 }
 
+double GlobalProposal::prior(){
+    double p_k = 1. / (double)kmax; // prior on k
+
+    int k = wavetree2d_sub_get_ncoeff(wt);
+    mpz_t a;
+    mpz_init(a);
+    hnk_get_hnk(hnk, treemaxdepth, k, a);
+    int n = mpz_get_si(a);
+    double p_hnk = 1. / (double)n; // prior on tree arrangement
+
+    double log_p_x = wavetree2d_sub_logpriorprobability(wt, proposal); // prior on coefficient values
+
+    return log(p_k) + log(p_hnk) + log_p_x;
+}
+
 void GlobalProposal::accept()
 {
 }
