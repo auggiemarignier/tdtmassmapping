@@ -326,11 +326,14 @@ int main(int argc, char *argv[])
                 throw ERROR("failed to reset chain history\n");
         }
 
-        chain_history_change_t step;
+        chain_history_change_mm_t step;
         if (wavetree2d_sub_get_last_perturbation(global.wt, &step) < 0)
             throw ERROR("failed to get last step\n");
 
         step.header.likelihood = global.current_likelihood;
+        step.header.posterior = 7.;
+        DEBUG("posterior = %f", step.header.posterior);
+        DEBUG("perturbation %f", step.perturbation.death.old_value);
         step.header.temperature = global.temperature;
         step.header.hierarchical = 1.0;
         if (chain_history_add_step(global.ch, &step) < 0)
