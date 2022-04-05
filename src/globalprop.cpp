@@ -276,6 +276,11 @@ double GlobalProposal::prior(){
     return log(p_k) + log(p_hnk) + log_p_x;
 }
 
+double GlobalProposal::unnormed_posterior(const double &log_likelihood, const double &log_prior)
+{
+    return log_likelihood + log_prior;
+}
+
 void GlobalProposal::accept()
 {
 }
