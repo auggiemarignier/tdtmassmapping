@@ -764,7 +764,7 @@ int main(int argc, char *argv[])
 
         std::vector<double> model_v(data.best_model, data.best_model + data.size);
         auto best_stats = statistics::run_statistics(kappa, model_v);
-        INFO("Best model likelihood %10.6f", data.min_likelihood);
+        INFO("Best model Posterior %10.6f", data.min_likelihood);
         INFO("Best model SNR %10.6f dB", std::get<0>(best_stats));
         INFO("Best model Pearson correlation %10.6f", std::get<1>(best_stats));
     };
