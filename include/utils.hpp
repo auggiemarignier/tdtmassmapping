@@ -1,24 +1,10 @@
 #pragma once
 
 #include "wavetree.h"
-#include "chain_history.h"
 #include <string>
 #include <complex>
 #include <vector>
 #include <math.h>
-
-struct chain_history_change_mm_t : chain_history_change_t
-{
-    struct
-    {
-        chain_history_step_t type;
-        int accepted;
-        double likelihood;
-        double posterior;
-        double temperature;
-        double hierarchical;
-    } header;
-};
 
 typedef std::vector<std::complex<double>> complexvector;
 
@@ -78,10 +64,9 @@ double vector_stddev(const std::vector<T> &vec)
 
 std::tuple<complexvector, std::vector<double>> add_gaussian_noise(const complexvector &input, const double &ngal, const double &sidelegnth);
 
-namespace statistics
-{
-    std::tuple<double, double> run_statistics(const std::vector<double> &truth, const std::vector<double> &estimate);
-    double snr(const std::vector<double> &truth, const std::vector<double> &estimate);
-    double snr(const complexvector &truth, const complexvector &estimate);
-    double pearson_correlation(const std::vector<double> &truth, const std::vector<double> &estimate);
-}; // namespace statistics
+namespace statistics {
+std::tuple<double, double> run_statistics(const std::vector<double>& truth, const std::vector<double>& estimate);
+double snr(const std::vector<double>& truth, const std::vector<double>& estimate); 
+double snr(const complexvector& truth, const complexvector& estimate); 
+double pearson_correlation(const std::vector<double>& truth, const std::vector<double>& estimate);
+};  // namespace statistics
