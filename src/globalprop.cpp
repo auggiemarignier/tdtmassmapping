@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include "globalprop.hpp"
 #include "logging.hpp"
 
