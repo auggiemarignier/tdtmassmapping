@@ -262,7 +262,7 @@ GlobalProposal::likelihood(double &log_normalization)
 double GlobalProposal::prior(){
     double p_k = 1. / (double)kmax; // prior on k
 
-    int k = wavetree2d_sub_get_ncoeff(wt);
+    int k = wavetree2d_sub_coeff_count(wt);
     mpz_t a;
     mpz_init(a);
     hnk_get_hnk(hnk, treemaxdepth, k, a);
