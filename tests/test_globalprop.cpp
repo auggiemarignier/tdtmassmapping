@@ -42,3 +42,13 @@ TEST_F(GlobalPropTest, GlobalLikelihood)
     double likelihood = global->likelihood(global->current_log_normalization);
     ASSERT_FLOAT_EQ(likelihood, 13.8323);
 }
+
+TEST_F(GlobalPropTest, GlobalPrior)
+{
+    // wavetree model at initialisation is 0 everywhere with k=1
+    // only 1 possible tree arrangement arrangement when k=1
+    // initial tree values given 0 prior probability
+    double p = global->prior();
+    double expected = log(1. / global->kmax) + log(1.) + 0;
+    ASSERT_EQ(p, expected);
+}
