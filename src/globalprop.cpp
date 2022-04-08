@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include "globalprop.hpp"
 #include "logging.hpp"
 
@@ -59,6 +61,8 @@ GlobalProposal::GlobalProposal(Observations *_observations,
       ncoeff(-1),
       zoffset(nullptr),
       current_likelihood(-1.0),
+      current_prior(-1.0),
+      current_unnormed_posterior(-1.0),
       coeff_hist(nullptr),
       random(seed),
       xywaveletf(nullptr),
@@ -257,6 +261,28 @@ GlobalProposal::likelihood(double &log_normalization)
     complexvector model_v(model, model + size);
     return observations->single_frequency_likelihood(model_v,
                                                      log_normalization);
+}
+
+double GlobalProposal::prior()
+{
+    double p_k = 1. / kmax; // prior on k
+
+    int k = wavetree2d_sub_coeff_count(wt);
+    mpz_t a;
+    mpz_init(a);
+    hnk_get_hnk(hnk, treemaxdepth, k, a);
+    uint n = mpz_get_ui(a);
+    mpz_clear(a);
+    double p_hnk = 1. / n; // prior on tree arrangement
+
+    double log_p_x = wavetree2d_sub_logpriorprobability(wt, proposal); // prior on coefficient values
+
+    return log(p_k) + log(p_hnk) + log_p_x;
+}
+
+double GlobalProposal::unnormed_posterior(const double &log_likelihood, const double &log_prior)
+{
+    return log_likelihood + log_prior;
 }
 
 void GlobalProposal::accept()

@@ -5,7 +5,7 @@ from matplotlib.colors import Normalize
 from matplotlib.lines import Line2D
 import sys
 import os
-from utils import meanvar_from_submeanvar
+from utils import meanvar_from_submeanvar, upsample_image
 
 
 directory = sys.argv[1]
@@ -43,12 +43,21 @@ while os.path.isdir(f"{directory}/restart/"):
         best_fitting = np.loadtxt(f"{directory}/best_model.txt")
         khistory = np.concatenate([khistory, np.loadtxt(f"{directory}/khistory.txt")])
 
-best_fitting[best_fitting < 0] = 0
-mean[mean < 0] = 0
-
 diff = np.abs(truth - mean)
 diff_best = np.abs(truth - best_fitting)
 hpdrange_meandiff = hpdrange - hpdrange.mean()
+
+if truth.shape[0] < 256:
+    upsample_factor = int(np.log2(256 - truth.shape[0]))  # assuming image shapes are powers of 2
+    truth = upsample_image(truth, upsample_factor)
+    mean = upsample_image(mean, upsample_factor)
+    best_fitting = upsample_image(best_fitting, upsample_factor)
+    diff = upsample_image(diff, upsample_factor)
+    diff_best = upsample_image(diff_best, upsample_factor)
+    hpdrange_meandiff = upsample_image(hpdrange_meandiff, upsample_factor)
+
+best_fitting[best_fitting < 0] = 0
+mean[mean < 0] = 0
 
 vmin = truth.min()
 vmax = truth.max()

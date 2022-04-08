@@ -143,8 +143,8 @@ int Proposal::step()
                     ERROR("failed to update histogram for %s acceptance\n", enum_to_string(name).c_str());
                     return -1;
                 }
-                
-                if (coefficient_histogram_sample(global.coeff_hist, prop_idx, prop_value)<0)
+
+                if (coefficient_histogram_sample(global.coeff_hist, prop_idx, prop_value) < 0)
                 {
                     ERROR("failed to update histogram");
                     return -1;
@@ -158,6 +158,8 @@ int Proposal::step()
 
                 global.current_likelihood = proposed_likelihood;
                 global.current_log_normalization = proposed_log_normalization;
+                global.current_prior = global.prior();
+                global.current_unnormed_posterior = global.unnormed_posterior(global.current_likelihood, global.current_prior);
                 global.accept();
 
                 return 1;
@@ -170,7 +172,7 @@ int Proposal::step()
                     return -1;
                 }
 
-                if (coefficient_histogram_sample(global.coeff_hist, prop_idx, prop_value)<0)
+                if (coefficient_histogram_sample(global.coeff_hist, prop_idx, prop_value) < 0)
                 {
                     ERROR("failed to update histogram");
                     return -1;

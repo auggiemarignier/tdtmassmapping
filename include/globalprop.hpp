@@ -52,6 +52,8 @@ public:
                             double &log_normalization);
     double likelihood(double &log_normalization);
     double likelihood_mpi(double &log_normalization) { return 1.0; } //TODO: implement this
+    double prior();
+    double unnormed_posterior(const double &log_likelihood, const double &log_prior);
     void accept();
     void reject();
     void set_max_depth(int md);
@@ -90,6 +92,8 @@ public:
 
     double current_likelihood;
     double current_log_normalization;
+    double current_prior;
+    double current_unnormed_posterior;
 
     coefficient_histogram_t *coeff_hist;
 

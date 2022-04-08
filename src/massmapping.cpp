@@ -275,7 +275,9 @@ int main(int argc, char *argv[])
     ValueProposal value(global);
 
     global.current_likelihood = global.likelihood(global.current_log_normalization);
-    INFO("Initial Likelihood: %f\n", global.current_likelihood);
+    global.current_prior = global.prior();
+    global.current_unnormed_posterior = global.unnormed_posterior(global.current_likelihood, global.current_prior);
+    INFO("Initial Unnormed Posterior: %f\n", global.current_unnormed_posterior);
 
     int *khistogram = new int[kmax];
     for (int i = 0; i < kmax; i++)
@@ -284,7 +286,7 @@ int main(int argc, char *argv[])
     FILE *fp_ch = NULL;
     if (chain_history_initialise(global.ch,
                                  wavetree2d_sub_get_S_v(global.wt),
-                                 global.current_likelihood,
+                                 global.current_unnormed_posterior,
                                  global.temperature,
                                  1.0) < 0)
         throw ERROR("failed to initialise chain history\n");
@@ -330,7 +332,7 @@ int main(int argc, char *argv[])
         if (wavetree2d_sub_get_last_perturbation(global.wt, &step) < 0)
             throw ERROR("failed to get last step\n");
 
-        step.header.likelihood = global.current_likelihood;
+        step.header.likelihood = global.current_unnormed_posterior;
         step.header.temperature = global.temperature;
         step.header.hierarchical = 1.0;
         if (chain_history_add_step(global.ch, &step) < 0)
@@ -339,9 +341,11 @@ int main(int argc, char *argv[])
         int current_k = wavetree2d_sub_coeff_count(global.wt);
         if (verbosity > 0 && (i + 1) % verbosity == 0)
         {
-            INFO("Iteration %6d: Current Likelihood: %f Current k: %d\n",
+            INFO("Iteration %6d: Current Posterior: %.2f Current Likelihood: %.2f Current Prior: %.2f Current k: %d\n",
                  i + 1,
+                 global.current_unnormed_posterior,
                  global.current_likelihood,
+                 global.current_prior,
                  current_k);
             INFO(birth.write_long_stats().c_str());
             INFO(death.write_long_stats().c_str());
