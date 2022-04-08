@@ -341,9 +341,11 @@ int main(int argc, char *argv[])
         int current_k = wavetree2d_sub_coeff_count(global.wt);
         if (verbosity > 0 && (i + 1) % verbosity == 0)
         {
-            INFO("Iteration %6d: Current Posterior: %f Current k: %d\n",
+            INFO("Iteration %6d: Current Posterior: %.2f Current Likelihood: %.2f Current Prior: %.2f Current k: %d\n",
                  i + 1,
                  global.current_unnormed_posterior,
+                 global.current_likelihood,
+                 global.current_prior,
                  current_k);
             INFO(birth.write_long_stats().c_str());
             INFO(death.write_long_stats().c_str());
